@@ -87,8 +87,9 @@ Whenever changes or new features are introduced to the repository, this file and
 | **2026-10-15** | Sprint 2 | Placement calendar, upcoming recruitment drives, dynamic eligibility check engine (CGPA/backlogs/branch), contribution submission & moderation workflow. | ✅ Completed |
 | **2026-10-15** | Sprint 3 | Senior alumni mentorship directory, verified interview experiences, round-by-round breakdown, search & filterable interview question bank. | ✅ Completed |
 | **2026-10-15** | Docs | Comprehensive README overhaul (`README.md`) featuring ASCII system architecture, ER diagrams, security matrix, and route tables. | ✅ Completed |
-| **2026-10-15** | Sprint 4 | Phase 4 AI Preparation Suite: Grounded AI Assistant page (`/ai-assistant`), question classifier, experience summarizer, privacy scrubbing, unit test suite (`AiServiceTest`). | 🔍 In User Review |
+| **2026-10-16** | Sprint 4 | Phase 4 AI Preparation Suite: Grounded AI Assistant page (`/ai-assistant`), question classifier, experience summarizer, conversational greeting/typo handler, unit tests (`AiServiceTest`). | ✅ Completed & Deployed |
 | **2026-10-16** | Docs | Master Documentation Hub (`DOCUMENTATION.md`) and dedicated `docs/` subsystem tracking ongoing updates. | ✅ Completed |
+| **2026-10-16** | Cloud & UI | Multi-stage Docker containerization for Render, zero-overflow responsive navbar, and SaaS compact 100% zoom dashboard layout. | ✅ Completed & Deployed |
 
 ---
 
@@ -186,6 +187,24 @@ During development and continuous verification, the following technical issues w
 - **Symptom**: Typing casual appreciation like *"ok thank you so muhc"* or acknowledgments like *"got it"* triggered the strict recruitment fallback *"I don't have verified data on that in our campus recruitment records."*
 - **Root Cause**: The gratitude check previously used a rigid anchored regular expression (`^(thanks|thank you)$`) which failed when prefixed with *"ok"* or when containing common user typos (e.g., *"muhc"*, *"thnx"*).
 - **Resolution**: Implemented flexible token matching in `DefaultAiService.java` (`isGratitude()`, `isAcknowledgment()`, `isFarewell()`, `isGreeting()`) that accommodates conversational prefixes, typos, and acknowledgments while preserving strict database grounding whenever recruiter or company terms are referenced. Added 4 dedicated unit tests in `AiServiceTest.java` (now 12 passing tests).
+
+### 7. Render Cloud Native Java Runtime Missing (`bash: java: command not found`)
+- **Symptom**: Initial deployment on Render failed with status 127: `bash: line 1: java: command not found`.
+- **Root Cause**: Render does not offer native runtime environments for JVM languages (it only natively supports Node.js, Python, Ruby, Go, Rust). Running `java -jar ...` in a native Linux container fails because no JDK/JRE is installed.
+- **Resolution**: Created a production-grade multi-stage `Dockerfile` based on official `maven:3.9.8-eclipse-temurin-21` and `eclipse-temurin:21-jre-jammy` with a non-root application user, Render 512MB RAM memory limits (`-Xmx384m`), and dynamic `$PORT` binding. Switched Render web service runtime to `Docker`.
+
+### 8. 100% Desktop Zoom Layout Disconnect & User Profile Navbar Clipping
+- **Symptom**: On standard 1080p and laptop screens at 100% zoom, the navbar horizontally overflowed, pushing the user profile dropdown off-screen and leaving the red notification badge touching the browser edge. The page cards were centered in a narrow container while the navbar stretched 100%, causing a visual disconnect.
+- **Root Cause**: 
+  1. The navbar had 8 individual top-level links plus 4 action buttons, exceeding ~1350px width.
+  2. The navbar used `container-fluid px-lg-4` (edge-to-edge) while dashboard cards used `container` (max 1320px).
+  3. Action buttons had no `flex-shrink-0`, allowing the user avatar to be clipped on window boundaries.
+- **Resolution**:
+  1. Unified both navbar and page layouts to use `container-xxl px-3 px-md-4` for perfect left-and-right symmetrical alignment.
+  2. Consolidated `Stats` under the *Community* dropdown (`Placement Stats`), reducing top-level link crowding.
+  3. Reduced `.nav-link` padding (`0.35rem 0.55rem`) and font size (`0.86rem`).
+  4. Added `flex-shrink: 0; ms-auto` to the right action bar and made username text responsive (`d-none d-xxl-inline`), guaranteeing the user avatar circle and notification bell never clip.
+  5. Compacted `.stat-widget` padding, icon dimensions (`2.5rem`), and grid gaps (`g-3`), keeping *Upcoming Campus Drives* and *Practice Tracker* immediately visible above the fold.
 
 ---
 

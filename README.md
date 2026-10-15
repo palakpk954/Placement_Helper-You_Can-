@@ -399,6 +399,23 @@ Once initialized, open your browser and navigate to:
 
 *(Flyway automatically applies database migrations and populates initial companies like Google, Microsoft, Amazon, TCS, Deloitte, and historical questions on first boot.)*
 
+### 4. Docker & Cloud Deployment (Render / Production)
+The repository includes a multi-stage `Dockerfile` and `.dockerignore` optimized for Java 21 cloud runtimes:
+
+```bash
+# Build the Docker image locally
+docker build -t youcan-placement-portal .
+
+# Run the container (binds to port 8080)
+docker run -p 8080:8080 -e PORT=8080 youcan-placement-portal
+```
+
+**Deploying on Render (Free Tier):**
+1. Connect your GitHub repository to [Render](https://dashboard.render.com) as a **Web Service**.
+2. Select **Runtime: Docker** (Render auto-detects `Dockerfile`).
+3. Leave *Build Command* and *Start Command* empty.
+4. Render builds the multi-stage image, configures memory limits (`-Xmx384m`), binds to `$PORT`, and serves the live application with free SSL.
+
 ---
 
 ## 🔑 Default Seed Credentials
@@ -440,6 +457,10 @@ The database initializes with the following demonstration accounts:
 | `/alumni` | `GET` | Authenticated | Placed alumni mentors directory |
 | `/mocks` | `GET`, `POST` | Authenticated | Mentor slot creation and student bookings |
 | `/contribute` | `GET`, `POST` | Authenticated | Submit interview experience (anonymous option) |
+| `/ai-assistant` | `GET` | Authenticated | Full interactive AI Placement Assistant interface |
+| `/api/ai/chat` | `POST` | Authenticated | Grounded institutional recruitment Q&A chatbot API |
+| `/api/ai/classify` | `POST` | Authenticated | Automated question domain and difficulty classifier |
+| `/api/ai/company-summary/{id}` | `GET` | Authenticated | AI synthesis and preparation summary for a company |
 | `/admin` | `GET` | `ROLE_ADMIN` | Placement Cell administration overview |
 | `/admin/approvals` | `GET`, `POST` | `ROLE_ADMIN` | Experience submission moderation queue |
 | `/admin/audit-log` | `GET` | `ROLE_ADMIN` | Searchable administrative action audit trail |

@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Created `AiServiceTest.java` with 12 unit tests covering greetings, gratitude with typos, acknowledgments, farewells, company packages, upcoming drives, classification, and strict fallback.
 - **Master Project Documentation**:
   - Created root [`DOCUMENTATION.md`](../DOCUMENTATION.md) and [`docs/`](./) repository tracking architecture, sprints, bug fixes, and runbooks.
+- **Docker Containerization for Cloud (Render)**:
+  - Added multi-stage `Dockerfile` (Maven builder + Eclipse Temurin 21 JRE runtime) with non-root user, container memory limits (`-Xmx384m`), and dynamic `$PORT` binding.
+  - Added `.dockerignore` for minimal, lightning-fast container context transfers.
 
 ### Fixed
 - Fixed port 8080 process conflict caused by leftover background Java processes from earlier IDE sessions.
@@ -35,6 +38,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Aligned accessor methods in `DefaultAiService` to match JPA entities (`Round.getRoundNumber()`, `AlumniProfile.getJobRole()`).
 - Addressed chatbot strict fallback triggering on greetings by adding dedicated greeting and capability guidance filters.
 - Fixed conversational appreciation and acknowledgments (e.g. *"ok thank you so muhc"* or *"got it"*) incorrectly falling back to the strict "no verified data" message by implementing resilient token matching (`isGratitude()`, `isAcknowledgment()`, `isFarewell()`).
+- Resolved Render Linux native deployment failure (`bash: java: command not found`) by switching to standard Docker runtime containerization.
+- Fixed 100% desktop zoom navbar overflow, profile avatar clipping, and container alignment by unifying layout to `container-xxl`, adding `flex-shrink: 0` to actions, and compacting stat widgets.
 
 ---
 
