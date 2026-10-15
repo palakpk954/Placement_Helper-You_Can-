@@ -76,6 +76,8 @@
                             <li><a class="dropdown-item py-2" th:href="@{/checklists}"><i class="bi bi-card-checklist me-2 text-danger"></i> Prep Checklists</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item py-2" th:href="@{/resume}"><i class="bi bi-file-earmark-person me-2 text-primary"></i> Resume Scanner</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-primary fw-semibold" th:href="@{/ai-assistant}"><i class="bi bi-robot me-2 text-primary"></i> AI Placement Assistant <span class="badge bg-primary-subtle text-primary ms-1" style="font-size: 0.65rem;">PHASE 4</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -95,6 +97,12 @@
 
                 <!-- Right Actions: Theme Toggle, Notifications, User Menu -->
                 <div class="d-flex align-items-center gap-2 mt-3 mt-xl-0">
+                    <!-- AI Assistant Quick Launch -->
+                    <a class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-flex align-items-center gap-1 shadow-xs" th:href="@{/ai-assistant}" title="AI Placement Assistant">
+                        <i class="bi bi-robot"></i>
+                        <span class="d-none d-sm-inline">AI Assistant</span>
+                    </a>
+
                     <!-- Dark / Light Mode Button -->
                     <button class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2" id="themeToggleBtn" type="button" title="Toggle Dark/Light Mode">
                         <i class="bi bi-moon-stars-fill text-dark" id="themeToggleIcon"></i>

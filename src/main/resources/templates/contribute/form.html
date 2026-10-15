@@ -103,12 +103,20 @@
                     </div>
 
                     <div class="row g-2">
-                        <div class="col-md-8">
-                            <input type="text" class="form-control form-control-sm" name="questionTexts" placeholder="Specific interview question asked...">
+                        <div class="col-md-7">
+                            <input type="text" class="form-control form-control-sm" id="questionTextInput" name="questionTexts" placeholder="Specific interview question asked...">
                         </div>
-                        <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm" name="questionTopics" placeholder="Topic (e.g. DSA, Graphs, DBMS)">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="questionTopicInput" name="questionTopics" placeholder="Topic (e.g. DSA, Graphs, DBMS)">
                         </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-1" id="btnAutoClassify" title="Auto-detect topic & difficulty">
+                                <i class="bi bi-magic"></i> <span>AI Classify</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aiClassificationBadge" class="mt-2 small d-none">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" id="aiClassificationText"></span>
                     </div>
                 </div>
 
@@ -129,6 +137,57 @@
         </div>
 
     </div>
+
+    <!-- Client Script for AI Question Classification -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnClassify = document.getElementById('btnAutoClassify');
+        if (btnClassify) {
+            btnClassify.addEventListener('click', async () => {
+                const qInput = document.getElementById('questionTextInput');
+                const tInput = document.getElementById('questionTopicInput');
+                const badge = document.getElementById('aiClassificationBadge');
+                const badgeText = document.getElementById('aiClassificationText');
+
+                const text = qInput ? qInput.value.trim() : '';
+                if (!text) {
+                    alert('Please enter an interview question text first to classify.');
+                    if (qInput) qInput.focus();
+                    return;
+                }
+
+                const origHtml = btnClassify.innerHTML;
+                btnClassify.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                btnClassify.disabled = true;
+
+                try {
+                    const response = await fetch('/api/ai/classify', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({question: text})
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && data.topic) {
+                            if (tInput) {
+                                tInput.value = data.topic + (data.tags ? ' (' + data.tags + ')' : '');
+                            }
+                            if (badge && badgeText) {
+                                badgeText.innerHTML = '<i class="bi bi-robot me-1"></i> AI Classification: <strong>' + data.topic + '</strong> | Difficulty: <strong>' + data.difficulty + '</strong>';
+                                badge.classList.remove('d-none');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Classification error:', err);
+                } finally {
+                    btnClassify.innerHTML = origHtml;
+                    btnClassify.disabled = false;
+                }
+            });
+        }
+    });
+    </script>
 </div>
 </body>
 </html>

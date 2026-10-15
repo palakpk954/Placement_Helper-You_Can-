@@ -6,6 +6,7 @@ import in.jecrcu.placement.entity.enums.ItemType;
 import in.jecrcu.placement.repository.AlumniProfileRepository;
 import in.jecrcu.placement.repository.CommentRepository;
 import in.jecrcu.placement.service.*;
+import in.jecrcu.placement.service.ai.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,8 @@ public class CompanyController {
     private final UserService userService;
     private final ReportService reportService;
     private final RateLimitService rateLimitService;
+    private final AiService aiService;
+
 
     @GetMapping
     public String directory(
@@ -123,8 +126,15 @@ public class CompanyController {
             model.addAttribute("isBookmarked", isBookmarked);
         }
 
+        // AI-1: What to Expect Experience Summary (Phase 4)
+        if (aiService != null && aiService.isEnabled()) {
+            String aiSummary = aiService.summarizeCompanyExperience(company.getName(), experiences);
+            model.addAttribute("aiSummary", aiSummary);
+        }
+
         return "companies/detail";
     }
+
 
     @PostMapping("/{id}/vote")
     public String voteDifficulty(

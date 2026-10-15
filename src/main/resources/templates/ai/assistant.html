@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>AI Placement Assistant — You_can JECRC</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container py-2">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 3.25rem; height: 3.25rem; font-size: 1.5rem;">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="fw-bold mb-0">AI Placement Assistant</h4>
+                        <span class="badge bg-primary text-white rounded-pill px-2 py-1 small">Phase 4</span>
+                        <span class="badge badge-soft-success rounded-pill" th:if="${aiAvailable}">
+                            <i class="bi bi-stars me-1"></i> Gemini Live
+                        </span>
+                        <span class="badge badge-soft-primary rounded-pill" th:if="${!aiAvailable}">
+                            <i class="bi bi-database-check me-1"></i> Grounded Portal DB
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-0">Institutional recruitment intelligence answering strictly from verified campus placement records.</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div class="d-flex gap-2">
+                <a th:href="@{/companies}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="bi bi-building me-1"></i> Companies
+                </a>
+                <a th:href="@{/practice}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-lightning-charge me-1"></i> Practice Mode
+                </a>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="app-card shadow-sm border overflow-hidden d-flex flex-column" style="height: 680px; max-height: 80vh;">
+            
+            <!-- Chat Card Header -->
+            <div class="p-3 border-bottom bg-surface-elevated d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="spinner-grow spinner-grow-sm text-success" role="status" style="width: 0.65rem; height: 0.65rem;"></span>
+                    <span class="small fw-semibold text-secondary">Verified Institutional Knowledge Engine</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-link text-muted text-decoration-none p-0 small" id="btnClearChat" title="Reset Conversation">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suggested Prompt Chips (Scrollable Bar) -->
+            <div class="p-2 px-3 border-bottom bg-body-tertiary d-flex gap-2 overflow-x-auto text-nowrap" id="promptChipsContainer">
+                <span class="small text-muted align-self-center me-1 d-none d-md-inline"><i class="bi bi-lightbulb me-1"></i> Suggested:</span>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 prompt-chip" data-prompt="What packages and roles does Microsoft offer?">
+                    💼 Microsoft Packages &amp; Roles
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 prompt-chip" data-prompt="What is the interview round breakdown for Google?">
+                    🔄 Google Round Breakdown
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 prompt-chip" data-prompt="What upcoming recruitment drives are scheduled right now?">
+                    📢 Scheduled Upcoming Drives
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 prompt-chip" data-prompt="Which companies allow active backlogs?">
+                    🎯 Backlog &amp; CGPA Policies
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 prompt-chip" data-prompt="What are the most tested DSA topics in campus placements?">
+                    📚 Most Asked DSA Topics
+                </button>
+            </div>
+
+            <!-- Messages Transcript Area -->
+            <div class="p-3 p-md-4 flex-grow-1 overflow-y-auto d-flex flex-column gap-3" id="chatMessages" style="background-color: var(--bg-page);">
+                
+                <!-- Initial Welcome Message from Assistant -->
+                <div class="d-flex gap-3 align-items-start" style="max-width: 85%;">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 2.25rem; height: 2.25rem;">
+                        <i class="bi bi-robot fs-6"></i>
+                    </div>
+                    <div class="p-3 rounded-4 shadow-sm bg-surface border">
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                            <span class="fw-bold small text-primary">You_can Assistant</span>
+                            <span class="text-muted" style="font-size: 0.65rem;">Just now</span>
+                        </div>
+                        <div class="small text-secondary" style="line-height: 1.6;">
+                            Hello! I am your <strong>Campus Placement Assistant</strong>. I can answer your questions about visiting recruiters, round structures, past interview questions, upcoming drives, cutoffs, and senior mentors.<br/><br/>
+                            🔒 <strong>Strict Grounding Guarantee:</strong> I answer <em>strictly from verified JECRC University placement records</em> and will never hallucinate or invent policies. If a detail is not in our verified archives, I will let you know directly.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div class="px-4 py-2 d-none" id="typingIndicator">
+                <div class="d-flex align-items-center gap-2 text-muted small">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <span>Consulting campus placement records...</span>
+                </div>
+            </div>
+
+            <!-- Chat Input Form -->
+            <div class="p-3 border-top bg-surface-elevated">
+                <form id="chatForm" class="d-flex gap-2 align-items-center">
+                    <div class="input-group">
+                        <input type="text" class="form-control rounded-start-pill ps-3 py-2" id="userQueryInput"
+                               placeholder="Ask about companies, packages, rounds, eligibility, or topics (e.g. 'What are Amazon's rounds?')..."
+                               autocomplete="off" required>
+                        <button type="submit" class="btn btn-primary rounded-end-pill px-4" id="btnSend">
+                            <i class="bi bi-send-fill me-1"></i> Send
+                        </button>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+                    <span class="text-muted" style="font-size: 0.7rem;">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i> Privacy Protected: Resumes and personal student data are never shared.
+                    </span>
+                    <span class="text-muted d-none d-md-inline" style="font-size: 0.7rem;">Press <strong>Enter</strong> to send</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Client Script for Chat Interaction -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatForm = document.getElementById('chatForm');
+        const queryInput = document.getElementById('userQueryInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const btnSend = document.getElementById('btnSend');
+        const btnClear = document.getElementById('btnClearChat');
+
+        // Scroll to bottom helper
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Format markdown to HTML (bold, lists, code, headers)
+        function formatMarkdown(text) {
+            if (!text) return '';
+            let escaped = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Headers
+            escaped = escaped.replace(/^### (.*$)/gim, '<h6 class="fw-bold mt-2 mb-1 text-primary">$1</h6>');
+            escaped = escaped.replace(/^## (.*$)/gim, '<h6 class="fw-bold mt-2 mb-1 text-primary">$1</h6>');
+
+            // Bold
+            escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Italic
+            escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // Inline code
+            escaped = escaped.replace(/`([^`]+)`/g, '<code class="bg-body-secondary px-1 py-0.5 rounded text-primary" style="font-size: 0.85em;">$1</code>');
+            // Newlines to break
+            escaped = escaped.replace(/\n/g, '<br/>');
+
+            return escaped;
+        }
+
+        // Append User Message
+        function appendUserMessage(text) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const msgHtml = `
+                <div class="d-flex gap-3 align-items-start justify-content-end align-self-end" style="max-width: 80%;">
+                    <div class="p-3 rounded-4 shadow-sm text-white" style="background: linear-gradient(135deg, var(--primary-blue), #1d4ed8);">
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                            <span class="fw-bold small opacity-75">You</span>
+                            <span class="opacity-75" style="font-size: 0.65rem;">${timeStr}</span>
+                        </div>
+                        <div class="small" style="line-height: 1.5;">${formatMarkdown(text)}</div>
+                    </div>
+                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 2.25rem; height: 2.25rem;">
+                        <i class="bi bi-person-fill fs-6"></i>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', msgHtml);
+            scrollToBottom();
+        }
+
+        // Append Assistant Message
+        function appendAssistantMessage(replyText, poweredBy) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const badgeHtml = poweredBy ? `<span class="badge badge-soft-secondary" style="font-size: 0.6rem;">${poweredBy}</span>` : '';
+            const msgHtml = `
+                <div class="d-flex gap-3 align-items-start" style="max-width: 85%;">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 2.25rem; height: 2.25rem;">
+                        <i class="bi bi-robot fs-6"></i>
+                    </div>
+                    <div class="p-3 rounded-4 shadow-sm bg-surface border">
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                            <span class="fw-bold small text-primary">You_can Assistant</span>
+                            <div class="d-flex align-items-center gap-1">
+                                ${badgeHtml}
+                                <span class="text-muted" style="font-size: 0.65rem;">${timeStr}</span>
+                            </div>
+                        </div>
+                        <div class="small text-secondary" style="line-height: 1.6;">${formatMarkdown(replyText)}</div>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', msgHtml);
+            scrollToBottom();
+        }
+
+        // Send Query Function
+        async function sendQuery(queryText) {
+            if (!queryText || !queryText.trim()) return;
+
+            appendUserMessage(queryText.trim());
+            queryInput.value = '';
+            queryInput.disabled = true;
+            btnSend.disabled = true;
+            typingIndicator.classList.remove('d-none');
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: queryText })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    appendAssistantMessage(data.reply || 'No response generated.', data.poweredBy);
+                } else {
+                    appendAssistantMessage('Unable to retrieve placement records right now. Please verify your connection or try again.');
+                }
+            } catch (err) {
+                console.error('Chat error:', err);
+                appendAssistantMessage('An error occurred while connecting to the placement intelligence service.');
+            } finally {
+                typingIndicator.classList.add('d-none');
+                queryInput.disabled = false;
+                btnSend.disabled = false;
+                queryInput.focus();
+                scrollToBottom();
+            }
+        }
+
+        // Form Submit
+        if (chatForm) {
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                sendQuery(queryInput.value);
+            });
+        }
+
+        // Prompt Chips Click Handlers
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const prompt = chip.getAttribute('data-prompt');
+                if (prompt) {
+                    sendQuery(prompt);
+                }
+            });
+        });
+
+        // Clear Chat
+        if (btnClear) {
+            btnClear.addEventListener('click', () => {
+                chatMessages.innerHTML = `
+                    <div class="d-flex gap-3 align-items-start" style="max-width: 85%;">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 2.25rem; height: 2.25rem;">
+                            <i class="bi bi-robot fs-6"></i>
+                        </div>
+                        <div class="p-3 rounded-4 shadow-sm bg-surface border">
+                            <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                                <span class="fw-bold small text-primary">You_can Assistant</span>
+                                <span class="text-muted" style="font-size: 0.65rem;">Just now</span>
+                            </div>
+                            <div class="small text-secondary" style="line-height: 1.6;">
+                                Chat conversation reset. How can I assist your campus placement preparation today?
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    });
+    </script>
+</div>
+</body>
+</html>

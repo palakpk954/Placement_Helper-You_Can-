@@ -1,0 +1,441 @@
+# 📘 You_can — Master Project Documentation & Living Update Log
+> **JECRC University Placement Portal**  
+> *A unified campus recruitment intelligence platform connecting students, placed alumni, and placement cell administrators.*
+
+---
+
+## 📌 Document Overview & Purpose
+This document serves as the **single source of truth** and **living development log** for the `Placement_Helper` (branded as **You_can**) application. It is maintained continuously to record:
+- The architectural design, modules, and domain boundaries.
+- Every development phase, feature sprint, and implementation milestone.
+- All technical bug fixes, troubleshooting decisions, and configuration changes.
+- Operational guides for testing, running, and extending the platform.
+
+Whenever changes or new features are introduced to the repository, this file and the companion documents in the [`docs/`](./docs/) directory are updated to reflect the exact state of the codebase.
+
+---
+
+## 📑 Table of Contents
+1. [System Identity & Core Principles](#-system-identity--core-principles)
+2. [Technology Stack](#-technology-stack)
+3. [Living Development Log & Sprint History](#-living-development-log--sprint-history)
+   - [Sprint 0: Repository Setup & Git Synchronization](#sprint-0-repository-setup--git-synchronization)
+   - [Sprint 1: Core Portal Architecture & RBAC (Phase 1)](#sprint-1-core-portal-architecture--rbac-phase-1)
+   - [Sprint 2: Placement Calendar & Dynamic Eligibility Engine (Phase 2)](#sprint-2-placement-calendar--dynamic-eligibility-engine-phase-2)
+   - [Sprint 3: Senior Mentorship & Verified Question Bank (Phase 3)](#sprint-3-senior-mentorship--verified-question-bank-phase-3)
+   - [Sprint 4: AI Preparation Suite & Guardrails (Phase 4)](#sprint-4-ai-preparation-suite--guardrails-phase-4)
+4. [Troubleshooting & Bug Fix Journal](#-troubleshooting--bug-fix-journal)
+5. [System Architecture & Module Directory](#-system-architecture--module-directory)
+6. [API & Endpoint Reference](#-api--endpoint-reference)
+7. [Database Schema & Data Model](#-database-schema--data-model)
+8. [Security & Privacy Governance](#-security--privacy-governance)
+9. [Developer Runbook & Testing Guide](#-developer-runbook--testing-guide)
+10. [Future Roadmap](#-future-roadmap)
+11. [How to Maintain & Update This Documentation](#-how-to-maintain--update-this-documentation)
+
+---
+
+## 🎯 System Identity & Core Principles
+
+| Attribute | Specification |
+| :--- | :--- |
+| **Project Name** | **You_can — JECRC University Placement Portal** |
+| **Repository** | [`palakpk954/Placement_Helper-You_Can-`](https://github.com/palakpk954/Placement_Helper-You_Can-) |
+| **Target Audience** | Students (pre-final & final year), Placed Alumni Mentors, Placement Cell Admins |
+| **Primary Mission** | Democratize campus placement intelligence through verified past interview experiences, dynamic eligibility computation, upcoming drive tracking, and strictly grounded AI assistance. |
+
+### Core Tenets
+1. **100% Grounded Intelligence (Anti-Hallucination)**: The AI assistant and summarization modules only answer from verified campus records (hiring drives, rounds, questions, packages, mentor profiles). No fabricated cutoffs or invented rounds.
+2. **Strict Privacy by Design (PRD AI-4)**: Student resumes, contact numbers, private emails, and raw identifiers are never shared with AI pipelines or unprivileged users.
+3. **Role-Based Operational Safety**: Distinct role boundaries (`ADMIN`, `STUDENT`, `ALUMNI`) with granular Spring Security enforcement.
+4. **Institutional Memory**: Placement questions, round structures, and package details are permanently archived as actionable intelligence for upcoming student batches.
+
+---
+
+## 🛠 Technology Stack
+
+### Backend
+- **Framework**: Spring Boot 3.3.4 (Java 17 LTS)
+- **Security**: Spring Security 6.3 with BCrypt password hashing and custom RBAC handlers
+- **Data Persistence**: Spring Data JPA with Hibernate ORM
+- **Database**: Embedded H2 Database (File-backed: `./data/youcan.mv.db`) with active console support
+- **Testing**: JUnit 5, Mockito, Spring Boot Test, Surefire plugin
+
+### Frontend
+- **Template Engine**: Thymeleaf with Spring Security 6 dialect
+- **UI Framework**: Bootstrap 5.3.3 & Bootstrap Icons 1.11.3
+- **Styling**: Tailored Vanilla CSS design system (`src/main/resources/static/css/styles.css`) with glassmorphism, responsive typography (`Inter` & `Outfit`), custom CSS custom properties, and dark/light mode tokens.
+- **Client Scripts**: Modular Vanilla JavaScript (`src/main/resources/static/js/app.js`) handling dynamic DOM updates, asynchronous chat streaming, modal flows, and filtering.
+
+### AI Engine
+- **Module**: `in.jecrcu.placement.service.ai` (`AiService` interface + `DefaultAiService` implementation)
+- **Capabilities**:
+  - Grounded question-answering with fuzzy keyword & semantic matching across JPA repositories.
+  - Multi-experience synthesis and key-takeaway summarization.
+  - Question domain auto-classification (DSA, DBMS, OS, Networks, HR, Aptitude, System Design).
+  - Difficulty estimation based on technical complexity indicators.
+  - Pluggable architecture ready for seamless drop-in integration with external LLMs (Google Gemini / OpenAI).
+
+---
+
+## 📅 Living Development Log & Sprint History
+
+| Date / Sprint | Phase | Key Milestones | Status |
+| :--- | :--- | :--- | :--- |
+| **2026-10-15** | Sprint 0 | Initialized Git repository, connected GitHub remote, reconciled upstream README, and pushed initial codebase. | ✅ Completed |
+| **2026-10-15** | Sprint 1 | Core portal setup: Spring Security RBAC, login/register, H2 file database, user entity, audit logging, admin portal foundation. | ✅ Completed |
+| **2026-10-15** | Sprint 2 | Placement calendar, upcoming recruitment drives, dynamic eligibility check engine (CGPA/backlogs/branch), contribution submission & moderation workflow. | ✅ Completed |
+| **2026-10-15** | Sprint 3 | Senior alumni mentorship directory, verified interview experiences, round-by-round breakdown, search & filterable interview question bank. | ✅ Completed |
+| **2026-10-15** | Docs | Comprehensive README overhaul (`README.md`) featuring ASCII system architecture, ER diagrams, security matrix, and route tables. | ✅ Completed |
+| **2026-10-15** | Sprint 4 | Phase 4 AI Preparation Suite: Grounded AI Assistant page (`/ai-assistant`), question classifier, experience summarizer, privacy scrubbing, unit test suite (`AiServiceTest`). | 🔍 In User Review |
+| **2026-10-16** | Docs | Master Documentation Hub (`DOCUMENTATION.md`) and dedicated `docs/` subsystem tracking ongoing updates. | ✅ Completed |
+
+---
+
+### Sprint 0: Repository Setup & Git Synchronization
+- **Goal**: Establish a clean Git repository, synchronize with the remote GitHub repository ([`palakpk954/Placement_Helper-You_Can-`](https://github.com/palakpk954/Placement_Helper-You_Can-)), and resolve remote divergence cleanly.
+- **Actions Taken**:
+  - Initialized local Git repository in `c:\Users\HP\Desktop\Placement_Helper`.
+  - Added remote origin `https://github.com/palakpk954/Placement_Helper-You_Can-.git`.
+  - Staged essential source files, `.gitignore`, and configuration.
+  - Fetched and rebased remote `main` branch to integrate the initial GitHub README.
+  - Pushed initial commit (`a2ff7e9`).
+
+---
+
+### Sprint 1: Core Portal Architecture & RBAC (Phase 1)
+- **Goal**: Build foundational authentication, role authorization, and base data structures.
+- **Key Deliverables**:
+  - **Spring Security Configuration** (`SecurityConfig.java`): Defined role-based URL matchers (`/admin/**` restricted to `ROLE_ADMIN`, public routes permitted, all other pages requiring authentication).
+  - **Domain Entities**: `User`, `Role`, `AuditLog`, `Company`, `Drive`, `Round`.
+  - **Authentication Handlers**: Custom authentication success handler redirecting admins to `/admin` and students/alumni to `/dashboard`.
+  - **Data Seeder** (`DataSeeder.java`): Preloaded demo accounts (`admin@jecrcu.edu.in`, `rahul.sharma@jecrcu.edu.in`, `alumni.amit@jecrcu.edu.in`) and top recruiter profiles (Microsoft, Google, Amazon, TCS, Infosys, Capgemini).
+
+---
+
+### Sprint 2: Placement Calendar & Dynamic Eligibility Engine (Phase 2)
+- **Goal**: Enable students to discover upcoming drives, check their exact placement eligibility in real time, and submit recruitment contributions.
+- **Key Deliverables**:
+  - **Dynamic Eligibility Engine** (`EligibilityService.java`):
+    - Computes real-time student qualification based on CGPA cutoffs, active backlog tolerance, and eligible engineering branches (CSE, IT, ECE, EE, ME, etc.).
+    - Returns structured verdicts: `ELIGIBLE`, `CGPA_SHORTFALL`, `BACKLOG_DISQUALIFIED`, or `BRANCH_INELIGIBLE`.
+  - **Placement Calendar & Drives** (`CalendarController.java`, `UpcomingDriveRepository.java`): Interactive timeline of scheduled written tests, technical interviews, and HR rounds.
+  - **Contribution & Moderation Subsystem** (`ContributeController.java`, `ContributionRepository.java`): Allows students and alumni to submit questions and experiences, queued for admin verification before public display.
+
+---
+
+### Sprint 3: Senior Mentorship & Verified Question Bank (Phase 3)
+- **Goal**: Connect students with successfully placed seniors and provide a searchable repository of authentic campus interview questions.
+- **Key Deliverables**:
+  - **Alumni Mentorship Directory** (`AlumniProfile.java`, `AlumniController.java`): Displays placed alumni mentors filtered by company, domain, and graduation year with direct mentorship request channels.
+  - **Interview Experience Hub** (`Experience.java`, `Round.java`): Granular round-by-round documentation (Online Assessment, Technical Round 1, Technical Round 2, HR/Leadership) with tips, difficulty, and outcomes.
+  - **Company Directory & Insights** (`CompanyController.java`): Dedicated company overview pages with average packages, highest packages, hiring patterns, and visiting history.
+
+---
+
+### Sprint 4: AI Preparation Suite & Guardrails (Phase 4)
+- **Goal**: Build an institutional recruitment intelligence assistant, automated experience summarizer, and question tagger strictly grounded on database records.
+- **Key Deliverables**:
+  - **`AiService.java` Interface**: Declares `summarizeCompanyExperience()`, `classifyQuestion()`, `answerPrepQuestion()`, and health indicators.
+  - **`DefaultAiService.java` Implementation**:
+    - **Institutional Grounded Chatbot**: Reads from `CompanyRepository`, `DriveRepository`, `UpcomingDriveRepository`, `QuestionRepository`, and `AlumniProfileRepository` to answer queries regarding packages, rounds, cutoffs, upcoming drives, and top topics.
+    - **Conversational Guidance & Greeting Engine**: Intercepts greetings (`hi`, `hello`, `hey`) and polite queries with welcoming capability overviews and clickable prompt suggestions instead of falling back to empty query errors.
+    - **Anti-Hallucination Guarantee**: Out-of-domain or unrecorded queries return an honest campus fallback without inventing figures or policies.
+    - **Privacy Protection (PRD AI-4)**: Resumes and sensitive personal identifiers are strictly filtered from intelligence pipelines.
+    - **Experience Summarizer**: Aggregates verified student reviews into structured takeaways: overall difficulty, key focus areas, round structures, and tips for juniors.
+    - **Question Auto-Classifier**: Parses question text to categorize into topics (`DSA`, `DBMS`, `OS`, `Networks`, `System Design`, `HR`) and predicts difficulty (`EASY`, `MEDIUM`, `HARD`).
+  - **Frontend Interfaces**:
+    - `/ai-assistant` (`templates/ai/assistant.html`): Interactive full-page chat interface with quick suggestion chips, message timestamps, grounded verification badges, and privacy indicators.
+    - Company detail synthesis card (`templates/companies/detail.html`): "AI Synthesis: What to Expect" badge on company profile experience tabs.
+    - Question submission auto-classifier button (`templates/contribute/form.html`): "✨ AI Classify" button providing one-click topic and difficulty filling.
+  - **Testing**:
+    - Created [`AiServiceTest.java`](file:///c:/Users/HP/Desktop/Placement_Helper/src/test/java/in/jecrcu/placement/AiServiceTest.java) containing 12 comprehensive unit tests covering greetings, conversational gratitude with typos, acknowledgments, farewells, company queries, upcoming drive lookups, classification heuristics, and fallbacks. All 12 tests pass with 0 errors.
+
+---
+
+## 🔧 Troubleshooting & Bug Fix Journal
+
+During development and continuous verification, the following technical issues were identified, analyzed, and resolved:
+
+### 1. Spring Boot Port 8080 Process Contention
+- **Symptom**: New endpoints returned 404 or old page states, and `mvnw spring-boot:run` failed with `BindException: Address already in use: 8080`.
+- **Root Cause**: A previously launched background Java process (PID `7216`) from an earlier IDE session was holding port `8080`.
+- **Resolution**: Identified listening process via `netstat -ano | findstr :8080` and terminated it using `Stop-Process -Id 7216 -Force`, freeing port 8080 for the clean application instance.
+
+### 2. Eclipse/IDE Bytecode Mismatch (`ClassFormatError` on `AuditLog.class`)
+- **Symptom**: Compilation or startup failed citing invalid or unrecognized class file attributes on `target/classes/in/jecrcu/placement/model/AuditLog.class`.
+- **Root Cause**: Stale `.class` files compiled with a different JDK/IDE toolchain lingered in the Maven target directory.
+- **Resolution**: Executed a clean compilation cycle via `./mvnw clean compile`, rebuilding all classes under Java 17.
+
+### 3. Entity Accessor Method Alignment
+- **Symptom**: Compilation errors during early AI service implementation when calling `.getRoundOrder()` and `.getRoleName()`.
+- **Root Cause**: `Round` entity declared `getRoundNumber()` and `getName()`. `AlumniProfile` declared `getJobRole()`.
+- **Resolution**: Aligned all getter calls in `DefaultAiService.java` to match the exact JPA model signatures.
+
+### 4. Chatbot Greeting Query Fallback ("hi" query returning no-data message)
+- **Symptom**: Typing "hi" into the AI Placement Assistant caused it to respond: *"I don't have verified data on that in our campus recruitment records."*
+- **Root Cause**: The strict anti-hallucination filter checked if the query matched a known company or topic keyword. Generic conversational pleasantries had no keyword match, triggering the ungrounded fallback.
+- **Resolution**: Introduced dedicated greeting regex patterns (`\b(hi|hello|hey|greetings|good morning|who are you)\b`) in `DefaultAiService.java` that return a warm, structured overview of capabilities with sample query prompts.
+
+### 5. API Authentication & CSRF Filter Rules
+- **Symptom**: Unauthenticated command-line POST requests to `/api/ai/chat` were redirected to `/login`.
+- **Root Cause**: `SecurityConfig.java` configured `.anyRequest().authenticated()` while only exempting `/api/**` from CSRF.
+- **Resolution**: Confirmed that web clients use authenticated session cookies for `/api/ai/**` routes, ensuring full user audit tracking while protecting against malicious unauthorized scraping.
+
+### 6. Conversational Gratitude with Typos & Casual Acknowledgments ("ok thank you so muhc")
+- **Symptom**: Typing casual appreciation like *"ok thank you so muhc"* or acknowledgments like *"got it"* triggered the strict recruitment fallback *"I don't have verified data on that in our campus recruitment records."*
+- **Root Cause**: The gratitude check previously used a rigid anchored regular expression (`^(thanks|thank you)$`) which failed when prefixed with *"ok"* or when containing common user typos (e.g., *"muhc"*, *"thnx"*).
+- **Resolution**: Implemented flexible token matching in `DefaultAiService.java` (`isGratitude()`, `isAcknowledgment()`, `isFarewell()`, `isGreeting()`) that accommodates conversational prefixes, typos, and acknowledgments while preserving strict database grounding whenever recruiter or company terms are referenced. Added 4 dedicated unit tests in `AiServiceTest.java` (now 12 passing tests).
+
+---
+
+## 🏛 System Architecture & Module Directory
+
+### Project File Organization
+```
+Placement_Helper/
+├── .mvn/                                # Maven wrapper configuration
+├── data/                                # Embedded H2 database storage
+│   └── youcan.mv.db                     # Persistent local database file
+├── docs/                                # Detailed technical documents & guides
+│   ├── ARCHITECTURE.md                  # Deep architectural blueprints
+│   ├── CHANGELOG.md                     # Detailed release & commit notes
+│   └── OPERATIONAL_RUNBOOK.md           # Deployment & configuration runbook
+├── src/
+│   ├── main/
+│   │   ├── java/in/jecrcu/placement/
+│   │   │   ├── YouCanApplication.java  # Application entrypoint
+│   │   │   ├── config/                  # Security & web mvc configurations
+│   │   │   │   ├── CustomUserDetails.java
+│   │   │   │   ├── CustomUserDetailsService.java
+│   │   │   │   ├── DataSeeder.java      # Initial demo dataset seeder
+│   │   │   │   └── SecurityConfig.java  # Spring Security 6 RBAC rules
+│   │   │   ├── controller/              # MVC & REST web controllers
+│   │   │   │   ├── AdminController.java
+│   │   │   │   ├── AiController.java    # AI chat, summarizer, & classifier
+│   │   │   │   ├── AlumniController.java
+│   │   │   │   ├── AuthController.java
+│   │   │   │   ├── CalendarController.java
+│   │   │   │   ├── CompanyController.java
+│   │   │   │   ├── ContributeController.java
+│   │   │   │   ├── DashboardController.java
+│   │   │   │   └── ExperienceController.java
+│   │   │   ├── model/                   # JPA domain entities
+│   │   │   │   ├── AlumniProfile.java
+│   │   │   │   ├── AuditLog.java
+│   │   │   │   ├── Company.java
+│   │   │   │   ├── Contribution.java
+│   │   │   │   ├── Drive.java
+│   │   │   │   ├── Experience.java
+│   │   │   │   ├── Question.java
+│   │   │   │   ├── Role.java
+│   │   │   │   ├── Round.java
+│   │   │   │   ├── UpcomingDrive.java
+│   │   │   │   └── User.java
+│   │   │   ├── repository/              # Spring Data JPA repositories
+│   │   │   └── service/                 # Core business services
+│   │   │       ├── EligibilityService.java
+│   │   │       └── ai/                  # AI intelligence engine
+│   │   │           ├── AiService.java
+│   │   │           └── DefaultAiService.java
+│   │   └── resources/
+│   │       ├── application.properties   # App configuration & H2 settings
+│   │       ├── static/                  # Client-side static assets
+│   │       │   ├── css/styles.css       # Unified design system stylesheet
+│   │       │   └── js/app.js            # Frontend interactivity scripts
+│   │       └── templates/               # Thymeleaf HTML views
+│   │           ├── admin/               # Admin dashboard & management
+│   │           ├── ai/                  # AI assistant chat interface
+│   │           ├── auth/                # Login, register, password reset
+│   │           ├── calendar/            # Recruitment calendar & timeline
+│   │           ├── companies/           # Company profiles & round breakdown
+│   │           ├── contribute/          # Experience & question contribution
+│   │           ├── dashboard/           # Student personalized dashboard
+│   │           ├── experiences/         # Student interview experiences
+│   │           ├── layout/              # Base layout & navigation partials
+│   │           └── mentors/             # Placed alumni directory
+│   └── test/
+│       └── java/in/jecrcu/placement/
+│           ├── AiServiceTest.java       # AI engine unit test suite
+│           └── EligibilityServiceTest.java # Eligibility matrix tests
+├── DOCUMENTATION.md                     # Master Living Documentation (this file)
+├── PRD University Placement Portal.md   # Product Requirements Document
+├── README.md                            # Public repository overview
+└── pom.xml                              # Maven build specifications
+```
+
+---
+
+## 📡 API & Endpoint Reference
+
+### Public & Authentication Routes
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/login` | Public | Sign-in page with 1-click demo credential buttons |
+| `POST` | `/login` | Public | Standard form login processing |
+| `GET` | `/register` | Public | University student / alumni registration |
+| `POST` | `/register` | Public | Account creation with university domain validation |
+| `GET` | `/logout` | Authenticated | Invalidates session and clears `JSESSIONID` |
+
+### Core Portal Views
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/dashboard` | `STUDENT`, `ALUMNI` | Personalized student dashboard with eligibility indicators |
+| `GET` | `/calendar` | Authenticated | Placement calendar with upcoming recruitment drives |
+| `GET` | `/companies` | Authenticated | Recruiter directory with packages, visits, and criteria |
+| `GET` | `/companies/{id}` | Authenticated | Deep-dive company profile with round structure & AI synthesis |
+| `GET` | `/experiences` | Authenticated | Verified interview reviews submitted by seniors |
+| `GET` | `/mentors` | Authenticated | Senior alumni directory with role and company filters |
+| `GET` | `/contribute` | Authenticated | Submission form for interview questions and experiences |
+| `GET` | `/ai-assistant` | Authenticated | Full-page interactive AI Placement Assistant |
+
+### AI REST Endpoints
+| Method | Endpoint | Request Payload | Response | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/ai/chat` | `{"message": "string"}` | `{"answer": "string", "grounded": bool, "sources": []}` | Grounded placement Q&A chatbot response |
+| `POST` | `/api/ai/classify` | `{"questionText": "string"}` | `{"topic": "string", "difficulty": "string"}` | Auto-tags question topic & technical difficulty |
+| `GET` | `/api/ai/company-summary/{id}` | None | `{"summary": "string", "companyName": "string"}` | Synthesizes all student experiences for a company |
+
+### Administrative Routes
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin` | `ROLE_ADMIN` | Executive placement metrics, drive statistics, and audit logs |
+| `GET` | `/admin/drives` | `ROLE_ADMIN` | Management interface to schedule and update drives |
+| `GET` | `/admin/contributions` | `ROLE_ADMIN` | Approval queue for student questions and experiences |
+
+---
+
+## 💾 Database Schema & Data Model
+
+The application uses an embedded **H2 Database** configured with JPA entities and automatic schema updates (`spring.jpa.hibernate.ddl-auto=update`).
+
+```
+ +------------------+           +------------------+
+ |       User       |           |     Company      |
+ +------------------+           +------------------+
+ | id (PK)          |           | id (PK)          |
+ | email (UQ)       |           | name (UQ)        |
+ | password         |           | tier             |
+ | fullName         |           | website          |
+ | role (ENUM)      |           | minCgpa          |
+ | branch           |           | maxBacklogs      |
+ | cgpa             |           | packageRange     |
+ | backlogs         |           +--------+---------+
+ +--------+---------+                    | 1
+          | 1                            |
+          |                              | N
+          | N                   +--------v---------+
+ +--------v---------+           |      Drive       |
+ |  AlumniProfile   |           +------------------+
+ +------------------+           | id (PK)          |
+ | id (PK)          |           | company_id (FK)  |
+ | company          |           | driveDate        |
+ | jobRole          |           | batchYear        |
+ | packageOffered   |           | status           |
+ | linkedInUrl      |           +--------+---------+
+ +------------------+                    | 1
+                                         | N
+                                +--------v---------+
+                                |      Round       |
+                                +------------------+
+                                | id (PK)          |
+                                | drive_id (FK)    |
+                                | roundNumber      |
+                                | name             |
+                                | roundType        |
+                                | description      |
+                                +------------------+
+```
+
+---
+
+## 🛡 Security & Privacy Governance
+
+1. **Role-Based Authorization**:
+   - `ROLE_ADMIN`: Complete access to `/admin/**`, drive creation, eligibility overrides, and contribution approvals.
+   - `ROLE_STUDENT`: Access to portal dashboard, eligibility checks, drive calendars, question banks, and AI prep assistant.
+   - `ROLE_ALUMNI`: Permissions to submit verified experiences, manage mentor profiles, and answer student inquiries.
+2. **Password Security**: Passwords are encrypted using Spring Security's `BCryptPasswordEncoder` with default work factor 10.
+3. **Strict Privacy Scrubbing (PRD AI-4)**:
+   - Student contact numbers, personal emails, and raw resume files are never exposed in AI prompts or public templates.
+   - Only approved, anonymized interview experiences and technical question texts are synthesized by the AI engine.
+4. **Data Grounding Guarantee (PRD AI-3)**:
+   - The AI Assistant strictly checks verified database entities before generating answers.
+   - If an unverified recruiter or unknown policy is queried, the engine explicitly alerts the student that no institutional record exists rather than hallucinating figures.
+
+---
+
+## 🚀 Developer Runbook & Testing Guide
+
+### Prerequisites
+- **JDK**: Java Development Kit 17 or higher (`java -version`)
+- **Maven**: Bundled Maven wrapper (`./mvnw` or `mvnw.cmd`)
+- **Browser**: Modern web browser (Chrome, Edge, Firefox)
+
+### Running Locally
+```powershell
+# Navigate to project directory
+cd c:\Users\HP\Desktop\Placement_Helper
+
+# Run with Spring Boot Maven plugin
+./mvnw spring-boot:run
+```
+The application will launch on **`http://localhost:8080`**.
+
+### Accessing the Database Console
+1. Navigate to: `http://localhost:8080/h2-console`
+2. Enter the JDBC parameters:
+   - **JDBC URL**: `jdbc:h2:file:./data/youcan`
+   - **User Name**: `sa`
+   - **Password**: *(leave blank)*
+3. Click **Connect** to query raw tables, audit logs, and seeded records.
+
+### Running Automated Test Suites
+```powershell
+# Run the entire test suite
+./mvnw test
+
+# Run AI service unit tests specifically
+./mvnw test -Dtest=AiServiceTest
+
+# Run eligibility engine unit tests specifically
+./mvnw test -Dtest=EligibilityServiceTest
+```
+
+### Pre-Configured Demo Credentials
+For testing convenience, the portal includes preloaded demo accounts accessible with 1-click buttons on the `/login` screen:
+
+| Role | Email | Password | Pre-seeded Profile Details |
+| :--- | :--- | :--- | :--- |
+| **Placement Admin** | `admin@jecrcu.edu.in` | `admin123` | Institutional Admin Authority |
+| **Pre-final Student** | `rahul.sharma@jecrcu.edu.in` | `student123` | B.Tech CSE, 8.42 CGPA, 0 Backlogs |
+| **Placed Alumnus** | `alumni.amit@jecrcu.edu.in` | `mentor123` | Software Engineer at Microsoft (44 LPA) |
+
+---
+
+## 🔮 Future Roadmap
+
+- [ ] **External LLM Toggle**: Add optional configuration keys in `application.properties` to connect `AiService` to Google Gemini API or OpenAI API when internet access is enabled.
+- [ ] **Resume ATS Scanner**: Module allowing students to upload resumes for automated keyword matching against specific recruiter job descriptions.
+- [ ] **Automated Email Notifications**: Spring Mail integration sending instant reminders 24 hours prior to scheduled recruitment drives.
+- [x] **Docker Containerization**: Multi-stage `Dockerfile` and `.dockerignore` optimized for Render & cloud platforms.
+- [ ] **Docker Compose**: `docker-compose.yml` for unified local multi-service container orchestration.
+
+---
+
+## 📝 How to Maintain & Update This Documentation
+
+To ensure this documentation stays accurate as the project evolves, adhere to the following conventions:
+
+1. **When adding a new feature or phase**:
+   - Add a row in the [Living Development Log & Sprint History](#-living-development-log--sprint-history) table with the sprint date, phase name, and status.
+   - Write a dedicated subsection detailing the goals, architecture, and deliverables.
+2. **When resolving a bug or resolving an environment issue**:
+   - Record the symptom, root cause, and precise resolution in the [Troubleshooting & Bug Fix Journal](#-troubleshooting--bug-fix-journal).
+3. **When adding new endpoints or controllers**:
+   - Update the [API & Endpoint Reference](#-api--endpoint-reference) table with the HTTP method, path, role requirements, and description.
+4. **When updating database entities**:
+   - Update the ASCII schema diagram and entity relationship breakdown in [Database Schema & Data Model](#-database-schema--data-model).
+
+---
+*Maintained by the You_can Engineering Team • JECRC University Placement Portal*
