@@ -69,6 +69,17 @@ public class RoadmapController {
         return "redirect:/roadmap";
     }
 
+    @PostMapping("/toggle-item")
+    public String toggleItemForm(
+            @RequestParam("itemId") Long itemId,
+            @RequestParam(value = "roadmapId", required = false) Long roadmapId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) return "redirect:/login";
+        roadmapService.toggleItemCompletion(itemId);
+        return "redirect:/roadmap" + (roadmapId != null ? "?roadmapId=" + roadmapId : "");
+    }
+
     @PostMapping("/toggle-item/{itemId}")
     @ResponseBody
     public String toggleItem(@PathVariable("itemId") Long itemId) {

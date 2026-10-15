@@ -5,7 +5,7 @@
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container">
+    <div class="container-xxl px-3 px-md-4">
 
         <!-- Header -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -13,8 +13,8 @@
                 <h3 class="fw-bold mb-1"><i class="bi bi-map-fill text-success me-2"></i>Personalized 1–8 Week Placement Roadmaps</h3>
                 <p class="text-muted small mb-0">Generate a structured, tickable preparation plan tailored to a specific company's interview rounds.</p>
             </div>
-            <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#generateRoadmapCollapse">
-                <i class="bi bi-magic me-1"></i> Generate New Roadmap
+            <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1" data-bs-toggle="collapse" data-bs-target="#generateRoadmapCollapse">
+                <i class="bi bi-plus-circle me-1"></i> Generate New Roadmap
             </button>
         </div>
 
@@ -46,32 +46,68 @@
             </div>
         </div>
 
+        <!-- Multi-Roadmap Switcher Tabs (if user has multiple roadmaps) -->
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3" th:if="${userRoadmaps != null and #lists.size(userRoadmaps) > 1}">
+            <span class="small text-muted fw-semibold me-1"><i class="bi bi-collection me-1"></i>Your Roadmaps:</span>
+            <a th:each="r : ${userRoadmaps}"
+               th:href="@{/roadmap(roadmapId=${r.id})}"
+               class="btn btn-sm rounded-pill px-3"
+               th:classappend="${currentRoadmap != null and currentRoadmap.id == r.id ? 'btn-success' : 'btn-outline-secondary'}">
+                <i class="bi bi-building me-1"></i>
+                <span th:text="${r.company.name + ' (' + r.weeks + ' Wk Plan)'}">Capgemini (8 Wk Plan)</span>
+            </a>
+        </div>
+
         <!-- Active Roadmap Display -->
         <div th:if="${currentRoadmap != null}">
             <div class="app-card p-4 mb-4 shadow-sm border-0">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                     <div>
-                        <span class="badge badge-soft-success mb-1" th:text="${currentRoadmap.company.name}">Amazon</span>
-                        <h4 class="fw-bold mb-0" th:text="${currentRoadmap.totalWeeks + '-Week Prep Plan for ' + currentRoadmap.company.name}">4-Week Prep Plan</h4>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge badge-soft-success" th:text="${currentRoadmap.company.name}">Amazon</span>
+                            <span class="badge bg-secondary-subtle text-secondary" th:text="${currentRoadmap.weeks + ' Weeks Duration'}">4 Weeks Duration</span>
+                        </div>
+                        <h4 class="fw-bold mb-0" th:text="${currentRoadmap.weeks + '-Week Preparation Roadmap for ' + currentRoadmap.company.name}">4-Week Prep Plan</h4>
                     </div>
+                    <!-- Progress Pill -->
+                    <div class="text-md-end">
+                        <div class="small fw-semibold text-muted mb-1">
+                            Progress: <span class="text-success fw-bold" th:text="${currentRoadmap.completedCount}">0</span> / <span th:text="${#lists.size(currentRoadmap.items)}">4</span> Weeks Completed
+                        </div>
+                        <div class="progress" style="height: 8px; min-width: 160px;">
+                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar"
+                                 th:style="'width: ' + ${currentRoadmap.progressPercentage} + '%'"
+                                 th:aria-valuenow="${currentRoadmap.progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Congratulations alert if all completed -->
+                <div class="alert alert-success d-flex align-items-center gap-2 py-2 mt-3 mb-2" th:if="${currentRoadmap.isAllCompleted()}">
+                    <i class="bi bi-trophy-fill fs-5 text-success"></i>
+                    <span class="small fw-semibold">Outstanding! You have completed all milestones in this preparation roadmap. You are ready for your interviews!</span>
                 </div>
 
                 <!-- Roadmap Items List -->
                 <div class="list-group list-group-flush mt-3" th:if="${currentRoadmap.items != null}">
-                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center" th:each="item : ${currentRoadmap.items}">
+                    <div class="list-group-item px-0 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3"
+                         th:each="item : ${currentRoadmap.items}">
                         <div class="d-flex align-items-start gap-3">
-                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold" th:text="${'Week ' + item.weekNumber}">Week 1</span>
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold flex-shrink-0"
+                                  th:classappend="${item.completed ? 'bg-success text-white' : 'bg-primary-subtle text-primary'}"
+                                  th:text="${'Week ' + item.weekNumber}">Week 1</span>
                             <div>
-                                <h6 class="fw-bold mb-1" th:text="${item.topic}">Data Structures &amp; Algorithms</h6>
-                                <p class="small text-muted mb-0" th:text="${item.description}">Master Arrays, Strings and Two-pointer questions.</p>
+                                <h6 class="fw-bold mb-1" th:classappend="${item.completed ? 'text-decoration-line-through text-muted' : ''}" th:text="${item.topic}">Data Structures &amp; Algorithms</h6>
+                                <p class="small text-muted mb-0" th:text="${item.description}">Complete recommended practice questions.</p>
                             </div>
                         </div>
-                        <form th:action="@{/roadmap/toggle-item}" method="post">
+                        <form th:action="@{/roadmap/toggle-item}" method="post" class="flex-shrink-0 m-0">
                             <input type="hidden" name="itemId" th:value="${item.id}">
-                            <button type="submit" class="btn btn-sm rounded-pill px-3"
+                            <input type="hidden" name="roadmapId" th:value="${currentRoadmap.id}">
+                            <button type="submit" class="btn btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1"
                                     th:classappend="${item.completed ? 'btn-success' : 'btn-outline-secondary'}">
                                 <i class="bi" th:classappend="${item.completed ? 'bi-check-circle-fill' : 'bi-circle'}"></i>
-                                <span th:text="${item.completed ? 'Done' : 'Mark Done'}">Done</span>
+                                <span th:text="${item.completed ? 'Completed' : 'Mark Done'}">Mark Done</span>
                             </button>
                         </form>
                     </div>
@@ -82,8 +118,11 @@
         <!-- Empty State -->
         <div class="app-card text-center py-5" th:if="${currentRoadmap == null}">
             <i class="bi bi-map text-muted display-4"></i>
-            <h5 class="fw-bold mt-3 mb-1">No active roadmap</h5>
-            <p class="text-muted small">Select a target company and time duration to generate your custom preparation roadmap.</p>
+            <h5 class="fw-bold mt-3 mb-1">No active roadmap yet</h5>
+            <p class="text-muted small mb-3">Select a target company and time duration to generate your custom preparation roadmap.</p>
+            <button class="btn btn-sm btn-success rounded-pill px-4 shadow-sm" data-bs-toggle="collapse" data-bs-target="#generateRoadmapCollapse">
+                <i class="bi bi-plus-circle me-1"></i> Generate Your First Roadmap
+            </button>
         </div>
 
     </div>

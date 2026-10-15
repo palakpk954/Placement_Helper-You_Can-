@@ -29,4 +29,8 @@ public class Badge {
 
     @Column(nullable = false)
     private String icon;
+
+    public String getName() {
+        return this.title;
+    }
 }

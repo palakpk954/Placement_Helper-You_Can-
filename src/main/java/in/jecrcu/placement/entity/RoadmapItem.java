@@ -32,4 +32,12 @@ public class RoadmapItem {
 
     @Builder.Default
     private Boolean completed = false;
+
+    @Transient
+    public String getDescription() {
+        if (targetQuestions != null && targetQuestions > 0) {
+            return "Complete " + targetQuestions + " high-frequency placement practice problems and review core concepts.";
+        }
+        return "Complete weekly targeted curriculum and placement mock questions.";
+    }
 }

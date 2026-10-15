@@ -38,7 +38,10 @@ public class RoadmapService {
 
         // Delete existing roadmap for this user/company if present
         roadmapRepository.findByUserIdAndCompanyId(user.getId(), companyId)
-                .ifPresent(roadmapRepository::delete);
+                .ifPresent(existing -> {
+                    roadmapRepository.delete(existing);
+                    roadmapRepository.flush();
+                });
 
         Roadmap roadmap = Roadmap.builder()
                 .user(user)
@@ -67,7 +70,7 @@ public class RoadmapService {
             RoadmapItem item = RoadmapItem.builder()
                     .roadmap(saved)
                     .weekNumber(w)
-                    .topic("Week " + w + ": " + topicName)
+                    .topic(topicName)
                     .targetQuestions(5 + (w * 2))
                     .completed(false)
                     .build();
@@ -82,7 +85,7 @@ public class RoadmapService {
     public boolean toggleItemCompletion(Long itemId) {
         RoadmapItem item = roadmapItemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Roadmap item not found"));
-        item.setCompleted(!item.getCompleted());
+        item.setCompleted(!Boolean.TRUE.equals(item.getCompleted()));
         roadmapItemRepository.save(item);
         return item.getCompleted();
     }
