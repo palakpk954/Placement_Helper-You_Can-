@@ -29,43 +29,40 @@
          TOP NAVIGATION BAR
          ========================================== -->
     <nav class="navbar navbar-expand-xl custom-navbar sticky-top">
-        <div class="container-fluid px-lg-4">
+        <div class="container-xxl px-3 px-md-4">
             <!-- Brand -->
-            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/dashboard}">
-                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem;">
+            <a class="navbar-brand d-flex align-items-center gap-2 me-3" th:href="@{/dashboard}">
+                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center shadow-xs" style="width: 2.25rem; height: 2.25rem;">
                     <i class="bi bi-mortarboard-fill fs-5"></i>
                 </div>
                 <div class="d-flex flex-column">
                     <span class="brand-font fs-5 lh-1 text-primary">You_can</span>
-                    <span class="text-muted" style="font-size: 0.68rem; letter-spacing: 0.05em;">JECRC UNIVERSITY</span>
+                    <span class="text-muted" style="font-size: 0.65rem; letter-spacing: 0.05em;">JECRC UNIVERSITY</span>
                 </div>
             </a>
 
             <!-- Mobile Navbar Toggler -->
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-target="#navContent" data-bs-toggle="collapse" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-target="#navContent" data-bs-toggle="collapse" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="bi bi-list fs-3"></i>
             </button>
 
             <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navContent">
-                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-3 gap-1">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-2 gap-0 gap-xl-1">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
+                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
+                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/statistics}"><i class="bi bi-graph-up-arrow me-1"></i> Stats</a>
+                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/eligibility}"><i class="bi bi-check2-circle me-1"></i> Eligibility</a>
+                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/eligibility}"><i class="bi bi-check2-circle me-1"></i> Eligibility</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-journal-code me-1"></i> Prep Tools
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
@@ -81,26 +78,28 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-people me-1"></i> Community
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
                             <li><a class="dropdown-item py-2" th:href="@{/alumni}"><i class="bi bi-person-badge me-2 text-primary"></i> Alumni Mentors</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/mocks}"><i class="bi bi-calendar-event me-2 text-success"></i> Mock Interviews</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/leaderboard}"><i class="bi bi-trophy me-2 text-warning"></i> Leaderboard &amp; Badges</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/statistics}"><i class="bi bi-graph-up-arrow me-2 text-info"></i> Placement Stats</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-primary fw-semibold" th:href="@{/contribute}"><i class="bi bi-plus-circle me-1"></i> Contribute</a>
+                        <a class="nav-link text-primary fw-semibold py-2 py-xl-1 px-2" th:href="@{/contribute}"><i class="bi bi-plus-circle me-1"></i> Contribute</a>
                     </li>
                 </ul>
 
-                <!-- Right Actions: Theme Toggle, Notifications, User Menu -->
-                <div class="d-flex align-items-center gap-2 mt-3 mt-xl-0">
+                <!-- Right Actions: AI Assistant, Theme Toggle, Notifications, User Menu -->
+                <div class="d-flex align-items-center gap-2 mt-3 mt-xl-0 flex-shrink-0 ms-xl-auto">
                     <!-- AI Assistant Quick Launch -->
-                    <a class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-flex align-items-center gap-1 shadow-xs" th:href="@{/ai-assistant}" title="AI Placement Assistant">
-                        <i class="bi bi-robot"></i>
-                        <span class="d-none d-sm-inline">AI Assistant</span>
+                    <a class="btn btn-sm btn-outline-primary rounded-pill px-2 px-md-3 py-1 d-flex align-items-center gap-1 shadow-xs" th:href="@{/ai-assistant}" title="AI Placement Assistant">
+                        <i class="bi bi-robot text-primary"></i>
+                        <span class="d-none d-lg-inline small fw-semibold">AI Assistant</span>
                     </a>
 
                     <!-- Dark / Light Mode Button -->
@@ -112,16 +111,16 @@
                     <div sec:authorize="isAuthenticated()">
                         <a class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 position-relative" th:href="@{/notifications}" title="Notifications">
                             <i class="bi bi-bell-fill"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;"
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.25em 0.45em;"
                                   th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">2</span>
                         </a>
                     </div>
 
                     <!-- User Profile & Admin dropdown (Authenticated) -->
                     <div class="dropdown" sec:authorize="isAuthenticated()">
-                        <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3 py-1 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i>
-                            <span sec:authentication="name" class="d-none d-sm-inline" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">User</span>
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-2 px-md-3 py-1 d-flex align-items-center gap-1 gap-md-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle fs-6"></i>
+                            <span sec:authentication="name" class="d-none d-xxl-inline small fw-semibold" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 p-2" style="min-width: 220px;">
                             <li class="px-3 py-2 border-bottom mb-1">

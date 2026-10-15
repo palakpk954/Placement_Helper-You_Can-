@@ -134,11 +134,12 @@ a:hover {
 
 .nav-link {
     font-weight: 500;
-    font-size: 0.925rem;
+    font-size: 0.86rem;
     color: var(--text-secondary);
-    padding: 0.5rem 0.85rem !important;
+    padding: 0.35rem 0.55rem !important;
     border-radius: var(--radius-md);
     transition: all 0.15s ease;
+    white-space: nowrap;
 }
 .nav-link:hover, .nav-link.active {
     color: var(--primary-blue);
@@ -174,23 +175,29 @@ a:hover {
 }
 
 .stat-widget {
-    padding: 1.25rem;
+    padding: 0.85rem 1rem;
     border-radius: var(--radius-lg);
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 .stat-icon {
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--radius-lg);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================

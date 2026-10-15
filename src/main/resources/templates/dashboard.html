@@ -6,18 +6,18 @@
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container">
+    <div class="container-xxl px-3 px-md-4">
         
         <!-- Welcome Header Card -->
-        <div class="app-card dashboard-hero p-4 mb-4 shadow-sm">
+        <div class="app-card dashboard-hero p-3 p-md-4 mb-3 shadow-sm">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 3.5rem; height: 3.5rem;">
-                        <i class="bi bi-person-fill fs-2"></i>
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 2.75rem; height: 2.75rem;">
+                        <i class="bi bi-person-fill fs-3"></i>
                     </div>
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <h3 class="fw-bold mb-0" th:text="${currentUser != null ? currentUser.fullName : 'JECRC Student'}">Rahul Sharma</h3>
+                            <h4 class="fw-bold mb-0" th:text="${currentUser != null ? currentUser.fullName : 'JECRC Student'}">Rahul Sharma</h4>
                             <span class="badge badge-soft-primary" th:text="${currentUser != null ? currentUser.branch : 'CSE'}">CSE</span>
                             <span class="badge badge-soft-warning" th:if="${currentUser != null and currentUser.points != null}">
                                 <i class="bi bi-award-fill me-1"></i><span th:text="${currentUser.points}">85</span> pts
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                    <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
                         <i class="bi bi-plus-circle me-1"></i> Share Experience
                     </a>
                     <a th:href="@{/practice}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
@@ -42,15 +42,15 @@
         </div>
 
         <!-- 4 Stat Highlight Widgets -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-3">
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-widget">
                     <div class="stat-icon bg-primary-subtle text-primary">
                         <i class="bi bi-building"></i>
                     </div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
-                        <div class="small text-muted">Visited Companies</div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">Visited Companies</div>
                     </div>
                 </div>
             </div>
@@ -60,8 +60,8 @@
                         <i class="bi bi-briefcase"></i>
                     </div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalDrives']}">36</div>
-                        <div class="small text-muted">Historical Drives</div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalDrives']}">36</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">Historical Drives</div>
                     </div>
                 </div>
             </div>
@@ -71,8 +71,8 @@
                         <i class="bi bi-question-diamond"></i>
                     </div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalQuestions']}">21</div>
-                        <div class="small text-muted">Real Questions</div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalQuestions']}">21</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">Real Questions</div>
                     </div>
                 </div>
             </div>
@@ -82,18 +82,18 @@
                         <i class="bi bi-trophy"></i>
                     </div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
-                        <div class="small text-muted">Campus Offers</div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">Campus Offers</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Main Content Grid -->
-        <div class="row g-4 mb-4">
+        <div class="row g-3 mb-4">
             <!-- Left: Upcoming Drives for Me -->
             <div class="col-lg-8">
-                <div class="app-card p-4 h-100">
+                <div class="app-card p-3 p-md-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h5 class="fw-bold mb-0"><i class="bi bi-megaphone-fill text-primary me-2"></i>Upcoming Campus Drives</h5>
@@ -153,7 +153,7 @@
 
             <!-- Right: Practice Tracker & Weak Topics -->
             <div class="col-lg-4">
-                <div class="app-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div class="app-card p-3 p-md-4 h-100 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="fw-bold mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Practice Tracker</h5>
