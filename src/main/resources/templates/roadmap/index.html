@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Prep Roadmap — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-map-fill text-success me-2"></i>Personalized 1–8 Week Placement Roadmaps</h3>
+                <p class="text-muted small mb-0">Generate a structured, tickable preparation plan tailored to a specific company's interview rounds.</p>
+            </div>
+            <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#generateRoadmapCollapse">
+                <i class="bi bi-magic me-1"></i> Generate New Roadmap
+            </button>
+        </div>
+
+        <!-- Generate Form Collapse -->
+        <div class="collapse mb-4" id="generateRoadmapCollapse">
+            <div class="app-card p-4 shadow-sm border-success">
+                <h5 class="fw-bold mb-3"><i class="bi bi-sliders text-success me-2"></i>Plan Placement Timeline</h5>
+                <form th:action="@{/roadmap/generate}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Target Company</label>
+                            <select class="form-select" name="companyId" required>
+                                <option value="" disabled selected>-- Select Company --</option>
+                                <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}">Google</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Duration (Weeks)</label>
+                            <select class="form-select" name="weeks">
+                                <option value="2">2 Weeks (Crash Course)</option>
+                                <option value="4" selected>4 Weeks (Recommended)</option>
+                                <option value="6">6 Weeks (In-Depth)</option>
+                                <option value="8">8 Weeks (Comprehensive)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-4">Generate My Plan</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Roadmap Display -->
+        <div th:if="${currentRoadmap != null}">
+            <div class="app-card p-4 mb-4 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span class="badge badge-soft-success mb-1" th:text="${currentRoadmap.company.name}">Amazon</span>
+                        <h4 class="fw-bold mb-0" th:text="${currentRoadmap.totalWeeks + '-Week Prep Plan for ' + currentRoadmap.company.name}">4-Week Prep Plan</h4>
+                    </div>
+                </div>
+
+                <!-- Roadmap Items List -->
+                <div class="list-group list-group-flush mt-3" th:if="${currentRoadmap.items != null}">
+                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center" th:each="item : ${currentRoadmap.items}">
+                        <div class="d-flex align-items-start gap-3">
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold" th:text="${'Week ' + item.weekNumber}">Week 1</span>
+                            <div>
+                                <h6 class="fw-bold mb-1" th:text="${item.topic}">Data Structures &amp; Algorithms</h6>
+                                <p class="small text-muted mb-0" th:text="${item.description}">Master Arrays, Strings and Two-pointer questions.</p>
+                            </div>
+                        </div>
+                        <form th:action="@{/roadmap/toggle-item}" method="post">
+                            <input type="hidden" name="itemId" th:value="${item.id}">
+                            <button type="submit" class="btn btn-sm rounded-pill px-3"
+                                    th:classappend="${item.completed ? 'btn-success' : 'btn-outline-secondary'}">
+                                <i class="bi" th:classappend="${item.completed ? 'bi-check-circle-fill' : 'bi-circle'}"></i>
+                                <span th:text="${item.completed ? 'Done' : 'Mark Done'}">Done</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5" th:if="${currentRoadmap == null}">
+            <i class="bi bi-map text-muted display-4"></i>
+            <h5 class="fw-bold mt-3 mb-1">No active roadmap</h5>
+            <p class="text-muted small">Select a target company and time duration to generate your custom preparation roadmap.</p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

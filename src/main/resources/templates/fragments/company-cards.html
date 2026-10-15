@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ==========================================
+     HTMX FRAGMENT: COMPANY CARDS GRID
+     ========================================== -->
+<div th:fragment="companyGrid" id="companyGridContainer" class="fade-in">
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="small text-muted">
+            Found <strong class="text-primary" th:text="${companies.size()}">16</strong> recruiters matching criteria
+        </span>
+    </div>
+
+    <!-- Empty State -->
+    <div class="app-card p-5 text-center my-4" th:if="${companies.isEmpty()}">
+        <div class="bg-body-tertiary rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-3">
+            <i class="bi bi-search text-muted fs-1"></i>
+        </div>
+        <h5 class="fw-bold">No companies found</h5>
+        <p class="text-muted small mb-3">Try adjusting your search terms or clearing some filters.</p>
+        <a th:href="@{/companies}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Reset All Filters</a>
+    </div>
+
+    <!-- Grid of Company Cards -->
+    <div class="row g-3" th:if="${!companies.isEmpty()}">
+        <div class="col-md-6 col-lg-4" th:each="c : ${companies}">
+            <div class="app-card app-card-lift h-100 p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Header: Logo, Name, Industry, Tier -->
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <div class="company-logo-frame flex-shrink-0">
+                            <img th:if="${c.logoUrl != null and !c.logoUrl.isBlank()}" th:src="${c.logoUrl}" th:alt="${c.name}" onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.alt) + '&background=0D8ABC&color=fff';">
+                            <div th:if="${c.logoUrl == null or c.logoUrl.isBlank()}" class="fw-bold text-primary fs-4" th:text="${#strings.substring(c.name, 0, 1)}">G</div>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <h6 class="fw-bold mb-0 text-truncate">
+                                <a th:href="@{'/companies/' + ${c.id}}" class="text-reset text-decoration-none" th:text="${c.name}">Google</a>
+                            </h6>
+                            <div class="d-flex align-items-center gap-1 mt-1">
+                                <span class="badge badge-soft-primary" th:text="${c.industry}">Product &amp; Tech</span>
+                                <span class="badge badge-soft-warning" th:text="${c.tier}">Super Dream</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Roles offered in recent visits -->
+                    <div class="small mb-3" th:if="${!c.drives.isEmpty()}">
+                        <div class="text-muted small mb-1">Recent Roles Offered:</div>
+                        <div class="fw-semibold text-truncate" th:text="${c.drives[0].roles}">Software Engineer (L3)</div>
+                        <div class="badge badge-soft-success mt-1" th:text="${c.drives[0].ctcOrStipend}">32.50 LPA</div>
+                    </div>
+
+                    <!-- Stats Badges: Visits, Recent, Difficulty Rating -->
+                    <div class="row g-2 text-center small mb-3">
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-body-tertiary">
+                                <div class="text-muted" style="font-size: 0.7rem;">VISITS</div>
+                                <div class="fw-bold" th:text="${c.totalVisits + ' times'}">2 times</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-body-tertiary">
+                                <div class="text-muted" style="font-size: 0.7rem;">MOST RECENT</div>
+                                <div class="fw-bold" th:text="${c.mostRecentVisit}">Aug 2025</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-body-tertiary">
+                                <div class="text-muted" style="font-size: 0.7rem;">DIFFICULTY</div>
+                                <div class="fw-bold text-warning">
+                                    <i class="bi bi-star-fill text-warning"></i> <span th:text="${c.averageDifficulty}">4.8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Action Buttons -->
+                <div class="d-flex gap-2 pt-2 border-top">
+                    <a th:href="@{'/companies/' + ${c.id}}" class="btn btn-sm btn-primary w-100 fw-semibold">
+                        View Drives &amp; Questions &rarr;
+                    </a>
+                    <a th:href="@{'/checklists/' + ${c.id}}" class="btn btn-sm btn-outline-secondary px-2" title="Prep Checklist">
+                        <i class="bi bi-card-checklist"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Calendar &amp; Seasonality Matrix — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Campus Placement Calendar</h3>
+                <p class="text-muted small mb-0">Track month-by-month recruitment drives and discover multi-year company visiting patterns.</p>
+            </div>
+            
+            <!-- Year Selector Toggle -->
+            <div class="btn-group shadow-sm" role="group">
+                <a th:each="y : ${availableYears}"
+                   th:href="@{/calendar(year=${y})}"
+                   class="btn btn-sm"
+                   th:classappend="${selectedYear == y ? 'btn-primary' : 'btn-outline-primary'}"
+                   th:text="${'Year ' + y}">Year 2026</a>
+            </div>
+        </div>
+
+        <!-- Section 1: Month-by-Month Timeline for Selected Year -->
+        <div class="app-card p-4 mb-4 shadow-sm">
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-calendar3 text-primary me-2"></i>Recruitment Schedule for Academic Year <span th:text="${selectedYear}">2026</span>
+            </h5>
+
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4" th:each="entry : ${monthlyDrives}">
+                    <div class="p-3 rounded-3 border h-100 bg-surface">
+                        <div class="d-flex justify-content-between align-items-center pb-2 border-bottom mb-2">
+                            <h6 class="fw-bold mb-0 text-primary" th:text="${entry.key}">August</h6>
+                            <span class="badge badge-soft-primary" th:text="${entry.value.size() + ' companies'}">2 companies</span>
+                        </div>
+
+                        <!-- Empty Month -->
+                        <div class="small text-muted py-3 text-center" th:if="${entry.value.isEmpty()}">
+                            No recruitment drives recorded.
+                        </div>
+
+                        <!-- Drives List in this Month -->
+                        <div class="d-flex flex-column gap-2" th:if="${!entry.value.isEmpty()}">
+                            <div class="p-2 rounded bg-body-tertiary small" th:each="drive : ${entry.value}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <strong class="text-truncate">
+                                        <a th:href="@{'/companies/' + ${drive.company.id}}" class="text-reset text-decoration-none" th:text="${drive.company.name}">Google</a>
+                                    </strong>
+                                    <span class="badge badge-soft-success" style="font-size: 0.65rem;" th:text="${drive.ctcOrStipend}">32.5 LPA</span>
+                                </div>
+                                <div class="text-muted text-truncate" style="font-size: 0.75rem;" th:text="${drive.roles}">Software Engineer (L3)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Seasonality Heatmap Matrix across Years -->
+        <div class="app-card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0"><i class="bi bi-grid-3x3-gap-fill text-warning me-2"></i>Multi-Year Seasonality Pattern (July &ndash; June)</h5>
+                    <span class="small text-muted">Identify which companies traditionally recruit in specific months across multiple seasons</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-start" style="width: 140px;">Month</th>
+                            <th th:each="y : ${availableYears}" th:text="${'Season ' + y}">Season 2026</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${seasonalityMatrix}">
+                            <td class="text-start fw-bold" th:text="${entry.key}">July</td>
+                            <td th:each="y : ${availableYears}" th:with="cell=${entry.value[y]}">
+                                <div class="heatmap-cell"
+                                     th:classappend="${cell == null or cell.count == 0 ? 'heatmap-0' : (cell.count == 1 ? 'heatmap-1' : (cell.count == 2 ? 'heatmap-2' : (cell.count == 3 ? 'heatmap-3' : 'heatmap-4')))}"
+                                     th:title="${cell != null and cell.companyNames != null ? T(java.lang.String).join(', ', cell.companyNames) : ''}">
+                                    <span th:text="${(cell != null ? cell.count : 0) + ' drives'}">2 drives</span>
+                                    <div class="small" style="font-size: 0.65rem;" th:if="${cell != null and cell.companyNames != null and !cell.companyNames.isEmpty()}" th:text="${cell.companyNames.get(0)}">Amazon</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

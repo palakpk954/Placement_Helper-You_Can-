@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Alumni Mentors Directory — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-person-badge-fill text-primary me-2"></i>Placed Seniors &amp; Alumni Mentors</h3>
+                <p class="text-muted small mb-0">Connect directly with placed seniors from JECRC University who offered to mentor juniors.</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
+                <i class="bi bi-pencil-square me-1"></i> Edit My Mentor Profile
+            </button>
+        </div>
+
+        <!-- Mentor Profile Edit Form Collapse -->
+        <div class="collapse mb-4" id="profileCollapse">
+            <div class="app-card p-4 shadow-sm border-primary">
+                <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-success me-2"></i>Opt-In as Alumni / Senior Mentor</h5>
+                <form th:action="@{/alumni/profile}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Current Company</label>
+                            <input type="text" class="form-control" name="companyName"
+                                   th:value="${myProfile != null ? myProfile.companyName : ''}" placeholder="e.g. Amazon, Google, TCS" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Designation / Role</label>
+                            <input type="text" class="form-control" name="jobRole"
+                                   th:value="${myProfile != null ? myProfile.jobRole : ''}" placeholder="e.g. SDE-1, Cloud Engineer" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Graduation Year</label>
+                            <input type="number" class="form-control" name="graduationYear"
+                                   th:value="${myProfile != null ? myProfile.graduationYear : 2025}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Branch</label>
+                            <input type="text" class="form-control" name="branch"
+                                   th:value="${myProfile != null ? myProfile.branch : 'CSE'}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">LinkedIn Profile URL</label>
+                            <input type="url" class="form-control" name="linkedinUrl"
+                                   th:value="${myProfile != null ? myProfile.linkedinUrl : ''}" placeholder="https://linkedin.com/in/username">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Topics You Can Mentor Juniors On</label>
+                        <input type="text" class="form-control" name="topicsCanHelp"
+                               th:value="${myProfile != null ? myProfile.topicsCanHelp : ''}" placeholder="e.g. DSA, Resume Review, System Design, HR Rounds">
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="visible" value="true" id="visibleCheck"
+                               th:checked="${myProfile != null ? myProfile.visible : true}">
+                        <label class="form-check-label small" for="visibleCheck">Show my mentor card in the public alumni directory</label>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">Save Mentor Profile</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="app-card p-3 mb-4 shadow-sm">
+            <form th:action="@{/alumni}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="company" th:value="${selectedCompany}" placeholder="Filter by company name (e.g. Amazon)...">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="branch" th:value="${selectedBranch}" placeholder="Filter by branch (e.g. CSE)...">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill w-100"><i class="bi bi-filter me-1"></i> Filter</button>
+                    <a th:href="@{/alumni}" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Mentors Grid -->
+        <div class="row g-4" th:if="${alumniList != null and !alumniList.isEmpty()}">
+            <div class="col-md-6 col-lg-4" th:each="a : ${alumniList}">
+                <div class="app-card p-4 h-100 shadow-sm border-0 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="avatar-circle bg-primary-subtle text-primary fw-bold fs-5 d-flex align-items-center justify-content-center rounded-circle" style="width: 50px; height: 50px;">
+                                <span th:text="${a.user != null ? a.user.fullName.substring(0, 1) : 'M'}">A</span>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0" th:text="${a.user != null ? a.user.fullName : 'Senior Mentor'}">Senior Name</h6>
+                                <span class="badge badge-soft-primary" th:text="${a.companyName}">Google</span>
+                            </div>
+                        </div>
+
+                        <p class="small text-muted mb-2">
+                            <i class="bi bi-briefcase me-1 text-primary"></i> <span th:text="${a.jobRole}">SDE-1</span><br>
+                            <i class="bi bi-mortarboard me-1 text-muted"></i> <span th:text="${'Class of ' + a.graduationYear + ' (' + a.branch + ')'}">2025 (CSE)</span>
+                        </p>
+
+                        <div class="mb-3" th:if="${a.topicsCanHelp != null and !a.topicsCanHelp.isBlank()}">
+                            <span class="small fw-semibold text-dark">Can help with:</span>
+                            <p class="small text-secondary mb-0 mt-1" th:text="${a.topicsCanHelp}">DSA, Mock Interviews, System Design</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top mt-2 d-flex justify-content-between align-items-center">
+                        <a th:if="${a.linkedinUrl != null and !a.linkedinUrl.isBlank()}"
+                           th:href="${a.linkedinUrl}" target="_blank"
+                           class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="bi bi-linkedin me-1"></i> Connect
+                        </a>
+                        <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill ms-auto">
+                            <i class="bi bi-calendar-check me-1"></i> Book Mock
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5" th:if="${alumniList == null or alumniList.isEmpty()}">
+            <i class="bi bi-people text-muted display-4"></i>
+            <h5 class="fw-bold mt-3 mb-1">No alumni mentors found</h5>
+            <p class="text-muted small">Try adjusting your filters or be the first to opt in as a mentor!</p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

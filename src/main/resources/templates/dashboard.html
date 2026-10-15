@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title>My Placement Dashboard — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+        
+        <!-- Welcome Header Card -->
+        <div class="app-card dashboard-hero p-4 mb-4 shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 3.5rem; height: 3.5rem;">
+                        <i class="bi bi-person-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h3 class="fw-bold mb-0" th:text="${currentUser != null ? currentUser.fullName : 'JECRC Student'}">Rahul Sharma</h3>
+                            <span class="badge badge-soft-primary" th:text="${currentUser != null ? currentUser.branch : 'CSE'}">CSE</span>
+                            <span class="badge badge-soft-warning" th:if="${currentUser != null and currentUser.points != null}">
+                                <i class="bi bi-award-fill me-1"></i><span th:text="${currentUser.points}">85</span> pts
+                            </span>
+                        </div>
+                        <div class="small text-muted d-flex flex-wrap gap-3">
+                            <span><i class="bi bi-mortarboard me-1"></i> Graduating: <strong th:text="${currentUser != null ? currentUser.graduationYear : '2026'}">2026</strong></span>
+                            <span><i class="bi bi-star-fill text-warning me-1"></i> CGPA: <strong th:text="${currentUser != null ? currentUser.cgpa : '7.50'}">8.45</strong></span>
+                            <span><i class="bi bi-exclamation-circle me-1"></i> Backlogs: <strong th:text="${currentUser != null ? currentUser.activeBacklogs : '0'}">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Share Experience
+                    </a>
+                    <a th:href="@{/practice}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="bi bi-lightning-charge me-1"></i> Practice Mode
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Stat Highlight Widgets -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
+                        <div class="small text-muted">Visited Companies</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalDrives']}">36</div>
+                        <div class="small text-muted">Historical Drives</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-question-diamond"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalQuestions']}">21</div>
+                        <div class="small text-muted">Real Questions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-danger-subtle text-danger">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
+                        <div class="small text-muted">Campus Offers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="row g-4 mb-4">
+            <!-- Left: Upcoming Drives for Me -->
+            <div class="col-lg-8">
+                <div class="app-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0"><i class="bi bi-megaphone-fill text-primary me-2"></i>Upcoming Campus Drives</h5>
+                            <span class="small text-muted" th:text="${eligibleUpcomingCount + ' upcoming drive(s) match your current eligibility'}">2 drives eligible</span>
+                        </div>
+                        <a th:href="@{/upcoming}" class="btn btn-sm btn-link text-decoration-none">View All &rarr;</a>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded-3 border app-card-lift" th:each="eval : ${upcomingEvaluations}">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="fw-bold mb-0" th:text="${eval.target.companyName}">Microsoft</h6>
+                                        <span class="badge badge-soft-success" th:if="${eval.eligible}">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Eligible for Me
+                                        </span>
+                                        <span class="badge badge-soft-danger" th:if="${!eval.eligible}">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Excluded
+                                        </span>
+                                    </div>
+                                    <div class="small text-muted" th:text="${eval.target.rolesOffered}">Software Development Engineer - 1</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge badge-soft-primary fs-6 fw-bold" th:text="${eval.target.ctcOrStipend}">48.00 LPA</span>
+                                    <div class="small text-muted mt-1">Drive Date: <span th:text="${eval.target.driveDate}">2026-10-28</span></div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top small">
+                                <div class="text-muted">
+                                    <span>Cutoff: <strong th:text="${eval.target.minCgpa}">7.50</strong></span> &bull;
+                                    <span>Branches: <strong th:text="${eval.target.eligibleBranches}">CSE, IT, ECE</strong></span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a th:if="${eval.target.company != null}" th:href="@{'/companies/' + ${eval.target.company.id}}" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                                        <i class="bi bi-clock-history me-1"></i> Past Data
+                                    </a>
+                                    <a th:href="@{'/upcoming/' + ${eval.target.id} + '/ics'}" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                                        <i class="bi bi-calendar-plus me-1"></i> Add to Calendar
+                                    </a>
+                                    <a th:href="@{/upcoming/{id}/register(id=${eval.target.id})}" class="btn btn-sm btn-primary py-1 px-3 rounded-pill fw-semibold">
+                                        Register Now
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Exclusion reason tooltip if ineligible -->
+                            <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small" th:if="${!eval.eligible}">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <span th:each="r : ${eval.exclusionReasons}" th:text="${r + ' '}">CGPA below cutoff</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Practice Tracker & Weak Topics -->
+            <div class="col-lg-4">
+                <div class="app-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Practice Tracker</h5>
+                            <a th:href="@{/practice}" class="btn btn-sm btn-link text-decoration-none">Practice &rarr;</a>
+                        </div>
+
+                        <!-- Progress Circle / Numbers -->
+                        <div class="bg-body-tertiary p-3 rounded-3 text-center mb-3">
+                            <div class="fs-2 fw-bold text-success mb-0" th:text="${practiceStats != null ? practiceStats.solvedCount : 0}">2</div>
+                            <div class="small text-muted">Questions Solved</div>
+                            <div class="d-flex justify-content-center gap-3 mt-2 small">
+                                <span class="text-muted"><i class="bi bi-question-circle text-warning me-1"></i> <strong th:text="${practiceStats != null ? practiceStats.unsureCount : 0}">1</strong> Unsure</span>
+                                <span class="text-muted"><i class="bi bi-skip-forward text-secondary me-1"></i> <strong th:text="${practiceStats != null ? practiceStats.skippedCount : 0}">1</strong> Skipped</span>
+                            </div>
+                        </div>
+
+                        <!-- Weak Topics Alert -->
+                        <h6 class="fw-bold small text-uppercase text-muted mb-2">Focus &amp; Weak Topics</h6>
+                        <div class="d-flex flex-wrap gap-1 mb-4" th:if="${practiceStats != null and !practiceStats.weakTopics.isEmpty()}">
+                            <span class="badge badge-soft-danger" th:each="wt : ${practiceStats.weakTopics}">
+                                <i class="bi bi-graph-down me-1"></i><span th:text="${wt}">Graphs</span>
+                            </span>
+                        </div>
+                        <div class="small text-muted mb-4" th:if="${practiceStats == null or practiceStats.weakTopics.isEmpty()}">
+                            Solve more questions in Practice Mode to unlock weak topic analysis.
+                        </div>
+
+                        <!-- Quick Links -->
+                        <h6 class="fw-bold small text-uppercase text-muted mb-2">Quick Navigation</h6>
+                        <div class="list-group list-group-flush small">
+                            <a th:href="@{/roadmap}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-map text-success me-2"></i> Company Prep Roadmaps</span>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </a>
+                            <a th:href="@{/mocks}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-calendar-event text-primary me-2"></i> Book Senior Mock Interview</span>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </a>
+                            <a th:href="@{/resume}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0">
+                                <span><i class="bi bi-file-earmark-person text-danger me-2"></i> Check Resume ATS Score</span>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <a th:href="@{/practice}" class="btn btn-warning w-100 py-2 fw-semibold mt-3 text-dark">
+                        <i class="bi bi-play-circle-fill me-1"></i> Start Today's Practice
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookmarks Section -->
+        <div class="app-card p-4 mb-4" th:if="${!bookmarkedCompanies.isEmpty() or !bookmarkedQuestions.isEmpty()}">
+            <h5 class="fw-bold mb-3"><i class="bi bi-bookmark-star-fill text-warning me-2"></i>My Bookmarks</h5>
+            <div class="row g-3">
+                <div class="col-md-6" th:if="${!bookmarkedCompanies.isEmpty()}">
+                    <h6 class="small fw-bold text-muted text-uppercase mb-2">Saved Companies</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a th:each="bc : ${bookmarkedCompanies}" th:href="@{'/companies/' + ${bc.id}}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                            <i class="bi bi-building me-1"></i> <span th:text="${bc.name}">Google</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6" th:if="${!bookmarkedQuestions.isEmpty()}">
+                    <h6 class="small fw-bold text-muted text-uppercase mb-2">Saved Questions</h6>
+                    <div class="d-flex flex-column gap-2">
+                        <a th:each="bq : ${bookmarkedQuestions}" th:href="@{/practice(companyId=${bq.round.drive.company.id})}" class="text-decoration-none text-truncate small p-2 rounded border bg-body-tertiary">
+                            <i class="bi bi-question-circle text-primary me-1"></i> <span th:text="${bq.questionText}">LRU Cache</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

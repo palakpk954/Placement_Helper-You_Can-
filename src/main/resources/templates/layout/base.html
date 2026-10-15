@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' — You_can' : 'You_can — JECRC University Placement Portal'}">You_can — JECRC University Placement Portal</title>
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Custom Design System Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <!-- HTMX for instant reactive interactions -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <!-- Chart.js for statistics dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- ==========================================
+         TOP NAVIGATION BAR
+         ========================================== -->
+    <nav class="navbar navbar-expand-xl custom-navbar sticky-top">
+        <div class="container-fluid px-lg-4">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/dashboard}">
+                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem;">
+                    <i class="bi bi-mortarboard-fill fs-5"></i>
+                </div>
+                <div class="d-flex flex-column">
+                    <span class="brand-font fs-5 lh-1 text-primary">You_can</span>
+                    <span class="text-muted" style="font-size: 0.68rem; letter-spacing: 0.05em;">JECRC UNIVERSITY</span>
+                </div>
+            </a>
+
+            <!-- Mobile Navbar Toggler -->
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-target="#navContent" data-bs-toggle="collapse" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-3"></i>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navContent">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-3 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/statistics}"><i class="bi bi-graph-up-arrow me-1"></i> Stats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/eligibility}"><i class="bi bi-check2-circle me-1"></i> Eligibility</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-journal-code me-1"></i> Prep Tools
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow-lg rounded-3">
+                            <li><a class="dropdown-item py-2" th:href="@{/questions}"><i class="bi bi-collection me-2 text-primary"></i> Question Bank</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/practice}"><i class="bi bi-lightning-charge me-2 text-warning"></i> Practice Mode</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/roadmap}"><i class="bi bi-map me-2 text-success"></i> 1-8 Wk Roadmap</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/compare}"><i class="bi bi-arrow-left-right me-2 text-info"></i> Compare Companies</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/checklists}"><i class="bi bi-card-checklist me-2 text-danger"></i> Prep Checklists</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/resume}"><i class="bi bi-file-earmark-person me-2 text-primary"></i> Resume Scanner</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-people me-1"></i> Community
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow-lg rounded-3">
+                            <li><a class="dropdown-item py-2" th:href="@{/alumni}"><i class="bi bi-person-badge me-2 text-primary"></i> Alumni Mentors</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/mocks}"><i class="bi bi-calendar-event me-2 text-success"></i> Mock Interviews</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/leaderboard}"><i class="bi bi-trophy me-2 text-warning"></i> Leaderboard &amp; Badges</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-semibold" th:href="@{/contribute}"><i class="bi bi-plus-circle me-1"></i> Contribute</a>
+                    </li>
+                </ul>
+
+                <!-- Right Actions: Theme Toggle, Notifications, User Menu -->
+                <div class="d-flex align-items-center gap-2 mt-3 mt-xl-0">
+                    <!-- Dark / Light Mode Button -->
+                    <button class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2" id="themeToggleBtn" type="button" title="Toggle Dark/Light Mode">
+                        <i class="bi bi-moon-stars-fill text-dark" id="themeToggleIcon"></i>
+                    </button>
+
+                    <!-- Notifications Bell (Authenticated) -->
+                    <div sec:authorize="isAuthenticated()">
+                        <a class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 position-relative" th:href="@{/notifications}" title="Notifications">
+                            <i class="bi bi-bell-fill"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;"
+                                  th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">2</span>
+                        </a>
+                    </div>
+
+                    <!-- User Profile & Admin dropdown (Authenticated) -->
+                    <div class="dropdown" sec:authorize="isAuthenticated()">
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3 py-1 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            <span sec:authentication="name" class="d-none d-sm-inline" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 p-2" style="min-width: 220px;">
+                            <li class="px-3 py-2 border-bottom mb-1">
+                                <div class="fw-bold text-truncate" sec:authentication="name">user@jecrcu.edu.in</div>
+                                <div class="badge badge-soft-primary" sec:authorize="hasRole('ADMIN')">Placement Coordinator</div>
+                                <div class="badge badge-soft-success" sec:authorize="hasRole('STUDENT')">JECRC Student</div>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item py-2 fw-semibold text-danger" th:href="@{/admin}"><i class="bi bi-shield-lock me-2"></i> Admin Panel</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-2 text-primary"></i> My Dashboard</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" th:href="@{/notifications}"><i class="bi bi-gear me-2 text-muted"></i> Preferences</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-box-arrow-right me-2"></i> Log out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Sign In button (Unauthenticated) -->
+                    <div sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary btn-sm rounded-pill px-3" th:href="@{/login}">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================================
+         FLASH ALERTS (Success / Error)
+         ========================================== -->
+    <div class="container mt-3" th:if="${successMessage != null or errorMessage != null}">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 d-flex align-items-center gap-2" role="alert" th:if="${successMessage}">
+            <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+            <span th:text="${successMessage}">Operation completed successfully.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 d-flex align-items-center gap-2" role="alert" th:if="${errorMessage}">
+            <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+            <span th:text="${errorMessage}">An error occurred.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PAGE CONTENT
+         ========================================== -->
+    <main class="py-4">
+        <th:block th:replace="~{::content}" />
+    </main>
+
+    <!-- ==========================================
+         UNIVERSITY FOOTER
+         ========================================== -->
+    <footer class="custom-footer mt-auto">
+        <div class="container">
+            <div class="row g-4 justify-content-between mb-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 2rem; height: 2rem;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <span class="brand-font fs-5 fw-bold text-primary">You_can</span>
+                        <span class="badge badge-soft-primary ms-1">v1.0</span>
+                    </div>
+                    <p class="small text-muted mb-2">
+                        Official Campus Placement Intelligence &amp; Preparation Portal for the students and alumni of <strong>JECRC University</strong>, Jaipur.
+                    </p>
+                    <p class="small text-muted">
+                        Built for student success with historical drive records, mock interviews, and past recruitment question banks.
+                    </p>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="fw-bold mb-3">Explore</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                        <li><a th:href="@{/companies}" class="text-secondary text-decoration-none">Company Archive</a></li>
+                        <li><a th:href="@{/calendar}" class="text-secondary text-decoration-none">Placement Calendar</a></li>
+                        <li><a th:href="@{/statistics}" class="text-secondary text-decoration-none">Placement Stats</a></li>
+                        <li><a th:href="@{/upcoming}" class="text-secondary text-decoration-none">Upcoming Drives</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="fw-bold mb-3">Practice &amp; Prep</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                        <li><a th:href="@{/questions}" class="text-secondary text-decoration-none">Question Bank</a></li>
+                        <li><a th:href="@{/practice}" class="text-secondary text-decoration-none">Practice Mode</a></li>
+                        <li><a th:href="@{/roadmap}" class="text-secondary text-decoration-none">Prep Roadmaps</a></li>
+                        <li><a th:href="@{/resume}" class="text-secondary text-decoration-none">Resume Scanner</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold mb-3">Placement Cell</h6>
+                    <p class="small text-muted mb-1"><i class="bi bi-geo-alt me-1 text-primary"></i> Training &amp; Placement Cell, JECRC University, Sitapura, Jaipur, Rajasthan</p>
+                    <p class="small text-muted mb-0"><i class="bi bi-envelope me-1 text-primary"></i> placements@jecrcu.edu.in</p>
+                </div>
+            </div>
+            <div class="border-top pt-3 d-flex flex-wrap justify-content-between align-items-center small text-muted">
+                <div>&copy; 2026 JECRC University. All rights reserved.</div>
+                <div class="d-flex gap-3">
+                    <span>Private University Access Only</span>
+                    <span>&bull;</span>
+                    <a th:href="@{/contribute}" class="text-decoration-none text-muted">Pay It Forward</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Back to Top Button -->
+    <button type="button" id="btnBackToTop" class="back-to-top-btn" title="Back to Top" aria-label="Back to Top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- Mobile Bottom Navigation Bar (Visible only on mobile screens < 768px) -->
+    <nav class="mobile-bottom-nav d-md-none" aria-label="Mobile Navigation">
+        <a th:href="@{/dashboard}" class="bottom-nav-item">
+            <i class="bi bi-speedometer2"></i>
+            <span>Home</span>
+        </a>
+        <a th:href="@{/companies}" class="bottom-nav-item">
+            <i class="bi bi-building"></i>
+            <span>Companies</span>
+        </a>
+        <a th:href="@{/upcoming}" class="bottom-nav-item position-relative">
+            <i class="bi bi-megaphone"></i>
+            <span>Drives</span>
+        </a>
+        <a th:href="@{/practice}" class="bottom-nav-item">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Practice</span>
+        </a>
+        <a th:href="@{/eligibility}" class="bottom-nav-item">
+            <i class="bi bi-check2-circle"></i>
+            <span>Eligibility</span>
+        </a>
+    </nav>
+
+    <!-- Bootstrap 5.3 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Application JS -->
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

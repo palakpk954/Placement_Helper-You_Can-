@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Manage Reported Data — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">Reported Data Issues</h3>
+                <p class="text-muted small mb-0">Review reports flagged by students on past drives, rounds, or questions.</p>
+            </div>
+            <span class="badge badge-soft-danger fs-6" th:text="${reports.size() + ' Reports'}">0 Reports</span>
+        </div>
+
+        <div class="app-card p-5 text-center my-4" th:if="${reports.isEmpty()}">
+            <i class="bi bi-shield-check text-success fs-1 mb-2 d-block"></i>
+            <h5 class="fw-bold">No Data Issues Reported</h5>
+            <p class="text-muted small">All community flagged issues have been verified and resolved.</p>
+        </div>
+
+        <div class="d-flex flex-column gap-3" th:if="${!reports.isEmpty()}">
+            <div class="app-card p-4 shadow-sm" th:each="rpt : ${reports}">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge badge-soft-danger" th:text="${rpt.targetType}">DRIVE</span>
+                            <strong class="text-primary" th:text="${'Target #' + rpt.targetId}">Target #1</strong>
+                            <span class="badge" th:classappend="${rpt.status.name() == 'OPEN' ? 'bg-warning text-dark' : 'bg-success'}" th:text="${rpt.status}">OPEN</span>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            Reported by: <span th:text="${rpt.reporter.fullName + ' (' + rpt.reporter.email + ')'}">Rahul Sharma</span> &bull;
+                            Date: <span th:text="${#temporals.format(rpt.createdAt, 'dd MMM yyyy HH:mm')}">15 Oct 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded bg-body-tertiary small mb-3">
+                    <strong class="d-block text-muted mb-1">Reported Issue:</strong>
+                    <div th:text="${rpt.reason}">Details of what is wrong</div>
+                </div>
+
+                <!-- Admin Action -->
+                <div class="d-flex justify-content-end gap-2" th:if="${rpt.status.name() == 'OPEN'}">
+                    <form th:action="@{'/admin/reports/' + ${rpt.id} + '/dismiss'}" method="post">
+                        <input type="hidden" name="adminNotes" value="Dismissed after verification">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Dismiss</button>
+                    </form>
+                    <form th:action="@{'/admin/reports/' + ${rpt.id} + '/resolve'}" method="post">
+                        <input type="hidden" name="adminNotes" value="Data verified and corrected in catalog">
+                        <button type="submit" class="btn btn-sm btn-success px-3">Mark Resolved</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Contributor Leaderboard &amp; Badges — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i>Campus Contributor Leaderboard</h3>
+                <p class="text-muted small mb-0">Recognizing students and seniors who share placement experiences and interview questions.</p>
+            </div>
+            <a th:href="@{/contribute}" class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Earn Points (+50)
+            </a>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="app-card shadow-sm border-0 mb-4 overflow-hidden">
+            <div class="p-3 bg-light border-bottom">
+                <h6 class="fw-bold mb-0"><i class="bi bi-star-fill text-warning me-2"></i>Top 10 Contributors</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60px;" class="text-center">#</th>
+                            <th>Student / Contributor</th>
+                            <th>Branch</th>
+                            <th>Graduation</th>
+                            <th class="text-end">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u, stat : ${topContributors}">
+                            <td class="text-center fw-bold">
+                                <span class="badge rounded-circle p-2"
+                                      th:classappend="${stat.index == 0 ? 'bg-warning text-dark' : (stat.index == 1 ? 'bg-secondary text-white' : (stat.index == 2 ? 'bg-danger text-white' : 'bg-light text-dark'))}"
+                                      th:text="${stat.index + 1}">1</span>
+                            </td>
+                            <td>
+                                <div class="fw-semibold" th:text="${u.fullName}">Student Name</div>
+                                <div class="small text-muted" th:text="${u.email}">email@jecrcu.edu.in</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border" th:text="${u.branch}">CSE</span></td>
+                            <td class="text-muted small" th:text="${u.graduationYear}">2026</td>
+                            <td class="text-end fw-bold text-primary">
+                                <i class="bi bi-coin text-warning me-1"></i>
+                                <span th:text="${u.points != null ? u.points : 0}">120</span> pts
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Badges Gallery -->
+        <h5 class="fw-bold mb-3"><i class="bi bi-award-fill text-primary me-2"></i>Achievement Badges</h5>
+        <div class="row g-3" th:if="${badges != null and !badges.isEmpty()}">
+            <div class="col-md-4" th:each="b : ${badges}">
+                <div class="app-card p-3 h-100 shadow-sm border-0 text-center">
+                    <div class="fs-1 mb-2 text-warning"><i class="bi bi-patch-check-fill"></i></div>
+                    <h6 class="fw-bold mb-1" th:text="${b.name}">First Contributor</h6>
+                    <p class="small text-muted mb-0" th:text="${b.description}">Submitted their first verified interview experience.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Resume Analyzer &amp; Tips — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 960px;">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-person-fill text-primary me-2"></i>Automated Resume Scanner</h3>
+                <p class="text-muted small mb-0">Upload your PDF resume for automated formatting checks, length verification, and placement recommendations.</p>
+            </div>
+        </div>
+
+        <!-- Upload Form Card -->
+        <div class="app-card p-4 shadow-sm border-0 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-upload text-primary me-2"></i>Upload Resume (PDF, max 2 MB)</h5>
+            <form th:action="@{/resume/upload}" method="post" enctype="multipart/form-data">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <input type="file" class="form-control" name="file" accept="application/pdf" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary rounded-pill w-100 fw-semibold">
+                            <i class="bi bi-search me-1"></i> Scan &amp; Analyze
+                        </button>
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="shareConsent" value="true" id="shareCheck">
+                    <label class="form-check-label small text-muted" for="shareCheck">
+                        Allow juniors to view this resume as a verified sample (anonymously).
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <!-- Analysis Results if uploaded -->
+        <div class="app-card p-4 shadow-sm border-0 mb-4" th:if="${myResume != null}">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1" th:text="${myResume.fileName}">resume.pdf</h5>
+                    <span class="badge bg-secondary-subtle text-secondary"
+                          th:text="${myResume.pageCount != null ? myResume.pageCount + ' Page(s)' : '1 Page'}">1 Page</span>
+                </div>
+                <span class="badge"
+                      th:classappend="${myResume.score != null and myResume.score >= 80 ? 'badge-soft-success fs-6' : (myResume.score != null and myResume.score >= 60 ? 'badge-soft-warning fs-6' : 'badge-soft-danger fs-6')}"
+                      th:text="${'Score: ' + (myResume.score != null ? myResume.score : 0) + ' / 100'}">Score: 85/100</span>
+            </div>
+
+            <!-- Checks -->
+            <div class="row g-3 mt-1 mb-3">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center">
+                        <i class="bi" th:classappend="${myResume.hasContactInfo ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                        <div class="small fw-semibold mt-1">Contact Details</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center">
+                        <i class="bi" th:classappend="${myResume.hasProjectsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                        <div class="small fw-semibold mt-1">Projects Section</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center">
+                        <i class="bi" th:classappend="${myResume.hasSkillsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                        <div class="small fw-semibold mt-1">Skills Section</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center">
+                        <i class="bi" th:classappend="${myResume.hasEducationSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                        <div class="small fw-semibold mt-1">Education Section</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback / Suggestions -->
+            <div th:if="${myResume.feedback != null and !myResume.feedback.isBlank()}">
+                <h6 class="fw-bold mb-2">Automated Feedback</h6>
+                <div class="p-3 bg-light rounded-3 small text-secondary" th:text="${myResume.feedback}">
+                    Great structure! Consider adding measurable metrics to your projects (e.g. reduced load time by 30%).
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Resumes Section -->
+        <h5 class="fw-bold mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Approved Student Resume Samples</h5>
+        <div class="row g-3" th:if="${sampleResumes != null and !sampleResumes.isEmpty()}">
+            <div class="col-md-6" th:each="sr : ${sampleResumes}">
+                <div class="app-card p-3 shadow-sm border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0">Verified Sample Resume</h6>
+                        <span class="small text-muted" th:text="${'Score: ' + sr.score + ' / 100'}">Score: 90/100</span>
+                    </div>
+                    <a th:href="@{/resume/download/{id}(id=${sr.id})}" class="btn btn-sm btn-outline-primary rounded-pill">
+                        <i class="bi bi-download me-1"></i> View Sample
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

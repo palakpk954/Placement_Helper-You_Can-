@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Notifications &amp; Preferences — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>Notifications &amp; Alerts</h3>
+                <p class="text-muted small mb-0">Stay updated with placement announcements, deadlines, and mock interview alerts.</p>
+            </div>
+            <form th:action="@{/notifications/mark-read}" method="post" th:if="${notifications != null and !notifications.isEmpty()}">
+                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="bi bi-check2-all me-1"></i> Mark All as Read
+                </button>
+            </form>
+        </div>
+
+        <!-- Preferences Card -->
+        <div class="app-card p-4 shadow-sm border-0 mb-4" th:if="${preferences != null}">
+            <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill text-secondary me-2"></i>Email Notification Settings</h5>
+            <form th:action="@{/notifications/preferences}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="emailDrives" value="true" id="drivesSwitch"
+                                   th:checked="${preferences.emailDrives}">
+                            <label class="form-check-label small" for="drivesSwitch">Matching Upcoming Drives &amp; Eligibility</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="emailDeadlines" value="true" id="deadlineSwitch"
+                                   th:checked="${preferences.emailDeadlines}">
+                            <label class="form-check-label small" for="deadlineSwitch">Application Deadlines within 48 hours</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="emailExperiences" value="true" id="expSwitch"
+                                   th:checked="${preferences.emailExperiences}">
+                            <label class="form-check-label small" for="expSwitch">New Experiences on Bookmarked Companies</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="emailBookings" value="true" id="bookingSwitch"
+                                   th:checked="${preferences.emailBookings}">
+                            <label class="form-check-label small" for="bookingSwitch">Mock Interview Bookings &amp; Reminders</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-top">
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notification List -->
+        <div class="app-card shadow-sm border-0 mb-4 overflow-hidden">
+            <div class="p-3 bg-light border-bottom">
+                <h6 class="fw-bold mb-0"><i class="bi bi-inbox-fill text-primary me-2"></i>Recent In-App Alerts</h6>
+            </div>
+            <div class="list-group list-group-flush" th:if="${notifications != null and !notifications.isEmpty()}">
+                <div class="list-group-item p-3" th:each="n : ${notifications}"
+                     th:classappend="${!n.read ? 'bg-light border-start border-primary border-4' : ''}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="fw-bold mb-1" th:text="${n.title}">Notification Title</h6>
+                            <p class="small text-secondary mb-1" th:text="${n.message}">Notification message details.</p>
+                            <span class="small text-muted" th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, HH:mm')}">Date</span>
+                        </div>
+                        <a th:if="${n.link != null and !n.link.isBlank()}" th:href="${n.link}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            View &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="text-center py-5" th:if="${notifications == null or notifications.isEmpty()}">
+                <i class="bi bi-bell-slash text-muted display-4"></i>
+                <h6 class="fw-bold mt-3 mb-1">No notifications yet</h6>
+                <p class="text-muted small">You're all caught up!</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

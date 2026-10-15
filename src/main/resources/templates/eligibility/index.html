@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Eligibility &amp; Simulator — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-check2-circle text-primary me-2"></i>Campus Placement Eligibility Checker</h3>
+                <p class="text-muted small mb-0">Evaluate company eligibility based on your academic profile, or simulate "What-If" scenarios.</p>
+            </div>
+        </div>
+
+        <!-- Simulator Form -->
+        <div class="app-card p-4 shadow-sm mb-4 border-0">
+            <h6 class="fw-bold mb-3"><i class="bi bi-sliders me-2 text-primary"></i>Profile / "What-If" Simulator</h6>
+            <form th:action="@{/eligibility}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Engineering Branch</label>
+                    <select class="form-select" name="simBranch">
+                        <option value="CSE" th:selected="${branch == 'CSE'}">CSE (Computer Science)</option>
+                        <option value="IT" th:selected="${branch == 'IT'}">IT (Information Tech)</option>
+                        <option value="ECE" th:selected="${branch == 'ECE'}">ECE (Electronics)</option>
+                        <option value="EE" th:selected="${branch == 'EE'}">EE (Electrical)</option>
+                        <option value="ME" th:selected="${branch == 'ME'}">ME (Mechanical)</option>
+                        <option value="Civil" th:selected="${branch == 'Civil'}">Civil Engineering</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">CGPA</label>
+                    <input type="number" step="0.01" min="0" max="10" class="form-control" name="simCgpa" th:value="${cgpa}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Active Backlogs</label>
+                    <input type="number" min="0" max="10" class="form-control" name="simBacklogs" th:value="${backlogs}" required>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill w-100 fw-semibold">
+                        <i class="bi bi-arrow-repeat me-1"></i> Re-Calculate
+                    </button>
+                    <a th:href="@{/eligibility}" class="btn btn-outline-secondary rounded-pill" title="Reset to my real profile">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+            <div class="mt-2" th:if="${isSimulated}">
+                <span class="badge bg-warning-subtle text-warning-emphasis">
+                    <i class="bi bi-info-circle me-1"></i> Simulation Mode active. Values shown are hypothetical.
+                </span>
+            </div>
+        </div>
+
+        <!-- Tabs: Upcoming vs Past Drives -->
+        <ul class="nav nav-pills mb-4" id="eligibilityTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill px-4" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming-pane" type="button" role="tab">
+                    Upcoming Drives (<span th:text="${upcomingResults != null ? upcomingResults.size() : 0}">0</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill px-4" id="past-tab" data-bs-toggle="pill" data-bs-target="#past-pane" type="button" role="tab">
+                    Historical Drives (<span th:text="${pastResults != null ? pastResults.size() : 0}">0</span>)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="eligibilityTabContent">
+            <!-- Upcoming Pane -->
+            <div class="tab-pane fade show active" id="upcoming-pane" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-6" th:each="r : ${upcomingResults}" th:with="d=${r.target}">
+                        <div class="app-card p-4 h-100 shadow-sm border-0 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="fw-bold mb-0" th:text="${d.companyName}">Microsoft</h5>
+                                    <span class="badge" th:classappend="${r.eligible ? 'badge-soft-success' : 'badge-soft-danger'}"
+                                          th:text="${r.eligible ? 'Eligible' : 'Not Eligible'}">Eligible</span>
+                                </div>
+                                <p class="text-primary small fw-semibold mb-2" th:text="${d.rolesOffered}">SDE</p>
+                                <div class="d-flex gap-2 mb-3">
+                                    <span class="badge bg-body-tertiary text-body border" th:text="${'CTC: ' + d.ctcOrStipend}">CTC: 16 LPA</span>
+                                    <span class="badge bg-body-tertiary text-body border" th:text="${'Cutoff: ' + d.minCgpa}">Cutoff: 7.00</span>
+                                </div>
+                                <div class="alert alert-danger py-2 px-3 small rounded-3" th:if="${!r.eligible and r.exclusionReasons != null and !r.exclusionReasons.isEmpty()}">
+                                    <ul class="mb-0 ps-3">
+                                        <li th:each="f : ${r.exclusionReasons}" th:text="${f}">Reason</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="pt-2 border-top mt-2">
+                                <a th:href="@{/upcoming/{id}/register(id=${d.id})}" class="btn btn-sm btn-primary rounded-pill w-100 fw-semibold">
+                                    Register for Drive &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center py-4 text-muted" th:if="${upcomingResults == null or upcomingResults.isEmpty()}">
+                        <i class="bi bi-info-circle me-1"></i> No upcoming recruitment drives scheduled to evaluate.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Past Drives Pane -->
+            <div class="tab-pane fade" id="past-pane" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-6" th:each="r : ${pastResults}" th:with="d=${r.target}">
+                        <div class="app-card p-4 h-100 shadow-sm border-0 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="fw-bold mb-0" th:text="${d.company.name}">Amazon</h5>
+                                    <span class="badge" th:classappend="${r.eligible ? 'badge-soft-success' : 'badge-soft-danger'}"
+                                          th:text="${r.eligible ? 'Eligible' : 'Not Eligible'}">Eligible</span>
+                                </div>
+                                <p class="text-muted small mb-2" th:text="${d.driveMonth + ' ' + d.driveYear + ' — ' + d.roles}">Aug 2025</p>
+                                <div class="d-flex gap-2 mb-2">
+                                    <span class="badge bg-body-tertiary text-body border" th:text="${'CTC: ' + d.ctcOrStipend}">CTC: 14 LPA</span>
+                                    <span class="badge bg-body-tertiary text-body border" th:text="${'Cutoff: ' + d.minCgpa}">Cutoff: 7.00</span>
+                                </div>
+                                <div class="alert alert-danger py-2 px-3 small rounded-3" th:if="${!r.eligible and r.exclusionReasons != null and !r.exclusionReasons.isEmpty()}">
+                                    <ul class="mb-0 ps-3">
+                                        <li th:each="f : ${r.exclusionReasons}" th:text="${f}">Reason</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="pt-2 border-top mt-2">
+                                <a th:href="@{/companies/{id}(id=${d.company.id})}" class="btn btn-sm btn-outline-secondary rounded-pill w-100">
+                                    View Past Rounds &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center py-4 text-muted" th:if="${pastResults == null or pastResults.isEmpty()}">
+                        <i class="bi bi-info-circle me-1"></i> No historical drives recorded.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

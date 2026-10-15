@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Upcoming Placement Drives — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-megaphone-fill text-primary me-2"></i>Upcoming Campus Recruitment Drives</h3>
+                <p class="text-muted small mb-0">Scheduled company visits, registration deadlines, and automated personal eligibility checks.</p>
+            </div>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/drives}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Post New Drive
+                </a>
+            </div>
+        </div>
+
+        <!-- Drives List -->
+        <div class="row g-4" th:if="${evaluations != null and !evaluations.isEmpty()}">
+            <div class="col-md-6 col-xl-4" th:each="eval : ${evaluations}" th:with="d=${eval.target}">
+                <div class="app-card h-100 p-4 shadow-sm d-flex flex-column justify-content-between border-0 position-relative">
+                    <div>
+                        <!-- Top status badges -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge"
+                                  th:classappend="${eval.eligible ? 'badge-soft-success' : 'badge-soft-danger'}">
+                                <i class="bi" th:classappend="${eval.eligible ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i>
+                                <span th:text="${eval.eligible ? 'Eligible for You' : 'Not Eligible'}">Eligible</span>
+                            </span>
+
+                            <a th:href="@{/upcoming/{id}/ics(id=${d.id})}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Add to Calendar (.ics)">
+                                <i class="bi bi-calendar-plus"></i>
+                            </a>
+                        </div>
+
+                        <!-- Company & Role -->
+                        <h5 class="fw-bold mb-1" th:text="${d.companyName}">Microsoft</h5>
+                        <p class="text-primary fw-semibold small mb-2" th:text="${d.rolesOffered}">Software Engineer (Full-Time)</p>
+
+                        <!-- CTC & Details -->
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-cash-stack text-success me-1"></i>
+                                <span th:text="${d.ctcOrStipend}">16.50 LPA</span>
+                            </span>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-mortarboard me-1"></i>
+                                <span th:text="${'Min CGPA: ' + d.minCgpa}">Min CGPA: 7.00</span>
+                            </span>
+                        </div>
+
+                        <!-- Branches & Backlogs -->
+                        <p class="small text-muted mb-2">
+                            <strong>Branches:</strong> <span th:text="${d.eligibleBranches}">CSE, IT, ECE</span><br>
+                            <strong>Max Backlogs:</strong> <span th:text="${d.maxBacklogs}">0</span>
+                        </p>
+
+                        <!-- Ineligibility reasons if not eligible -->
+                        <div class="alert alert-danger py-2 px-3 small mb-3 rounded-3" th:if="${!eval.eligible and eval.exclusionReasons != null and !eval.exclusionReasons.isEmpty()}">
+                            <ul class="mb-0 ps-3">
+                                <li th:each="r : ${eval.exclusionReasons}" th:text="${r}">CGPA below requirement</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Footer Details and Action -->
+                    <div class="pt-3 border-top mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                            <span><i class="bi bi-clock me-1"></i> Deadline:</span>
+                            <span class="fw-semibold text-danger" th:text="${#temporals.format(d.deadline, 'dd MMM yyyy, HH:mm')}">25 Oct 2026</span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/upcoming/{id}/register(id=${d.id})}"
+                               class="btn rounded-pill btn-sm fw-semibold shadow-sm"
+                               th:classappend="${registeredDriveIds != null and registeredDriveIds.contains(d.id) ? 'btn-success' : 'btn-primary'}">
+                                <span th:if="${registeredDriveIds != null and registeredDriveIds.contains(d.id)}">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Registered
+                                </span>
+                                <span th:unless="${registeredDriveIds != null and registeredDriveIds.contains(d.id)}">
+                                    Register Now <i class="bi bi-box-arrow-right ms-1"></i>
+                                </span>
+                            </a>
+                            <a th:if="${d.company != null}"
+                               th:href="@{/companies/{id}(id=${d.company.id})}"
+                               class="btn btn-outline-secondary rounded-pill btn-sm">
+                                View Past Drive Archive &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5" th:if="${evaluations == null or evaluations.isEmpty()}">
+            <i class="bi bi-calendar-x text-muted display-4"></i>
+            <h5 class="fw-bold mt-3 mb-1">No upcoming recruitment drives scheduled</h5>
+            <p class="text-muted small">New campus recruitment notifications posted by the placement cell will appear here.</p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

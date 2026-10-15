@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Interactive Practice Mode — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/questions}" class="text-decoration-none small text-muted">&larr; Back to Question Bank</a>
+                <h3 class="fw-bold mb-1 mt-1"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Interactive Practice Mode</h3>
+                <p class="text-muted small mb-0">Solve interview questions one-by-one, track progress, and reveal hints.</p>
+            </div>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 fs-6 rounded-pill" th:if="${totalQuestions > 0}"
+                  th:text="${'Question ' + (currentIndex + 1) + ' of ' + totalQuestions}">Question 1 of 10</span>
+        </div>
+
+        <div th:if="${currentQuestion != null}">
+            <!-- Question Card -->
+            <div class="app-card p-4 p-md-5 shadow-sm border-0 mb-4 position-relative">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span class="badge bg-primary-subtle text-primary"
+                          th:if="${currentQuestion.round != null and currentQuestion.round.drive != null}">
+                        <i class="bi bi-building me-1"></i>
+                        <span th:text="${currentQuestion.round.drive.company.name}">Google</span>
+                    </span>
+                    <span class="badge bg-info-subtle text-info fw-semibold" th:if="${currentQuestion.topicTags != null}"
+                          th:text="${currentQuestion.topicTags}">DSA</span>
+                    <span class="badge"
+                          th:classappend="${currentQuestion.difficulty != null and currentQuestion.difficulty.name() == 'EASY' ? 'badge-soft-success' : (currentQuestion.difficulty != null and currentQuestion.difficulty.name() == 'HARD' ? 'badge-soft-danger' : 'badge-soft-warning')}"
+                          th:text="${currentQuestion.difficulty}">MEDIUM</span>
+
+                    <!-- Attempt Status Badge -->
+                    <span class="badge bg-success ms-auto" th:if="${userAttempt != null and userAttempt.status.name() == 'SOLVED'}">
+                        <i class="bi bi-check-lg me-1"></i> Solved
+                    </span>
+                    <span class="badge bg-warning text-dark ms-auto" th:if="${userAttempt != null and userAttempt.status.name() == 'UNSURE'}">
+                        <i class="bi bi-question-lg me-1"></i> Marked Unsure
+                    </span>
+                </div>
+
+                <h4 class="fw-semibold mb-4 lh-base" th:text="${currentQuestion.questionText}">
+                    Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+                </h4>
+
+                <!-- Reveal Hint / Solution -->
+                <div class="p-3 bg-body-tertiary rounded-3 mb-4 border" th:if="${currentQuestion.answerOrHint != null and !currentQuestion.answerOrHint.isBlank()}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold small text-muted"><i class="bi bi-lightbulb-fill text-warning me-1"></i> Answer Key &amp; Hints</span>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#solutionCollapse">
+                            Reveal Hint
+                        </button>
+                    </div>
+                    <div class="collapse mt-3" id="solutionCollapse">
+                        <hr class="my-2">
+                        <p class="small text-secondary mb-0" th:text="${currentQuestion.answerOrHint}">
+                            Hint / solution approach text goes here.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mark Status Buttons -->
+                <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+                    <form th:action="@{/practice/attempt}" method="post" class="d-inline">
+                        <input type="hidden" name="questionId" th:value="${currentQuestion.id}">
+                        <input type="hidden" name="status" value="SOLVED">
+                        <input type="hidden" name="nextIndex" th:value="${currentIndex + 1}">
+                        <button type="submit" class="btn btn-success rounded-pill px-3">
+                            <i class="bi bi-check2-circle me-1"></i> Mark as Solved
+                        </button>
+                    </form>
+
+                    <form th:action="@{/practice/attempt}" method="post" class="d-inline">
+                        <input type="hidden" name="questionId" th:value="${currentQuestion.id}">
+                        <input type="hidden" name="status" value="UNSURE">
+                        <input type="hidden" name="nextIndex" th:value="${currentIndex + 1}">
+                        <button type="submit" class="btn btn-warning rounded-pill px-3">
+                            <i class="bi bi-question-circle me-1"></i> Mark as Unsure
+                        </button>
+                    </form>
+
+                    <form th:action="@{/practice/attempt}" method="post" class="d-inline">
+                        <input type="hidden" name="questionId" th:value="${currentQuestion.id}">
+                        <input type="hidden" name="status" value="SKIPPED">
+                        <input type="hidden" name="nextIndex" th:value="${currentIndex + 1}">
+                        <button type="submit" class="btn btn-outline-secondary rounded-pill px-3">
+                            Skip <i class="bi bi-chevron-right ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="d-flex justify-content-between align-items-center">
+                <a th:href="@{/practice(index=${currentIndex - 1})}"
+                   class="btn btn-outline-secondary rounded-pill px-4"
+                   th:classappend="${currentIndex == 0 ? 'disabled' : ''}">
+                    &larr; Previous Question
+                </a>
+                <a th:href="@{/practice(index=${currentIndex + 1})}"
+                   class="btn btn-primary rounded-pill px-4"
+                   th:classappend="${currentIndex >= totalQuestions - 1 ? 'disabled' : ''}">
+                    Next Question &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5" th:if="${currentQuestion == null}">
+            <i class="bi bi-check2-all text-success display-4"></i>
+            <h4 class="fw-bold mt-3 mb-1">No questions to practice</h4>
+            <p class="text-muted small">All caught up or no questions match your current filter.</p>
+            <a th:href="@{/questions}" class="btn btn-primary rounded-pill px-4">Browse All Questions</a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

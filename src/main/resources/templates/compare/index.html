@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Compare Recruiters Side by Side — You_can JECRC</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1">Side-by-Side Company Comparison</h3>
+            <p class="text-muted small mb-0">Directly compare rounds, question topics, packages, and eligibility criteria between any two campus recruiters.</p>
+        </div>
+
+        <!-- Selectors Form -->
+        <div class="app-card p-4 mb-4 shadow-sm">
+            <form th:action="@{/compare}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold">Select First Company</label>
+                    <select class="form-select" name="c1" onchange="this.form.submit()">
+                        <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}" th:selected="${c1Id == c.id}">Google</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-center text-muted fw-bold">
+                    <div class="d-none d-md-block pt-3"><i class="bi bi-arrow-left-right fs-4 text-primary"></i></div>
+                    <div class="d-md-none">VS</div>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold">Select Second Company</label>
+                    <select class="form-select" name="c2" onchange="this.form.submit()">
+                        <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}" th:selected="${c2Id == c.id}">Microsoft</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="app-card p-4 shadow-sm mb-4" th:if="${profile1 != null and profile2 != null}">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 25%;">Criteria</th>
+                            <th style="width: 37.5%;" class="text-center">
+                                <h5 class="fw-bold mb-0 text-primary" th:text="${profile1.company.name}">Google</h5>
+                                <span class="badge badge-soft-primary" th:text="${profile1.company.industry}">Product &amp; Tech</span>
+                            </th>
+                            <th style="width: 37.5%;" class="text-center">
+                                <h5 class="fw-bold mb-0 text-success" th:text="${profile2.company.name}">Microsoft</h5>
+                                <span class="badge badge-soft-success" th:text="${profile2.company.industry}">Product &amp; Tech</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Campus Visits Count</td>
+                            <td class="text-center" th:text="${profile1.totalVisits + ' visits recorded'}">2 visits</td>
+                            <td class="text-center" th:text="${profile2.totalVisits + ' visits recorded'}">2 visits</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Package Offered (CTC)</td>
+                            <td class="text-center fw-bold text-success" th:text="${profile1.latestCtc}">35.00 LPA</td>
+                            <td class="text-center fw-bold text-success" th:text="${profile2.latestCtc}">48.00 LPA</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">CGPA Cutoff</td>
+                            <td class="text-center" th:text="${profile1.minCgpa}">8.50</td>
+                            <td class="text-center" th:text="${profile2.minCgpa}">8.00</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Eligible Branches</td>
+                            <td class="text-center" th:text="${profile1.eligibleBranches}">CSE, IT</td>
+                            <td class="text-center" th:text="${profile2.eligibleBranches}">CSE, IT, ECE</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Typical Rounds Count</td>
+                            <td class="text-center" th:text="${profile1.typicalRoundsCount + ' Rounds'}">4 Rounds</td>
+                            <td class="text-center" th:text="${profile2.typicalRoundsCount + ' Rounds'}">4 Rounds</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Typical Rounds Breakdown</td>
+                            <td>
+                                <ul class="list-unstyled mb-0 small ps-2">
+                                    <li th:each="r : ${profile1.roundNames}"><i class="bi bi-check2 text-primary me-1"></i> <span th:text="${r}">Online Assessment</span></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-unstyled mb-0 small ps-2">
+                                    <li th:each="r : ${profile2.roundNames}"><i class="bi bi-check2 text-success me-1"></i> <span th:text="${r}">Codility Assessment</span></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Interview Focus Topics</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <span class="badge badge-soft-primary" th:each="t : ${profile1.topTopics}" th:text="${t}">Graphs</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <span class="badge badge-soft-success" th:each="t : ${profile2.topTopics}" th:text="${t}">Binary Search</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Difficulty Rating</td>
+                            <td class="text-center fw-bold text-warning">
+                                <i class="bi bi-star-fill text-warning"></i> <span th:text="${profile1.difficultyRating}">4.8</span> / 5.0
+                            </td>
+                            <td class="text-center fw-bold text-warning">
+                                <i class="bi bi-star-fill text-warning"></i> <span th:text="${profile2.difficultyRating}">4.5</span> / 5.0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Work Mode</td>
+                            <td class="text-center" th:text="${profile1.workMode}">HYBRID</td>
+                            <td class="text-center" th:text="${profile2.workMode}">HYBRID</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

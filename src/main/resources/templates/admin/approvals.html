@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Experience Approval Queue — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">Student Submissions Approval Queue</h3>
+                <p class="text-muted small mb-0">Moderation queue for interview experiences. Approving awards +50 points to the student.</p>
+            </div>
+            <span class="badge badge-soft-warning fs-6" th:text="${pendingExperiences.size() + ' Pending'}">1 Pending</span>
+        </div>
+
+        <!-- Empty state -->
+        <div class="app-card p-5 text-center my-4" th:if="${pendingExperiences.isEmpty()}">
+            <div class="bg-body-tertiary rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-3">
+                <i class="bi bi-check2-all text-success fs-1"></i>
+            </div>
+            <h5 class="fw-bold">No Pending Submissions</h5>
+            <p class="text-muted small">All student placement experience submissions have been reviewed and approved.</p>
+        </div>
+
+        <!-- Pending Cards List -->
+        <div class="d-flex flex-column gap-4" th:if="${!pendingExperiences.isEmpty()}">
+            <div class="app-card p-4 shadow-sm" th:each="exp : ${pendingExperiences}">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3 pb-2 border-bottom">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h5 class="fw-bold mb-0 text-primary" th:text="${exp.title}">Experience Title</h5>
+                            <span class="badge badge-soft-warning" th:if="${exp.anonymous}"><i class="bi bi-incognito me-1"></i> Anonymous to public</span>
+                            <span class="badge badge-soft-success" th:text="${exp.outcome}">SELECTED</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold"
+                                  th:if="${duplicateFlaggedIds != null and duplicateFlaggedIds.contains(exp.id)}">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Possible Duplicate Detected
+                            </span>
+                        </div>
+                        <div class="small text-muted">
+                            Company: <strong th:text="${exp.drive.company.name}">Google</strong> &bull;
+                            Drive: <span th:text="${exp.drive.driveMonth + ' ' + exp.drive.driveYear}">August 2025</span> &bull;
+                            Submitted by: <strong class="text-danger" th:text="${exp.author.fullName + ' (' + exp.author.email + ')'}">Rahul Sharma</strong>
+                        </div>
+                    </div>
+                    <div class="small text-muted">
+                        Difficulty Rated: <strong th:text="${exp.difficultyRating + ' / 5'}">4 / 5</strong>
+                    </div>
+                </div>
+
+                <!-- Narrative -->
+                <div class="small text-secondary mb-3" style="white-space: pre-line;" th:text="${exp.content}">Narrative content</div>
+
+                <!-- Tips & Mistakes -->
+                <div class="row g-2 mb-3 small" th:if="${exp.tips != null or exp.mistakesToAvoid != null}">
+                    <div class="col-md-6" th:if="${exp.tips}">
+                        <div class="p-2 rounded bg-success-subtle text-success">
+                            <strong>Key Tips:</strong>
+                            <div th:text="${exp.tips}">Tips</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" th:if="${exp.mistakesToAvoid}">
+                        <div class="p-2 rounded bg-danger-subtle text-danger">
+                            <strong>Mistakes to Avoid:</strong>
+                            <div th:text="${exp.mistakesToAvoid}">Mistakes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls: Approve or Reject -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <span class="small text-muted">Approval will publish this post and award <strong>+50 contributor points</strong>.</span>
+                    <div class="d-flex gap-2">
+                        <!-- Reject Modal trigger -->
+                        <button type="button" class="btn btn-sm btn-outline-danger px-3" data-bs-toggle="modal" th:data-bs-target="${'#rejectModal-' + exp.id}">
+                            <i class="bi bi-x-circle me-1"></i> Reject with Reason
+                        </button>
+
+                        <!-- Approve Form -->
+                        <form th:action="@{'/admin/approvals/' + ${exp.id} + '/approve'}" method="post">
+                            <button type="submit" class="btn btn-sm btn-success px-4 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Approve &amp; Publish
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div class="modal fade" th:id="${'rejectModal-' + exp.id}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{'/admin/approvals/' + ${exp.id} + '/reject'}" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold text-danger"><i class="bi bi-x-octagon-fill me-2"></i>Reject Submission</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label class="form-label small fw-semibold">Rejection Reason (Visible to Student)</label>
+                                    <textarea class="form-control" name="reason" rows="3" placeholder="Explain why the submission could not be approved (e.g. 'Please provide more details on the technical questions asked' or 'Inappropriate language')." required></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-sm btn-danger px-3">Confirm Rejection</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

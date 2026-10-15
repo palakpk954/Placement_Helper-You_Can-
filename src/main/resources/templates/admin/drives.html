@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Manage Recruitment Drives — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">Manage Historical Campus Drives</h3>
+                <p class="text-muted small mb-0">Record or edit individual recruitment drives, rounds, and selection counts.</p>
+            </div>
+            <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#newDriveCollapse">
+                <i class="bi bi-plus-lg me-1"></i> Add Drive Record
+            </button>
+        </div>
+
+        <!-- Add Drive Form Collapse -->
+        <div class="collapse mb-4" id="newDriveCollapse">
+            <div class="app-card p-4 shadow-sm border-primary">
+                <h5 class="fw-bold mb-3"><i class="bi bi-briefcase-fill text-primary me-2"></i>Record Campus Drive</h5>
+                <form th:action="@{/admin/drives/save}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Recruiting Company</label>
+                            <select class="form-select" name="companyId" required>
+                                <option value="" disabled selected>-- Select Recruiter --</option>
+                                <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}">Google</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Visit Year</label>
+                            <input type="number" class="form-control" name="driveYear" value="2026" min="2000" max="2035" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Visit Month</label>
+                            <select class="form-select" name="driveMonth" required>
+                                <option value="July">July</option>
+                                <option value="August" selected>August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Roles Offered</label>
+                            <input type="text" class="form-control" name="roles" placeholder="e.g. Graduate Trainee / SDE-1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Package (CTC / Stipend)</label>
+                            <input type="text" class="form-control" name="ctcOrStipend" placeholder="e.g. 12.00 LPA (Base: 9.5 LPA)" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Min CGPA Cutoff</label>
+                            <input type="number" step="0.01" min="0" max="10" class="form-control" name="minCgpa" value="6.50" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Eligible Branches</label>
+                            <input type="text" class="form-control" name="eligibleBranches" value="CSE, IT, ECE" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Selections (Placed Count)</label>
+                            <input type="number" min="0" class="form-control" name="studentsSelected" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Job Type</label>
+                            <select class="form-select" name="jobType">
+                                <option value="PLACEMENT" selected>Full-Time Placement</option>
+                                <option value="INTERNSHIP">Internship</option>
+                                <option value="BOTH">Both (Internship + PPO)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Work Mode</label>
+                            <select class="form-select" name="workMode">
+                                <option value="HYBRID" selected>Hybrid</option>
+                                <option value="ON_SITE">On-Site</option>
+                                <option value="REMOTE">Remote</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#newDriveCollapse">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary px-4 fw-semibold">Save Drive</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Drives Table -->
+        <div class="app-card p-4 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Recruiter</th>
+                            <th>Timeline</th>
+                            <th>Roles</th>
+                            <th>Package</th>
+                            <th>Eligibility</th>
+                            <th>Selections</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${drives}">
+                            <td><strong class="text-primary" th:text="${d.company.name}">Google</strong></td>
+                            <td class="small" th:text="${d.driveMonth + ' ' + d.driveYear}">August 2025</td>
+                            <td class="small text-truncate" style="max-width: 200px;" th:text="${d.roles}">SDE</td>
+                            <td><span class="badge badge-soft-success" th:text="${d.ctcOrStipend}">35.00 LPA</span></td>
+                            <td class="small">
+                                <div>Cutoff: <span th:text="${d.minCgpa}">8.50</span></div>
+                                <div class="text-muted" th:text="${d.eligibleBranches}">CSE, IT</div>
+                            </td>
+                            <td><strong class="text-primary" th:text="${d.studentsSelected}">3</strong></td>
+                            <td class="text-end">
+                                <a th:href="@{'/companies/' + ${d.company.id}}" class="btn btn-sm btn-outline-secondary py-1 px-2" title="View Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${company.name + ' — Preparation Checklist'}">Company Prep Checklist — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Company Preparation Checklist</h3>
+                <p class="text-muted small mb-0">Structured checklist generated automatically from past recruitment rounds and real question topics.</p>
+            </div>
+            
+            <!-- Switch Company dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span th:text="${'Switch: ' + company.name}">Switch Company</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="max-height: 280px; overflow-y: auto;">
+                    <li th:each="c : ${allCompanies}">
+                        <a class="dropdown-item small" th:href="@{'/checklists/' + ${c.id}}" th:text="${c.name}">Google</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Target Company Card -->
+        <div class="app-card p-4 mb-4 shadow-sm">
+            <div class="d-flex align-items-center gap-3">
+                <div class="company-logo-frame flex-shrink-0" style="width: 4rem; height: 4rem;">
+                    <img th:if="${company.logoUrl != null and !company.logoUrl.isBlank()}" th:src="${company.logoUrl}" th:alt="${company.name}" onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.alt) + '&background=0D8ABC&color=fff';">
+                    <div th:if="${company.logoUrl == null or company.logoUrl.isBlank()}" class="fw-bold text-primary fs-3" th:text="${#strings.substring(company.name, 0, 1)}">G</div>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h4 class="fw-bold mb-0 text-primary" th:text="${company.name}">Google</h4>
+                        <span class="badge badge-soft-warning" th:text="${company.tier}">Super Dream</span>
+                    </div>
+                    <div class="small text-muted">
+                        <span>Industry: <strong th:text="${company.industry}">Product &amp; Tech</strong></span> &bull;
+                        <span>Avg Difficulty: <strong class="text-warning"><i class="bi bi-star-fill text-warning"></i> <span th:text="${company.averageDifficulty}">4.8</span>/5</strong></span> &bull;
+                        <a th:href="@{'/companies/' + ${company.id}}" class="text-decoration-none ms-1">View Full Past Drives &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Sections -->
+        <div class="d-flex flex-column gap-4">
+            <div class="app-card p-4 shadow-sm" th:each="section : ${sections}">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <i class="bi fs-5 text-primary" th:classappend="${section.icon}"></i>
+                    <h5 class="fw-bold mb-0" th:text="${section.title}">Round 1: Screening &amp; OA</h5>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check p-2 rounded hover-bg d-flex align-items-start gap-2" th:each="item, iter : ${section.items}">
+                        <input class="form-check-input mt-1 ms-0" type="checkbox" th:id="${'chk-' + item.category + '-' + iter.index}" onchange="toggleChecklistItem(this)">
+                        <label class="form-check-label flex-grow-1 small" th:for="${'chk-' + item.category + '-' + iter.index}">
+                            <span class="fw-semibold text-secondary" th:text="${item.text}">Quantitative Aptitude</span>
+                            <span class="badge ms-1"
+                                  th:classappend="${item.priority == 'High' ? 'badge-soft-danger' : 'badge-soft-secondary'}"
+                                  style="font-size: 0.65rem;" th:text="${item.priority + ' Priority'}">High Priority</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+            <a th:href="@{/practice(companyId=${company.id})}" class="btn btn-warning fw-semibold px-4">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Practice <span th:text="${company.name}">Google</span> Questions
+            </a>
+            <a th:href="@{/roadmap}" class="btn btn-outline-primary px-3">
+                <i class="bi bi-map me-1"></i> Generate Week-by-Week Roadmap &rarr;
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleChecklistItem(chk) {
+            const label = chk.nextElementSibling;
+            if (chk.checked) {
+                label.style.textDecoration = 'line-through';
+                label.style.opacity = '0.6';
+            } else {
+                label.style.textDecoration = 'none';
+                label.style.opacity = '1';
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

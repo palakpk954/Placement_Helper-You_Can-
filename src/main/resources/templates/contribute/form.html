@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Contribute Interview Experience — You_can JECRC</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container" style="max-width: 860px;">
+
+        <!-- Header -->
+        <div class="mb-4 text-center">
+            <span class="badge badge-soft-primary px-3 py-1 mb-2">Pay It Forward</span>
+            <h3 class="fw-bold mb-1">Share Your Campus Placement Experience</h3>
+            <p class="text-muted small">Your insights empower junior batches of JECRC University to prepare strategically. Submissions earn you <strong>+50 contributor points</strong> upon approval!</p>
+        </div>
+
+        <div class="app-card p-4 p-md-5 shadow-sm">
+            <form th:action="@{/contribute}" method="post">
+
+                <!-- 1. Select Drive -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold" for="driveSelect">1. Recruitment Drive</label>
+                    <select class="form-select" id="driveSelect" name="driveId" required>
+                        <option value="" disabled selected>-- Select Company &amp; Drive --</option>
+                        <option th:each="d : ${drives}" th:value="${d.id}"
+                                th:text="${d.company.name + ' — ' + d.roles + ' (' + d.driveMonth + ' ' + d.driveYear + ')'}"
+                                th:selected="${preselectedCompanyId != null and d.company.id == preselectedCompanyId}">
+                            Microsoft — SDE-1 (Oct 2025)
+                        </option>
+                    </select>
+                    <div class="form-text small">Select the specific company visit you participated in.</div>
+                </div>
+
+                <!-- 2. Headline & Overview -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold" for="titleInput">2. Experience Title</label>
+                    <input type="text" class="form-control" id="titleInput" name="title" placeholder="e.g. How I prepared and cracked Microsoft IDC on-campus (SDE-1)" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold" for="contentInput">3. Walkthrough Narrative</label>
+                    <textarea class="form-control" id="contentInput" name="content" rows="6" placeholder="Describe how the recruitment drive proceeded from the initial screening test to the final round. Mention preparation timeline, resources used, and atmosphere..." required></textarea>
+                </div>
+
+                <!-- 3. Tips & Mistakes -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-success" for="tipsInput"><i class="bi bi-lightbulb-fill me-1"></i> What went well &amp; Key Tips</label>
+                        <textarea class="form-control" id="tipsInput" name="tips" rows="3" placeholder="1. Practice speaking your thought process aloud.&#10;2. Focus on tree algorithms..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-danger" for="mistakesInput"><i class="bi bi-exclamation-triangle-fill me-1"></i> Mistakes to Avoid</label>
+                        <textarea class="form-control" id="mistakesInput" name="mistakesToAvoid" rows="3" placeholder="Do not rush into coding without clarifying edge cases..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 4. Outcome & Difficulty -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label class="form-label fw-bold">Interview Outcome</label>
+                        <select class="form-select" name="outcome" required>
+                            <option value="SELECTED" selected>Selected / Received Offer</option>
+                            <option value="REJECTED">Reached Final Round (Not Selected)</option>
+                            <option value="WAITLISTED">Waitlisted</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-bold">Overall Difficulty Rating</label>
+                        <select class="form-select" name="difficultyRating" required>
+                            <option value="1">1 Star — Very Easy</option>
+                            <option value="2">2 Stars — Easy</option>
+                            <option value="3" selected>3 Stars — Moderate</option>
+                            <option value="4">4 Stars — Hard</option>
+                            <option value="5">5 Stars — Extremely Challenging</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 5. Add Round and Question (Optional) -->
+                <div class="p-3 bg-body-tertiary rounded-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-code-slash text-primary me-2"></i>Key Round &amp; Question Details (Optional)</h6>
+                        <span class="small text-muted">Helps populate the Question Bank</span>
+                    </div>
+
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm" name="roundNames" placeholder="Round Name (e.g. Technical Round 1)">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select form-select-sm" name="roundTypes">
+                                <option value="ONLINE_ASSESSMENT">Online Assessment</option>
+                                <option value="CODING">Coding Test</option>
+                                <option value="TECHNICAL" selected>Technical Interview</option>
+                                <option value="HR">HR / Managerial</option>
+                                <option value="CASE_STUDY">Case Study</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm" name="roundDescriptions" placeholder="Round description or focus area (e.g. Tree traversals & OS paging)...">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control form-control-sm" name="questionTexts" placeholder="Specific interview question asked...">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control form-control-sm" name="questionTopics" placeholder="Topic (e.g. DSA, Graphs, DBMS)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Anonymity Toggle -->
+                <div class="form-check form-switch p-3 border rounded-3 mb-4 bg-surface">
+                    <input class="form-check-input ms-0 me-3" type="checkbox" id="anonSwitch" name="anonymous" value="true">
+                    <label class="form-check-label fw-semibold" for="anonSwitch">
+                        <i class="bi bi-incognito text-primary me-1"></i> Post Anonymously
+                    </label>
+                    <div class="small text-muted ps-4">Your real name will NOT be displayed to other students or in exports. Only the placement cell moderation queue can see your author ID.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold fs-6">
+                    <i class="bi bi-send-fill me-1"></i> Submit Experience for Approval
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

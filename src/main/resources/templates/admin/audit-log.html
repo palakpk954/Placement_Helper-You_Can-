@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Audit Trail — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">Audit Trail &amp; System Log</h3>
+                <p class="text-muted small mb-0">Chronological history of all admin actions, approvals, and data modifications.</p>
+            </div>
+        </div>
+
+        <div class="app-card p-4 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Target Entity</th>
+                            <th>Previous State</th>
+                            <th>New State / Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="log : ${logs}">
+                            <td class="text-nowrap" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-10-15 12:00:00</td>
+                            <td>
+                                <span class="fw-semibold text-primary" th:text="${log.actor != null ? log.actor.fullName : 'System'}">Placement Admin</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-soft-primary" th:text="${log.action}">CREATE_DRIVE</span>
+                            </td>
+                            <td>
+                                <span class="text-muted" th:text="${log.entityType + (log.entityId != null ? ' #' + log.entityId : '')}">Company #1</span>
+                            </td>
+                            <td class="text-muted" th:text="${log.oldValue != null ? log.oldValue : '—'}">—</td>
+                            <td class="fw-semibold" th:text="${log.newValue != null ? log.newValue : '—'}">Google (2026)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

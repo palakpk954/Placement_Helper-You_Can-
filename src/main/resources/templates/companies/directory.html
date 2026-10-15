@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Company Placement Archive — You_can JECRC</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Company Directory &amp; History</h3>
+                <p class="text-muted small mb-0">Search and filter companies that have visited JECRC University with their full selection history.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/compare}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-arrow-left-right me-1"></i> Compare Two
+                </a>
+                <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Add Experience
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Controls Card -->
+        <div class="app-card p-4 mb-4 shadow-sm">
+            <form id="filterForm" th:action="@{/companies}" method="get"
+                  hx-get="/companies/fragment"
+                  hx-trigger="input from:#searchInput delay:350ms, change from:select"
+                  hx-target="#companyGridContainer"
+                  hx-swap="outerHTML">
+
+                <!-- Row 1: Search & Sort -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-8 col-lg-9">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control border-start-0 border-end-0 ps-0" id="searchInput" name="search"
+                                   th:value="${selectedSearch}" placeholder="Search company name, roles, or keywords (e.g. Google, SDE, Cloud)...">
+                            <span class="input-group-text bg-transparent border-start-0 text-muted d-none d-md-flex align-items-center">
+                                <span class="kbd-shortcut" title="Press / to focus">/</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <select class="form-select" name="sort">
+                            <option value="recent" th:selected="${selectedSort == 'recent'}">Sort: Most Recent Visit</option>
+                            <option value="frequent" th:selected="${selectedSort == 'frequent'}">Sort: Most Frequent Visitor</option>
+                            <option value="ctc" th:selected="${selectedSort == 'ctc'}">Sort: Highest Package (CTC)</option>
+                            <option value="difficulty" th:selected="${selectedSort == 'difficulty'}">Sort: Difficulty Rating</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mobile Filter Toggle Button -->
+                <div class="d-md-none mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2"
+                            data-bs-toggle="collapse" data-bs-target="#advancedFiltersCollapse" aria-expanded="false" aria-controls="advancedFiltersCollapse">
+                        <i class="bi bi-sliders"></i>
+                        <span>Detailed Filters (Industry, Year, Branch...)</span>
+                    </button>
+                </div>
+
+                <!-- Row 2: Multi-faceted filters (Collapsible on Mobile, always open on Desktop) -->
+                <div class="collapse d-md-block" id="advancedFiltersCollapse">
+                    <div class="row g-2 pt-2 pt-md-0 border-top border-md-0">
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                            <label class="form-label small text-muted mb-1">Industry</label>
+                            <select class="form-select form-select-sm" name="industry">
+                                <option value="ALL">All Industries</option>
+                                <option th:each="ind : ${allIndustries}" th:value="${ind}" th:text="${ind}" th:selected="${selectedIndustry == ind}">IT Services</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                            <label class="form-label small text-muted mb-1">Visit Year</label>
+                            <select class="form-select form-select-sm" name="year">
+                                <option value="">All Years</option>
+                                <option th:each="y : ${allYears}" th:value="${y}" th:text="${y}" th:selected="${selectedYear == y}">2026</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                            <label class="form-label small text-muted mb-1">Visit Month</label>
+                            <select class="form-select form-select-sm" name="month">
+                                <option value="ALL">All Months</option>
+                                <option th:each="m : ${allMonths}" th:value="${m}" th:text="${m}" th:selected="${selectedMonth == m}">August</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                            <label class="form-label small text-muted mb-1">Job Type</label>
+                            <select class="form-select form-select-sm" name="jobType">
+                                <option value="ALL">All Job Types</option>
+                                <option value="PLACEMENT" th:selected="${selectedJobType == 'PLACEMENT'}">Placement Only</option>
+                                <option value="INTERNSHIP" th:selected="${selectedJobType == 'INTERNSHIP'}">Internship Only</option>
+                                <option value="BOTH" th:selected="${selectedJobType == 'BOTH'}">Both (Intern + PPO)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                            <label class="form-label small text-muted mb-1">Eligible Branch</label>
+                            <select class="form-select form-select-sm" name="branch">
+                                <option value="ALL">All Branches</option>
+                                <option value="CSE" th:selected="${selectedBranch == 'CSE'}">CSE</option>
+                                <option value="IT" th:selected="${selectedBranch == 'IT'}">IT</option>
+                                <option value="ECE" th:selected="${selectedBranch == 'ECE'}">ECE</option>
+                                <option value="EE" th:selected="${selectedBranch == 'EE'}">EE</option>
+                                <option value="ME" th:selected="${selectedBranch == 'ME'}">Mechanical</option>
+                                <option value="Civil" th:selected="${selectedBranch == 'Civil'}">Civil</option>
+                                <option value="MCA" th:selected="${selectedBranch == 'MCA'}">MCA</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3 col-lg-2 d-flex align-items-end">
+                            <a th:href="@{/companies}" class="btn btn-sm btn-outline-secondary w-100">Reset Filters</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Cards Container (Updated via HTMX) -->
+        <div th:replace="~{fragments/company-cards :: companyGrid}"></div>
+
+    </div>
+</div>
+</body>
+</html>

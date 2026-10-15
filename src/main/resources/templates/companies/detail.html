@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${company.name + ' — Placement History &amp; Interview Questions'}">Company Detail — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Top Header Card -->
+        <div class="app-card p-4 mb-4 shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="company-logo-frame shadow-sm" style="width: 4.5rem; height: 4.5rem;">
+                        <img th:if="${company.logoUrl != null and !company.logoUrl.isBlank()}" th:src="${company.logoUrl}" th:alt="${company.name}" onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.alt) + '&background=0D8ABC&color=fff';">
+                        <div th:if="${company.logoUrl == null or company.logoUrl.isBlank()}" class="fw-bold text-primary fs-3" th:text="${#strings.substring(company.name, 0, 1)}">G</div>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h2 class="fw-bold mb-0" th:text="${company.name}">Google</h2>
+                            <span class="badge badge-soft-warning" th:text="${company.tier}">Super Dream</span>
+                            <span class="badge badge-soft-primary" th:text="${company.industry}">Product &amp; Tech</span>
+                        </div>
+                        <p class="text-muted small mb-0" th:text="${company.description}">Global technology leader.</p>
+                        <div class="small mt-1" th:if="${company.website}">
+                            <a th:href="${company.website}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> <span th:text="${company.website}">careers.google.com</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <!-- Bookmark Button (HTMX) -->
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                            hx-post="/bookmarks/toggle"
+                            hx-vals='js:{itemType: "COMPANY", itemId: [[${company.id}]]}'
+                            hx-swap="innerHTML">
+                        <i class="bi me-1" th:classappend="${isBookmarked ? 'bi-bookmark-fill text-warning' : 'bi-bookmark'}"></i>
+                        <span th:text="${isBookmarked ? 'Bookmarked' : 'Bookmark'}">Bookmark</span>
+                    </button>
+
+                    <!-- Prep Checklist Button -->
+                    <a th:href="@{'/checklists/' + ${company.id}}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="bi bi-card-checklist me-1"></i> Prep Checklist
+                    </a>
+
+                    <!-- Share Experience Button -->
+                    <a th:href="@{/contribute(companyId=${company.id})}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Add Experience
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="row g-3 mt-3 pt-3 border-top text-center">
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">TOTAL VISITS</div>
+                    <div class="fs-5 fw-bold" th:text="${company.totalVisits + ' times'}">2 times</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">AVG DIFFICULTY</div>
+                    <div class="fs-5 fw-bold text-warning">
+                        <i class="bi bi-star-fill text-warning"></i> <span th:text="${company.averageDifficulty}">4.8</span> / 5.0
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">MOST RECENT VISIT</div>
+                    <div class="fs-5 fw-bold" th:text="${company.mostRecentVisit}">Aug 2025</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">YOUR DIFFICULTY VOTE</div>
+                    <form th:action="@{'/companies/' + ${company.id} + '/vote'}" method="post" class="d-inline-flex gap-1 justify-content-center mt-1">
+                        <input type="hidden" name="rating" id="voteRatingInput" th:value="${userVote != null ? userVote : 4}">
+                        <button type="submit" name="rating" value="1" class="btn btn-sm p-0 border-0" th:classappend="${userVote != null and userVote >= 1 ? 'text-warning' : 'text-muted'}"><i class="bi bi-star-fill"></i></button>
+                        <button type="submit" name="rating" value="2" class="btn btn-sm p-0 border-0" th:classappend="${userVote != null and userVote >= 2 ? 'text-warning' : 'text-muted'}"><i class="bi bi-star-fill"></i></button>
+                        <button type="submit" name="rating" value="3" class="btn btn-sm p-0 border-0" th:classappend="${userVote != null and userVote >= 3 ? 'text-warning' : 'text-muted'}"><i class="bi bi-star-fill"></i></button>
+                        <button type="submit" name="rating" value="4" class="btn btn-sm p-0 border-0" th:classappend="${userVote != null and userVote >= 4 ? 'text-warning' : 'text-muted'}"><i class="bi bi-star-fill"></i></button>
+                        <button type="submit" name="rating" value="5" class="btn btn-sm p-0 border-0" th:classappend="${userVote != null and userVote >= 5 ? 'text-warning' : 'text-muted'}"><i class="bi bi-star-fill"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs: Drives History, Questions, Experiences, Alumni, Discussion -->
+        <ul class="nav nav-pills nav-fill mb-4 bg-body-tertiary p-1 rounded-3 shadow-sm" id="companyTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-semibold" id="drives-tab" data-bs-toggle="tab" data-bs-target="#drivesTabPane" type="button" role="tab"><i class="bi bi-clock-history me-1"></i> Recruitment Drives</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold" id="experiences-tab" data-bs-toggle="tab" data-bs-target="#experiencesTabPane" type="button" role="tab"><i class="bi bi-chat-heart me-1"></i> Student Experiences (<span th:text="${experiences.size()}">1</span>)</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold" id="alumni-tab" data-bs-toggle="tab" data-bs-target="#alumniTabPane" type="button" role="tab"><i class="bi bi-people me-1"></i> Placed Alumni (<span th:text="${alumni.size()}">1</span>)</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold" id="qa-tab" data-bs-toggle="tab" data-bs-target="#qaTabPane" type="button" role="tab"><i class="bi bi-question-circle me-1"></i> Discussion (<span th:text="${comments.size()}">2</span>)</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="companyTabContent">
+            
+            <!-- TAB 1: DRIVES HISTORY & ROUND-BY-ROUND INTERVIEW QUESTIONS -->
+            <div class="tab-pane fade show active" id="drivesTabPane" role="tabpanel">
+                <div class="d-flex flex-column gap-4">
+                    <div class="app-card p-4 shadow-sm" th:each="drive : ${drives}">
+                        <!-- Drive Header -->
+                        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-3 gap-2">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h5 class="fw-bold mb-0 text-primary" th:text="${drive.driveMonth + ' ' + drive.driveYear + ' Campus Drive'}">August 2025 Campus Drive</h5>
+                                    <span class="badge badge-soft-success" th:text="${drive.jobType}">PLACEMENT</span>
+                                    <span class="badge badge-soft-info" th:text="${drive.workMode}">HYBRID</span>
+                                </div>
+                                <div class="fw-semibold" th:text="${drive.roles}">Software Engineer (L3) &amp; Winter Intern</div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success-subtle text-success fs-6 fw-bold" th:text="${drive.ctcOrStipend}">35.00 LPA</span>
+                                <div class="small text-muted mt-1">Offers Extended: <strong th:text="${drive.studentsSelected}">3</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Eligibility & Offer Details Grid -->
+                        <div class="row g-3 mb-4 small bg-body-tertiary p-3 rounded-3">
+                            <div class="col-sm-6 col-md-3">
+                                <span class="text-muted d-block">CGPA CUTOFF</span>
+                                <strong th:text="${drive.minCgpa}">8.50</strong>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <span class="text-muted d-block">ELIGIBLE BRANCHES</span>
+                                <strong th:text="${drive.eligibleBranches}">CSE, IT</strong>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <span class="text-muted d-block">JOINING LOCATION</span>
+                                <strong th:text="${drive.joiningLocation}">Bangalore / Gurgaon</strong>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <span class="text-muted d-block">SERVICE BOND / AGREEMENT</span>
+                                <strong th:text="${drive.bondDetails}">None</strong>
+                            </div>
+                        </div>
+
+                        <!-- Selection Process & Rounds -->
+                        <h6 class="fw-bold mb-3"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Selection Process &amp; Rounds (<span th:text="${drive.rounds.size()}">4</span> Rounds)</h6>
+                        
+                        <div class="round-timeline mb-4">
+                            <div class="position-relative mb-4 ps-2" th:each="round : ${drive.rounds}">
+                                <div class="round-step-node" th:text="${round.roundNumber}">1</div>
+                                <div class="p-3 rounded-3 border bg-surface">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="fw-bold mb-0" th:text="${round.name}">Online Assessment</h6>
+                                            <span class="badge badge-soft-primary" th:text="${round.roundType.displayName}">Coding Assessment</span>
+                                            <span class="badge badge-soft-warning" th:text="${round.difficulty}">HARD</span>
+                                        </div>
+                                        <div class="small text-muted">
+                                            <i class="bi bi-stopwatch me-1"></i> <span th:text="${round.durationMinutes + ' mins'}">90 mins</span>
+                                        </div>
+                                    </div>
+                                    <p class="small text-muted mb-3" th:text="${round.description}">Algorithmic coding problems on DP and graphs.</p>
+
+                                    <!-- Interview Questions in this Round -->
+                                    <div th:if="${!round.questions.isEmpty()}">
+                                        <div class="small fw-bold text-uppercase text-muted mb-2">Questions Asked in this Round:</div>
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="p-2 rounded bg-body-tertiary border-start border-3 border-primary small" th:each="q : ${round.questions}">
+                                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                                    <div>
+                                                        <span class="fw-semibold" th:text="${q.questionText}">House Robber on circular street</span>
+                                                        <div class="d-flex gap-1 mt-1">
+                                                            <span class="badge badge-soft-secondary" style="font-size: 0.65rem;" th:each="tag : ${#strings.arraySplit(q.topicTags, ',')}" th:text="${#strings.trim(tag)}">DSA</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge badge-soft-warning" style="font-size: 0.65rem;" th:text="${q.difficulty}">MEDIUM</span>
+                                                </div>
+                                                <!-- Answer / Hint accordion -->
+                                                <div class="mt-2" th:if="${q.answerOrHint}">
+                                                    <button class="btn btn-sm btn-link p-0 text-decoration-none small text-muted" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#hint-' + q.id}">
+                                                        <i class="bi bi-lightbulb me-1"></i> Reveal Hint &amp; Complexity
+                                                    </button>
+                                                    <div class="collapse mt-1" th:id="${'hint-' + q.id}">
+                                                        <div class="p-2 rounded bg-surface border text-muted small" th:text="${q.answerOrHint}">Hint text</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report wrong entry button -->
+                        <div class="text-end">
+                            <button class="btn btn-sm btn-link text-muted text-decoration-none small" data-bs-toggle="modal" data-bs-target="#reportModal"
+                                    th:data-target-type="'DRIVE'" th:data-target-id="${drive.id}">
+                                <i class="bi bi-flag me-1"></i> Report an error in this drive's data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: STUDENT EXPERIENCES -->
+            <div class="tab-pane fade" id="experiencesTabPane" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Verified Student Experiences</h5>
+                    <a th:href="@{/contribute(companyId=${company.id})}" class="btn btn-sm btn-primary rounded-pill px-3">
+                        <i class="bi bi-pencil-square me-1"></i> Write Your Experience
+                    </a>
+                </div>
+
+                <div class="app-card p-4 text-center text-muted" th:if="${experiences.isEmpty()}">
+                    <i class="bi bi-chat-square-text fs-2 d-block mb-2 text-muted"></i>
+                    No approved experiences posted yet for this company. Be the first to pay it forward!
+                </div>
+
+                <div class="d-flex flex-column gap-3" th:if="${!experiences.isEmpty()}">
+                    <div class="app-card p-4" th:each="exp : ${experiences}">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <h5 class="fw-bold mb-1" th:text="${exp.title}">My Journey to Microsoft</h5>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span th:if="${!exp.anonymous}" class="fw-semibold text-primary" th:text="${exp.author.fullName}">Amit Kumar</span>
+                                    <span th:if="${exp.anonymous}" class="fw-semibold text-secondary"><i class="bi bi-incognito me-1"></i> Anonymous Senior</span>
+                                    <span>&bull;</span>
+                                    <span class="badge badge-soft-success" th:text="${exp.outcome}">SELECTED</span>
+                                    <span>&bull;</span>
+                                    <span>Difficulty Rated: <strong th:text="${exp.difficultyRating + '/5'}">4/5</strong></span>
+                                </div>
+                            </div>
+                            <!-- Upvote Button -->
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    th:hx-post="@{'/companies/experiences/' + ${exp.id} + '/upvote'}"
+                                    hx-swap="innerHTML">
+                                <i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i> <span th:text="${exp.upvotes}">42</span> Upvotes
+                            </button>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mt-3 mb-3 text-secondary" style="white-space: pre-line;" th:text="${exp.content}">Experience narrative</div>
+
+                        <!-- Tips & Mistakes -->
+                        <div class="row g-2 pt-2 border-top small" th:if="${exp.tips != null or exp.mistakesToAvoid != null}">
+                            <div class="col-md-6" th:if="${exp.tips}">
+                                <div class="p-2 rounded bg-success-subtle text-success border border-success-subtle">
+                                    <strong><i class="bi bi-lightbulb-fill me-1"></i> What went well &amp; Key Tips:</strong>
+                                    <div style="white-space: pre-line;" th:text="${exp.tips}">Practice aloud</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" th:if="${exp.mistakesToAvoid}">
+                                <div class="p-2 rounded bg-danger-subtle text-danger border border-danger-subtle">
+                                    <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> Mistakes to Avoid:</strong>
+                                    <div style="white-space: pre-line;" th:text="${exp.mistakesToAvoid}">Do not fake projects</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PLACED ALUMNI MENTORS -->
+            <div class="tab-pane fade" id="alumniTabPane" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Alumni Placed at <span th:text="${company.name}">Google</span></h5>
+                    <a th:href="@{/alumni}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Browse All Mentors &rarr;</a>
+                </div>
+
+                <div class="app-card p-4 text-center text-muted" th:if="${alumni.isEmpty()}">
+                    <i class="bi bi-people fs-2 d-block mb-2 text-muted"></i>
+                    No alumni profiles registered yet for this recruiter.
+                </div>
+
+                <div class="row g-3" th:if="${!alumni.isEmpty()}">
+                    <div class="col-md-6" th:each="alu : ${alumni}">
+                        <div class="app-card p-3 d-flex align-items-start gap-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem;">
+                                <i class="bi bi-person-fill fs-4"></i>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h6 class="fw-bold mb-0 text-truncate" th:text="${alu.user.fullName}">Amit Kumar</h6>
+                                <div class="small text-muted" th:text="${alu.jobRole}">SDE-1</div>
+                                <div class="small text-muted mt-1">
+                                    <span>Batch: <strong th:text="${alu.graduationYear}">2024</strong></span> &bull;
+                                    <span th:text="${alu.branch}">CSE</span>
+                                </div>
+                                <div class="small mt-2" th:if="${alu.topicsCanHelp}">
+                                    <span class="badge badge-soft-primary" th:each="t : ${#strings.arraySplit(alu.topicsCanHelp, ',')}" th:text="${#strings.trim(t)}">DSA</span>
+                                </div>
+                                <div class="mt-2" th:if="${alu.linkedinUrl}">
+                                    <a th:href="${alu.linkedinUrl}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;">
+                                        <i class="bi bi-linkedin me-1"></i> LinkedIn
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: DISCUSSION & Q&A -->
+            <div class="tab-pane fade" id="qaTabPane" role="tabpanel">
+                <div class="app-card p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Ask a Question / Discussion</h5>
+                    <form th:action="@{'/companies/' + ${company.id} + '/comments'}" method="post">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="content" rows="3" placeholder="Ask about interview rounds, preparation tips, or cutoff criteria..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm px-3 fw-semibold">Post Question</button>
+                    </form>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="app-card p-3" th:each="comment : ${comments}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <strong class="small" th:text="${comment.author.fullName}">Student</strong>
+                                <span class="badge badge-soft-success" style="font-size: 0.65rem;" th:if="${comment.author.role.name() == 'ROLE_ADMIN'}">Placement Coordinator</span>
+                            </div>
+                            <span class="small text-muted" th:text="${#temporals.format(comment.createdAt, 'dd MMM yyyy')}">15 Oct 2026</span>
+                        </div>
+                        <p class="small text-secondary mb-2" th:text="${comment.content}">Comment text</p>
+
+                        <!-- Nested Replies -->
+                        <div class="ms-4 ps-2 border-start mt-2" th:each="reply : ${comment.replies}">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <strong class="small text-primary" th:text="${reply.author.fullName}">Senior</strong>
+                                <span class="badge badge-soft-primary" style="font-size: 0.6rem;">Verified Contributor</span>
+                            </div>
+                            <p class="small text-secondary mb-0" th:text="${reply.content}">Reply text</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         REPORT ENTRY MODAL
+         ========================================== -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{'/companies/' + ${company.id} + '/report'}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="reportModalLabel"><i class="bi bi-flag-fill text-danger me-2"></i>Report a Wrong Entry</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="targetType" value="DRIVE">
+                        <input type="hidden" name="targetId" th:value="${!drives.isEmpty() ? drives[0].id : 1}">
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">What is incorrect?</label>
+                            <textarea class="form-control" name="reason" rows="4" placeholder="Explain the incorrect detail (e.g. 'The cutoff was 7.00 not 8.50' or 'There was an aptitude round before coding')." required></textarea>
+                        </div>
+                        <p class="text-muted small">Our placement cell coordinators will verify with past drive records and update the entry.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-danger px-3">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

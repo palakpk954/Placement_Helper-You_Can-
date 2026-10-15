@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Analytics &amp; Statistics — You_can JECRC</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1">Campus Placement Intelligence &amp; Analytics</h3>
+            <p class="text-muted small mb-0">Interactive visual trends, compensation packages, and branch statistics for JECRC University.</p>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
+                        <div class="small text-muted">Recruiters Registered</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-cash-stack"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0">48.0 LPA</div>
+                        <div class="small text-muted">Highest Campus Package</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-trophy"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
+                        <div class="small text-muted">Total Selections</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-stopwatch"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['averageRounds']}">3.5</div>
+                        <div class="small text-muted">Avg Rounds per Drive</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 1: Charts (Companies per Year & Package Trends) -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="app-card p-4 h-100 shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Companies Visited per Year</h5>
+                    <div style="height: 280px;">
+                        <canvas id="companiesPerYearCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="app-card p-4 h-100 shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-graph-up text-success me-2"></i>Package Trends Over Time (LPA)</h5>
+                    <div style="height: 280px;">
+                        <canvas id="packageTrendsCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Charts (Monthly Distribution & Branch Offers) -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="app-card p-4 h-100 shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event text-warning me-2"></i>Drives Distribution by Month</h5>
+                    <div style="height: 280px;">
+                        <canvas id="monthlyDistCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="app-card p-4 h-100 shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-info me-2"></i>Branch-Wise Placement Opportunities</h5>
+                    <div style="height: 280px;">
+                        <canvas id="branchStatsCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Top Recruiters Table & Top Question Topics -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="app-card p-4 shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-award-fill text-primary me-2"></i>Top Recruiters by Total Campus Selections</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Company</th>
+                                    <th class="text-end">Total Placed Students</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r, iter : ${topRecruiters}">
+                                    <td class="fw-bold text-muted" th:text="${'#' + iter.count}">#1</td>
+                                    <td class="fw-semibold text-primary" th:text="${r['companyName']}">TCS</td>
+                                    <td class="text-end fw-bold">
+                                        <span class="badge badge-soft-success fs-6" th:text="${r['selections'] + ' Offers'}">325 Offers</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="app-card p-4 shadow-sm h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-tags-fill text-danger me-2"></i>Most Commonly Asked Interview Topics</h5>
+                    <div style="height: 280px;">
+                        <canvas id="topicStatsCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chart.js Scripts -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Companies per Year Chart
+            const yearData = /*[[${companiesPerYearChart}]]*/ {labels: [], values: []};
+            new Chart(document.getElementById('companiesPerYearCanvas'), {
+                type: 'bar',
+                data: {
+                    labels: yearData.labels,
+                    datasets: [{
+                        label: 'Companies',
+                        data: yearData.values,
+                        backgroundColor: 'rgba(29, 78, 216, 0.75)',
+                        borderColor: '#1d4ed8',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // 2. Package Trends
+            const pkgData = /*[[${packageTrends}]]*/ {years: [], averages: [], highest: []};
+            new Chart(document.getElementById('packageTrendsCanvas'), {
+                type: 'line',
+                data: {
+                    labels: pkgData.years,
+                    datasets: [
+                        {
+                            label: 'Highest CTC (LPA)',
+                            data: pkgData.highest,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Average CTC (LPA)',
+                            data: pkgData.averages,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 3. Monthly Distribution
+            const monthData = /*[[${monthlyDistributionChart}]]*/ {labels: [], values: []};
+            new Chart(document.getElementById('monthlyDistCanvas'), {
+                type: 'bar',
+                data: {
+                    labels: monthData.labels,
+                    datasets: [{
+                        label: 'Drives',
+                        data: monthData.values,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#f59e0b',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // 4. Branch Stats
+            const branchData = /*[[${branchStats}]]*/ {labels: [], values: []};
+            new Chart(document.getElementById('branchStatsCanvas'), {
+                type: 'doughnut',
+                data: {
+                    labels: branchData.labels,
+                    datasets: [{
+                        data: branchData.values,
+                        backgroundColor: ['#1d4ed8', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 5. Topic Frequency
+            const topicData = /*[[${topicStats}]]*/ {labels: [], values: []};
+            new Chart(document.getElementById('topicStatsCanvas'), {
+                type: 'polarArea',
+                data: {
+                    labels: topicData.labels,
+                    datasets: [{
+                        data: topicData.values,
+                        backgroundColor: ['rgba(239, 68, 68, 0.6)', 'rgba(59, 130, 246, 0.6)', 'rgba(16, 185, 129, 0.6)', 'rgba(245, 158, 11, 0.6)', 'rgba(139, 92, 246, 0.6)']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+        /*]]>*/
+    </script>
+</div>
+</body>
+</html>

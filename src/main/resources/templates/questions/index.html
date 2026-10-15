@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Question Bank — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-collection-fill text-primary me-2"></i>Campus Question Bank</h3>
+                <p class="text-muted small mb-0">Browse real technical and HR questions asked during campus placement rounds at JECRC University.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/practice}" class="btn btn-warning rounded-pill px-3 shadow-sm fw-semibold">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Interactive Practice
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="app-card p-3 mb-4 shadow-sm">
+            <form th:action="@{/questions}" method="get" class="row g-2 align-items-center">
+                <!-- Search Input -->
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0" name="search"
+                               th:value="${searchKeyword}" placeholder="Search keywords (e.g. Tree, DBMS, Reverse)...">
+                    </div>
+                </div>
+
+                <!-- Company Filter -->
+                <div class="col-md-3">
+                    <select class="form-select" name="companyId" onchange="this.form.submit()">
+                        <option value="">All Companies</option>
+                        <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}"
+                                th:selected="${selectedCompanyId != null and selectedCompanyId == c.id}">Google</option>
+                    </select>
+                </div>
+
+                <!-- Difficulty Filter -->
+                <div class="col-md-2">
+                    <select class="form-select" name="difficulty" onchange="this.form.submit()">
+                        <option value="">All Difficulties</option>
+                        <option value="EASY" th:selected="${selectedDifficulty == 'EASY'}">Easy</option>
+                        <option value="MEDIUM" th:selected="${selectedDifficulty == 'MEDIUM'}">Medium</option>
+                        <option value="HARD" th:selected="${selectedDifficulty == 'HARD'}">Hard</option>
+                    </select>
+                </div>
+
+                <!-- Topic Filter -->
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="topic" th:value="${selectedTopic}" placeholder="Topic (e.g. DSA)">
+                </div>
+
+                <!-- Submit / Reset -->
+                <div class="col-md-1 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i></button>
+                    <a th:href="@{/questions}" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-x-lg"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Counter -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="small text-muted" th:text="${questions != null ? questions.size() + ' questions found' : '0 questions'}">12 questions found</span>
+        </div>
+
+        <!-- Question Cards List -->
+        <div class="row g-3" th:if="${questions != null and !questions.isEmpty()}">
+            <div class="col-12" th:each="q : ${questions}">
+                <div class="app-card p-4 h-100 shadow-sm border-0 position-relative">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <!-- Company Badge if round is available -->
+                            <span class="badge bg-primary-subtle text-primary fw-semibold"
+                                  th:if="${q.round != null and q.round.drive != null and q.round.drive.company != null}">
+                                <i class="bi bi-building me-1"></i>
+                                <span th:text="${q.round.drive.company.name}">Company</span>
+                            </span>
+
+                            <!-- Round Badge -->
+                            <span class="badge bg-secondary-subtle text-secondary"
+                                  th:if="${q.round != null}">
+                                <span th:text="${q.round.name}">Technical Interview</span>
+                            </span>
+
+                            <!-- Topic Badge -->
+                            <span class="badge bg-info-subtle text-info fw-semibold" th:if="${q.topicTags != null}" th:text="${q.topicTags}">DSA</span>
+
+                            <!-- Difficulty Badge -->
+                            <span class="badge"
+                                  th:classappend="${q.difficulty != null and q.difficulty.name() == 'EASY' ? 'badge-soft-success' : (q.difficulty != null and q.difficulty.name() == 'HARD' ? 'badge-soft-danger' : 'badge-soft-warning')}"
+                                  th:text="${q.difficulty != null ? q.difficulty.name() : 'MEDIUM'}">MEDIUM</span>
+                        </div>
+
+                        <!-- Bookmark Button -->
+                        <button class="btn btn-sm btn-outline-warning rounded-pill"
+                                hx-post="/bookmarks/toggle"
+                                th:hx-vals="${'{&quot;itemType&quot;: &quot;QUESTION&quot;, &quot;itemId&quot;: ' + q.id + '}'}"
+                                hx-swap="outerHTML">
+                            <i class="bi bi-bookmark me-1"></i> Bookmark
+                        </button>
+                    </div>
+
+                    <!-- Question Text -->
+                    <p class="fs-6 fw-medium text-dark mb-3 mt-1" th:text="${q.questionText}">
+                        Describe how you would design a scalable LRU Cache in Java or C++.
+                    </p>
+
+                    <!-- Answer / Hint Accordion if available -->
+                    <div th:if="${q.answerOrHint != null and !q.answerOrHint.isBlank()}">
+                        <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted" type="button"
+                                data-bs-toggle="collapse" th:data-bs-target="${'#hint-' + q.id}">
+                            <i class="bi bi-lightbulb me-1 text-warning"></i> View Hint / Approach
+                        </button>
+                        <div class="collapse mt-2" th:id="${'hint-' + q.id}">
+                            <div class="p-3 bg-light rounded-3 small text-secondary" th:text="${q.answerOrHint}">
+                                Use a HashMap paired with a Doubly Linked List for O(1) get and put operations.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5" th:if="${questions == null or questions.isEmpty()}">
+            <i class="bi bi-inbox text-muted display-4"></i>
+            <h5 class="fw-bold mt-3 mb-1">No questions found</h5>
+            <p class="text-muted small">Try broadening your search keyword or clearing the filters.</p>
+            <a th:href="@{/questions}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Reset Filters</a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

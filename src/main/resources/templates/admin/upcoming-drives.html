@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Manage Upcoming Drives — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">Manage Upcoming Campus Recruitment Drives</h3>
+                <p class="text-muted small mb-0">Post announcements, set registration deadlines, define cutoffs, and alert eligible students.</p>
+            </div>
+            <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#newUpcomingCollapse">
+                <i class="bi bi-plus-lg me-1"></i> Post Upcoming Drive
+            </button>
+        </div>
+
+        <!-- Create Form Collapse -->
+        <div class="collapse mb-4" id="newUpcomingCollapse">
+            <div class="app-card p-4 shadow-sm border-primary">
+                <h5 class="fw-bold mb-3"><i class="bi bi-megaphone-fill text-primary me-2"></i>Post New Recruitment Drive Announcement</h5>
+                <form th:action="@{/admin/upcoming-drives/save}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Company Name</label>
+                            <input type="text" class="form-control" name="companyName" placeholder="e.g. Google / Microsoft" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Link to Existing Company Profile (Optional)</label>
+                            <select class="form-select" name="companyId">
+                                <option value="">-- Standalone / Unlinked --</option>
+                                <option th:each="c : ${companies}" th:value="${c.id}" th:text="${c.name}">Google</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Drive Date</label>
+                            <input type="date" class="form-control" name="driveDate" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Roles Offered</label>
+                            <input type="text" class="form-control" name="rolesOffered" placeholder="e.g. Software Engineer / Cloud Trainee" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Package (CTC / Stipend)</label>
+                            <input type="text" class="form-control" name="ctcOrStipend" placeholder="e.g. 15.00 LPA (Base: 12 LPA)" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Min CGPA Cutoff</label>
+                            <input type="number" step="0.01" min="0" max="10" class="form-control" name="minCgpa" value="6.50" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Eligible Branches</label>
+                            <input type="text" class="form-control" name="eligibleBranches" value="CSE, IT, ECE" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Max Active Backlogs Allowed</label>
+                            <input type="number" min="0" max="10" class="form-control" name="maxBacklogs" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Registration URL</label>
+                            <input type="url" class="form-control" name="registrationLink" placeholder="https://forms.gle/... or company portal link">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Application Deadline</label>
+                            <input type="datetime-local" class="form-control" name="deadline" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#newUpcomingCollapse">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold">Publish Announcement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Drives Table -->
+        <div class="app-card shadow-sm border-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Company</th>
+                            <th>Role &amp; CTC</th>
+                            <th>Eligibility Cutoff</th>
+                            <th>Drive Date</th>
+                            <th>Deadline</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${upcomingDrives}">
+                            <td>
+                                <strong class="text-dark" th:text="${d.companyName}">Google</strong>
+                                <span class="badge bg-success-subtle text-success ms-1" th:if="${d.active}">Active</span>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-primary" th:text="${d.rolesOffered}">SDE</div>
+                                <div class="small text-muted" th:text="${d.ctcOrStipend}">16.00 LPA</div>
+                            </td>
+                            <td>
+                                <div class="small">Min CGPA: <strong th:text="${d.minCgpa}">7.00</strong></div>
+                                <div class="small text-muted" th:text="${d.eligibleBranches}">CSE, IT</div>
+                            </td>
+                            <td class="small" th:text="${d.driveDate}">2026-11-15</td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger" th:text="${#temporals.format(d.deadline, 'dd MMM yyyy, HH:mm')}">20 Oct 2026</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:action="@{/admin/upcoming-drives/{id}/delete(id=${d.id})}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this upcoming drive announcement?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${upcomingDrives.isEmpty()}">
+                            <td colspan="6" class="text-center py-4 text-muted">No upcoming drives currently listed.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

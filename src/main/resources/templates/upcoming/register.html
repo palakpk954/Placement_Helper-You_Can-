@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${'Register for ' + drive.companyName + ' — You_can'}">Register for Drive — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container py-2" style="max-width: 960px;">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a th:href="@{/upcoming}">Upcoming Drives</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/eligibility}">Eligibility</a></li>
+                <li class="breadcrumb-item active" th:text="${drive.companyName + ' Registration'}">Microsoft Registration</li>
+            </ol>
+        </nav>
+
+        <!-- Flash messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2 fs-5 align-middle"></i>
+            <span th:text="${successMessage}">Registration successful!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5 align-middle"></i>
+            <span th:text="${errorMessage}">Eligibility error</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${infoMessage}" class="alert alert-info alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2 fs-5 align-middle"></i>
+            <span th:text="${infoMessage}">Info update</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Main Registration Card -->
+        <div class="app-card p-4 p-md-5 shadow-sm border-0 mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge" th:classappend="${isEligible ? 'badge-soft-success' : 'badge-soft-danger'}"
+                              th:text="${isEligible ? 'You Are Eligible' : 'Ineligible for this Drive'}">Eligible</span>
+                        <span class="badge bg-primary-subtle text-primary" th:if="${isRegistered}">
+                            <i class="bi bi-patch-check-fill me-1"></i> Registered
+                        </span>
+                    </div>
+                    <h2 class="fw-bold mb-1" th:text="${drive.companyName}">Microsoft</h2>
+                    <p class="text-primary fs-5 fw-semibold mb-0" th:text="${drive.rolesOffered}">Software Development Engineer - 1</p>
+                </div>
+
+                <div class="text-md-end">
+                    <span class="fs-4 fw-bold text-success d-block" th:text="${drive.ctcOrStipend}">48.00 LPA</span>
+                    <span class="small text-muted">Offered Package (CTC)</span>
+                </div>
+            </div>
+
+            <!-- Key Drive Specs Row -->
+            <div class="row g-3 p-3 bg-body-tertiary rounded-4 mb-4">
+                <div class="col-6 col-md-3">
+                    <small class="text-muted d-block">Campus Drive Date</small>
+                    <strong class="text-body fw-bold" th:text="${#temporals.format(drive.driveDate, 'dd MMMM yyyy')}">28 Oct 2026</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                    <small class="text-muted d-block">Registration Deadline</small>
+                    <strong class="text-danger" th:text="${#temporals.format(drive.deadline, 'dd MMM yyyy, HH:mm')}">25 Oct 2026, 18:00</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                    <small class="text-muted d-block">Min CGPA Cutoff</small>
+                    <strong class="text-body fw-bold" th:text="${drive.minCgpa}">7.50</strong>
+                </div>
+                <div class="col-6 col-md-3">
+                    <small class="text-muted d-block">Max Backlogs</small>
+                    <strong class="text-body fw-bold" th:text="${drive.maxBacklogs}">0</strong>
+                </div>
+            </div>
+
+            <!-- Registration Action Area -->
+            <!-- STATE A: Already Registered -->
+            <div th:if="${isRegistered}" class="p-4 rounded-4 border border-success bg-success-subtle mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-check-lg fs-3"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-success mb-1">Registration Confirmed!</h5>
+                        <p class="small text-secondary mb-0">
+                            Your application was logged with the Training &amp; Placement Cell on
+                            <span class="fw-semibold" th:if="${registration != null}" th:text="${#temporals.format(registration.registeredAt, 'dd MMM yyyy, HH:mm')}">Date</span>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 pt-2 border-top border-success-subtle">
+                    <a th:href="@{/upcoming/{id}/ics(id=${drive.id})}" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-calendar-check me-1"></i> Add to Calendar (.ics)
+                    </a>
+                    <a th:if="${drive.registrationLink != null and !drive.registrationLink.isBlank()}"
+                       th:href="${drive.registrationLink}" target="_blank"
+                       class="btn btn-outline-dark rounded-pill px-4 fw-semibold">
+                        Company Careers Portal <i class="bi bi-box-arrow-up-right ms-1"></i>
+                    </a>
+                    <form th:action="@{/upcoming/{id}/withdraw(id=${drive.id})}" method="post" class="ms-auto"
+                          onsubmit="return confirm('Are you sure you want to withdraw your registration for this drive?');">
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 btn-sm">
+                            <i class="bi bi-x-circle me-1"></i> Withdraw
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STATE B: Eligible and Not Registered Yet -->
+            <div th:if="${!isRegistered and isEligible}">
+                <div class="card border-0 bg-primary-subtle p-3 rounded-4 mb-4">
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-person-check-fill me-2"></i>Verified Academic Credentials</h6>
+                    <div class="row g-2 small text-secondary">
+                        <div class="col-md-3"><strong>Applicant:</strong> <span th:text="${currentUser != null ? currentUser.fullName : 'Student'}">Rahul Sharma</span></div>
+                        <div class="col-md-3"><strong>Branch:</strong> <span class="badge bg-primary text-white" th:text="${currentUser != null ? currentUser.branch : 'CSE'}">CSE</span></div>
+                        <div class="col-md-3"><strong>CGPA:</strong> <span class="badge bg-success text-white" th:text="${currentUser != null ? currentUser.cgpa : '8.45'}">8.45</span></div>
+                        <div class="col-md-3"><strong>Active Backlogs:</strong> <span class="badge bg-secondary text-white" th:text="${currentUser != null ? currentUser.activeBacklogs : 0}">0</span></div>
+                    </div>
+                </div>
+
+                <form th:action="@{/upcoming/{id}/register(id=${drive.id})}" method="post">
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Application Notes or Portfolio Link (Optional)</label>
+                        <input type="text" name="notes" class="form-control rounded-3"
+                               placeholder="e.g. GitHub: github.com/username or LeetCode profile URL">
+                        <div class="form-text small">This optional note is recorded alongside your placement file.</div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow fw-bold">
+                            <i class="bi bi-send-check-fill me-2"></i> Submit Campus Drive Registration
+                        </button>
+                        <a th:if="${drive.registrationLink != null and !drive.registrationLink.isBlank()}"
+                           th:href="${drive.registrationLink}" target="_blank"
+                           class="btn btn-outline-secondary rounded-pill px-4">
+                            External Career Page <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- STATE C: Not Eligible -->
+            <div th:if="${!isEligible}" class="alert alert-danger p-4 rounded-4 mb-4">
+                <h5 class="fw-bold mb-2"><i class="bi bi-shield-x me-2"></i>Ineligible for Campus Drive Registration</h5>
+                <p class="mb-3 small">You do not meet one or more criteria set by the employer for this campus recruitment cycle:</p>
+                <ul class="mb-3 small ps-3">
+                    <li th:each="reason : ${exclusionReasons}" th:text="${reason}">CGPA below cutoff</li>
+                </ul>
+                <a th:href="@{/eligibility}" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                    <i class="bi bi-sliders me-1"></i> Open "What-If" Simulator
+                </a>
+            </div>
+
+            <!-- Additional Help / Resources -->
+            <hr class="my-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-compass me-2 text-primary"></i>Interview Preparation for this Drive</h6>
+            <div class="d-flex flex-wrap gap-2">
+                <a th:if="${drive.company != null}" th:href="@{/companies/{id}(id=${drive.company.id})}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-building me-1"></i> View Past Visit Archive
+                </a>
+                <a th:if="${drive.company != null}" th:href="@{/practice(companyId=${drive.company.id})}" class="btn btn-sm btn-outline-warning rounded-pill px-3 text-dark">
+                    <i class="bi bi-lightning-charge me-1"></i> Practice Company Questions
+                </a>
+                <a th:href="@{/roadmap}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                    <i class="bi bi-map me-1"></i> 1-8 Wk Preparation Roadmap
+                </a>
+                <a th:href="@{/resume}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="bi bi-file-earmark-person me-1"></i> Resume Scanner &amp; Checklist
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
