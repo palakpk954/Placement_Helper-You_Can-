@@ -40,6 +40,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed conversational appreciation and acknowledgments (e.g. *"ok thank you so muhc"* or *"got it"*) incorrectly falling back to the strict "no verified data" message by implementing resilient token matching (`isGratitude()`, `isAcknowledgment()`, `isFarewell()`).
 - Resolved Render Linux native deployment failure (`bash: java: command not found`) by switching to standard Docker runtime containerization.
 - Fixed 100% desktop zoom navbar overflow, profile avatar clipping, and container alignment by unifying layout to `container-xxl`, adding `flex-shrink: 0` to actions, and compacting stat widgets.
+- Fixed Roadmap 500 internal server error, removed redundant nested navbar layout, and implemented live progress tracking bars and status badges.
+- Resolved IDE false-positive diagnostics by configuring `.vscode/settings.json` (`nullAnalysis.mode: disabled`, `updateBuildConfiguration: automatic`).
+- Eliminated all unused imports, unused fields, and potential null-pointer warnings across controllers, entities, and test suites, achieving a zero-warning, 100% passing test build (28/28 tests).
 
 ---
 
