@@ -1,8 +1,6 @@
 package in.jecrcu.placement.service;
 
 import in.jecrcu.placement.entity.Drive;
-import in.jecrcu.placement.entity.Question;
-import in.jecrcu.placement.entity.Round;
 import in.jecrcu.placement.repository.CompanyRepository;
 import in.jecrcu.placement.repository.DriveRepository;
 import in.jecrcu.placement.repository.QuestionRepository;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

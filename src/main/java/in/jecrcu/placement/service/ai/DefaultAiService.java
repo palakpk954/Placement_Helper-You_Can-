@@ -1,7 +1,6 @@
 package in.jecrcu.placement.service.ai;
 
 import in.jecrcu.placement.entity.*;
-import in.jecrcu.placement.entity.enums.Difficulty;
 import in.jecrcu.placement.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

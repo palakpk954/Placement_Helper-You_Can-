@@ -1,6 +1,5 @@
 package in.jecrcu.placement.controller;
 
-import in.jecrcu.placement.entity.User;
 import in.jecrcu.placement.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

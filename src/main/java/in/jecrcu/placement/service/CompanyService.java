@@ -4,14 +4,12 @@ import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.DifficultyVote;
 import in.jecrcu.placement.entity.Drive;
 import in.jecrcu.placement.entity.User;
-import in.jecrcu.placement.entity.enums.JobType;
 import in.jecrcu.placement.repository.CompanyRepository;
 import in.jecrcu.placement.repository.DifficultyVoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

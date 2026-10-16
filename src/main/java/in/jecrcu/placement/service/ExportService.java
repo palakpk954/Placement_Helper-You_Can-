@@ -5,7 +5,6 @@ import com.lowagie.text.Font;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.Drive;
 import in.jecrcu.placement.repository.DriveRepository;
 import lombok.RequiredArgsConstructor;

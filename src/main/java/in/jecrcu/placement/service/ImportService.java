@@ -1,7 +1,6 @@
 package in.jecrcu.placement.service;
 
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.Drive;
 import in.jecrcu.placement.entity.enums.JobType;

@@ -3,8 +3,6 @@ package in.jecrcu.placement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "badges")
 @Getter
