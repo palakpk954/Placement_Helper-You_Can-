@@ -4,8 +4,6 @@ import in.jecrcu.placement.config.CustomUserDetails;
 import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.Question;
 import in.jecrcu.placement.entity.enums.Difficulty;
-import in.jecrcu.placement.entity.enums.ItemType;
-import in.jecrcu.placement.service.BookmarkService;
 import in.jecrcu.placement.service.CompanyService;
 import in.jecrcu.placement.service.PracticeService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ public class QuestionBankController {
 
     private final PracticeService practiceService;
     private final CompanyService companyService;
-    private final BookmarkService bookmarkService;
 
     @GetMapping("/questions")
     public String questionBank(

@@ -1,9 +1,7 @@
 package in.jecrcu.placement;
 
-import in.jecrcu.placement.entity.Drive;
 import in.jecrcu.placement.entity.UpcomingDrive;
 import in.jecrcu.placement.entity.User;
-import in.jecrcu.placement.repository.DriveRepository;
 import in.jecrcu.placement.repository.UpcomingDriveRepository;
 import in.jecrcu.placement.service.EligibilityService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EligibilityServiceTest {
@@ -27,14 +23,10 @@ class EligibilityServiceTest {
     @Mock
     private UpcomingDriveRepository upcomingDriveRepository;
 
-    @Mock
-    private DriveRepository driveRepository;
-
     @InjectMocks
     private EligibilityService eligibilityService;
 
     private UpcomingDrive sampleUpcoming;
-    private Drive samplePast;
 
     @BeforeEach
     void setUp() {
@@ -49,13 +41,6 @@ class EligibilityServiceTest {
                 .driveDate(LocalDate.now().plusDays(10))
                 .deadline(LocalDateTime.now().plusDays(5))
                 .active(true)
-                .build();
-
-        samplePast = Drive.builder()
-                .id(1L)
-                .minCgpa(BigDecimal.valueOf(7.50))
-                .eligibleBranches("CSE, IT")
-                .maxBacklogs(0)
                 .build();
     }
 

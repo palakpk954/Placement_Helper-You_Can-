@@ -48,7 +48,7 @@ public class ResumeController {
 
         try {
             User user = userService.findById(userDetails.getId()).orElseThrow();
-            Resume resume = resumeService.uploadAndAnalyze(user, file, shareConsent);
+            resumeService.uploadAndAnalyze(user, file, shareConsent);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Resume uploaded and analyzed successfully! Check your instant score and recommendations.");
         } catch (Exception e) {

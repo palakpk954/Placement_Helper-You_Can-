@@ -67,7 +67,8 @@ public class ImportService {
     }
 
     public ImportPreviewResult parseAndValidate(MultipartFile file) throws Exception {
-        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename().toLowerCase() : "";
+        String originalName = file.getOriginalFilename();
+        String filename = originalName != null ? originalName.toLowerCase() : "";
         List<ImportRowDto> parsedRows;
 
         if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {

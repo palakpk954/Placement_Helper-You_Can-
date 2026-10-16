@@ -23,7 +23,6 @@ public class ExperienceService {
     private final DriveRepository driveRepository;
     private final RoundRepository roundRepository;
     private final QuestionRepository questionRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
 
     public List<Experience> getApprovedExperiencesForCompany(Long companyId) {

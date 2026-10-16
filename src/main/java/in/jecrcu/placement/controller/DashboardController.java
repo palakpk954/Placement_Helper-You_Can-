@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 public class DashboardController {
 
     private final UserService userService;
-    private final CompanyService companyService;
-    private final DriveService driveService;
     private final EligibilityService eligibilityService;
     private final PracticeService practiceService;
     private final BookmarkService bookmarkService;

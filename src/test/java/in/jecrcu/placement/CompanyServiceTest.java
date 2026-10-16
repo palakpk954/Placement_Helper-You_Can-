@@ -4,7 +4,6 @@ import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.Drive;
 import in.jecrcu.placement.repository.CompanyRepository;
 import in.jecrcu.placement.repository.DifficultyVoteRepository;
-import in.jecrcu.placement.repository.DriveRepository;
 import in.jecrcu.placement.service.CompanyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +23,6 @@ class CompanyServiceTest {
 
     @Mock
     private CompanyRepository companyRepository;
-
-    @Mock
-    private DriveRepository driveRepository;
 
     @Mock
     private DifficultyVoteRepository difficultyVoteRepository;

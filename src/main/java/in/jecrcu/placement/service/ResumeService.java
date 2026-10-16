@@ -65,7 +65,8 @@ public class ResumeService {
         if (file.getSize() > 2 * 1024 * 1024) {
             throw new IllegalArgumentException("Resume must be smaller than 2 MB.");
         }
-        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "resume.pdf";
+        String rawName = file.getOriginalFilename();
+        String originalFilename = (rawName != null && !rawName.isBlank()) ? rawName : "resume.pdf";
         if (!originalFilename.toLowerCase().endsWith(".pdf")) {
             throw new IllegalArgumentException("Only PDF resumes are supported.");
         }

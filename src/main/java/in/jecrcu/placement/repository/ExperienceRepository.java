@@ -1,6 +1,5 @@
 package in.jecrcu.placement.repository;
 
-import in.jecrcu.placement.entity.Company;
 import in.jecrcu.placement.entity.Experience;
 import in.jecrcu.placement.entity.User;
 import in.jecrcu.placement.entity.enums.ExperienceStatus;

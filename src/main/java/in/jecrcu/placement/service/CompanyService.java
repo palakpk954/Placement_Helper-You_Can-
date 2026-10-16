@@ -7,7 +7,6 @@ import in.jecrcu.placement.entity.User;
 import in.jecrcu.placement.entity.enums.JobType;
 import in.jecrcu.placement.repository.CompanyRepository;
 import in.jecrcu.placement.repository.DifficultyVoteRepository;
-import in.jecrcu.placement.repository.DriveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final DriveRepository driveRepository;
     private final DifficultyVoteRepository difficultyVoteRepository;
 
     public List<Company> getAllCompanies() {

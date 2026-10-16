@@ -1,7 +1,6 @@
 package in.jecrcu.placement.repository;
 
 import in.jecrcu.placement.entity.PracticeAttempt;
-import in.jecrcu.placement.entity.enums.PracticeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
