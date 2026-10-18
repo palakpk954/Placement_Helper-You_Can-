@@ -6,14 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - Phase 4 (AI Preparation Suite)
+## [Unreleased] - Post-Phase 4: Live Cloud LLM & Generative RAG
 
 ### Added
-- **Institutional AI Placement Assistant**:
-  - Grounded question-answering service (`in.jecrcu.placement.service.ai.AiService`, `DefaultAiService`).
-  - Web assistant chat view at `/ai-assistant` (`templates/ai/assistant.html`) with glassmorphic cards and dynamic message feeds.
-  - Quick-prompt suggestion chips for top recruiters (Microsoft, Google), calendar drives, eligibility policies, and DSA topics.
-  - REST endpoint `POST /api/ai/chat` returning grounded responses with sources and anti-hallucination flags.
+- **Google Gemini Cloud LLM Connectivity**:
+  - Direct REST integration with Google Gemini API (`gemini-1.5-flash`) via `DefaultAiService.java`.
+  - Configured in `application.properties`: `app.ai.api-key=${GEMINI_API_KEY:${APP_AI_API_KEY:}}`, `app.ai.model=${APP_AI_MODEL:gemini-1.5-flash}`, `temperature=0.2`, `max-tokens=1000`.
+  - Upgraded HTTP client with robust Jackson `ObjectMapper` payload serialization/deserialization.
+- **Institutional Retrieval-Augmented Generation (RAG)**:
+  - Deep grounding pipeline dynamically assembling verified institutional records (company tiers, latest packages/CTC, hiring rounds, active upcoming visits, alumni mentors, and student interview tips).
+  - Strict Anti-Hallucination system prompt ensuring Gemini never invents compensation figures or cutoff policies.
+  - Privacy by Design (AI-4): Anonymizes student feedback and scrubs all PII (names, emails, roll numbers) before prompting external models.
+- **Resilient Zero-Downtime Offline Fallback (AI-5)**:
+  - Automatic, seamless fallback to the local deterministic grounded database engine if the API key is missing, invalid, or hits network/quota limits.
+- **AI Health & Status Endpoint**:
+  - `GET /api/ai/status` returning provider type, active model, cloud availability flag, and system health.
+- **Expanded AI Unit Test Suite**:
+  - Expanded `AiServiceTest.java` to 16 comprehensive unit tests covering cloud provider metadata, offline engine reporting, conversational greeting/gratitude fast-paths, and graceful fallback on simulated API errors.
+
 - **Conversational Guidance & Greeting Engine**:
   - Natural greeting pattern matching (`hi`, `hello`, `hey`, `greetings`) providing an introductory tour and suggested queries.
 - **AI Experience Summarizer**:

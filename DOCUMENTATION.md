@@ -150,7 +150,29 @@ Whenever changes or new features are introduced to the repository, this file and
     - Company detail synthesis card (`templates/companies/detail.html`): "AI Synthesis: What to Expect" badge on company profile experience tabs.
     - Question submission auto-classifier button (`templates/contribute/form.html`): "✨ AI Classify" button providing one-click topic and difficulty filling.
   - **Testing**:
-    - Created [`AiServiceTest.java`](file:///c:/Users/HP/Desktop/Placement_Helper/src/test/java/in/jecrcu/placement/AiServiceTest.java) containing 12 comprehensive unit tests covering greetings, conversational gratitude with typos, acknowledgments, farewells, company queries, upcoming drive lookups, classification heuristics, and fallbacks. All 12 tests pass with 0 errors.
+    - Created [`AiServiceTest.java`](file:///c:/Users/HP/Desktop/Placement_Helper/src/test/java/in/jecrcu/placement/AiServiceTest.java) containing 16 comprehensive unit tests covering greetings, conversational gratitude with typos, acknowledgments, farewells, company queries, upcoming drive lookups, classification heuristics, and fallbacks. All 16 tests pass with 0 errors.
+
+---
+
+### Sprint 5: Live Cloud LLM & Generative RAG (Post-Phase 4 Extra Feature)
+- **Goal**: Elevate the institutional AI Placement Assistant with live cloud generative reasoning via Google Gemini API while preserving strict institutional grounding, anti-hallucination guardrails, and zero-downtime offline fallback.
+- **Key Deliverables**:
+  - **Google Gemini 1.5 Flash Integration**:
+    - Direct cloud LLM REST integration via `DefaultAiService.java`.
+    - Configured via environment variables / properties: `app.ai.api-key=${GEMINI_API_KEY:${APP_AI_API_KEY:}}`, `app.ai.model=${APP_AI_MODEL:gemini-1.5-flash}`, `temperature=0.2`, `max-tokens=1000`.
+    - Robust Jackson `ObjectMapper` payload serialization/deserialization.
+  - **Institutional Retrieval-Augmented Generation (RAG)**:
+    - Context assembler pulls verified placement records from database: company tiers, latest drive packages/CTC, selection rounds, upcoming recruitment visits, placed alumni mentors, and student interview tips.
+    - Strict System Prompt: Explicitly instructs Gemini to answer based strictly on verified records, never fabricate packages or cutoff criteria, and politely advise students when data is unrecorded.
+  - **Privacy by Design (PRD AI-4)**:
+    - Anonymizes student feedback and strips all PII (names, emails, phone numbers, roll numbers) before passing context to external LLMs.
+  - **Zero-Downtime Offline Fallback (PRD AI-5)**:
+    - If `GEMINI_API_KEY` is not provided or if the external API encounters network timeouts, rate limits, or quota exhaustion, the engine automatically falls back to the deterministic local grounded synthesis with zero errors.
+  - **AI Status & Monitoring Endpoint**:
+    - Public REST endpoint `GET /api/ai/status` returning active provider, model name, cloud availability flag, and system health status.
+  - **Comprehensive Verification**:
+    - Complete test suite passing: **32 tests executed with 0 failures, 0 errors**.
+
 
 ---
 

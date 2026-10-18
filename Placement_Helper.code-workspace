@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"name": "☕ Backend (Java Controllers, Services & Entities)",
+			"path": "backend/src/main/java/in/jecrcu/placement"
+		},
+		{
+			"name": "🎨 Frontend (HTML & Thymeleaf Views)",
+			"path": "frontend/templates"
+		},
+		{
+			"name": "💅 Frontend Assets (CSS & JavaScript)",
+			"path": "frontend/static"
+		},
+		{
+			"name": "⚙️ Config & Database Migrations",
+			"path": "backend/src/main/resources"
+		},
+		{
+			"name": "🧪 Tests",
+			"path": "backend/src/test"
+		},
+		{
+			"name": "📁 Full Project (Root)",
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "disabled",
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"java.autobuild.enabled": false
+	}
+}
