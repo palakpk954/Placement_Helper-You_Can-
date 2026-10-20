@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface MockBookingRepository extends JpaRepository<MockBooking, Long> {
     List<MockBooking> findByStudentIdOrderByMockSlotStartTimeDesc(Long studentId);
+    List<MockBooking> findByMockSlotMentorIdOrderByMockSlotStartTimeDesc(Long mentorId);
     Optional<MockBooking> findByMockSlotId(Long slotId);
     long countByMockSlotMentorIdAndStatus(Long mentorId, BookingStatus status);
 }

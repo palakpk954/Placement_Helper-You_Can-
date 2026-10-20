@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title>Alumni Mentor Cockpit — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xxl px-3 px-md-4">
+
+        <!-- Flash Messages -->
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 shadow-xs" role="alert" th:if="${successMessage}">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div th:text="${successMessage}">Success message</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 shadow-xs" role="alert" th:if="${errorMessage}">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div th:text="${errorMessage}">Error message</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Alumni Mentor Hero Card -->
+        <div class="app-card dashboard-hero p-4 mb-4 shadow-sm border-0" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs flex-shrink-0" style="width: 3.5rem; height: 3.5rem;">
+                        <i class="bi bi-mortarboard-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                            <h4 class="fw-bold mb-0" th:text="${currentUser.fullName}">Amit Kumar</h4>
+                            <span class="badge badge-soft-info"><i class="bi bi-patch-check-fill me-1"></i> Verified Alumni Mentor</span>
+                            <span class="badge badge-soft-primary" th:if="${myProfile != null}" th:text="${myProfile.companyName}">Microsoft</span>
+                        </div>
+                        <div class="small text-muted d-flex flex-wrap gap-3">
+                            <span th:if="${myProfile != null}">
+                                <i class="bi bi-briefcase me-1 text-primary"></i> <strong class="text-dark" th:text="${myProfile.jobRole}">SDE-1</strong>
+                            </span>
+                            <span>
+                                <i class="bi bi-calendar3 me-1"></i> Class of <strong th:text="${currentUser.graduationYear != null ? currentUser.graduationYear : (myProfile != null ? myProfile.graduationYear : '2024')}">2024</strong>
+                                (<span th:text="${currentUser.branch != null ? currentUser.branch : (myProfile != null ? myProfile.branch : 'CSE')}">CSE</span>)
+                            </span>
+                            <span th:if="${myProfile != null and myProfile.linkedinUrl != null and !myProfile.linkedinUrl.isBlank()}">
+                                <a th:href="${myProfile.linkedinUrl}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-linkedin me-1 text-primary"></i> LinkedIn Profile
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-success rounded-pill px-3 shadow-xs" data-bs-toggle="collapse" data-bs-target="#hostSlotCollapse">
+                        <i class="bi bi-plus-circle me-1"></i> Offer Mock Slot
+                    </button>
+                    <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
+                        <i class="bi bi-pencil-square me-1"></i> Share Experience
+                    </a>
+                    <a th:href="@{/alumni}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                        <i class="bi bi-people me-1"></i> Mentor Network
+                    </a>
+                    <a th:href="@{/dashboard(view='student')}" class="btn btn-sm btn-outline-info rounded-pill px-3" title="Preview Student Placement Dashboard">
+                        <i class="bi bi-eye me-1"></i> Student View
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Host Slot Collapse (Inline on Dashboard) -->
+        <div class="collapse mb-4" id="hostSlotCollapse">
+            <div class="app-card p-4 shadow-sm border-success">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-success"><i class="bi bi-calendar-plus me-2"></i>Publish 1-on-1 Mock Interview Slot</h5>
+                    <button class="btn-close" type="button" data-bs-toggle="collapse" data-bs-target="#hostSlotCollapse" aria-label="Close"></button>
+                </div>
+                <p class="small text-muted mb-3">Publish an open 1-on-1 interview slot for junior students preparing for upcoming placement drives.</p>
+                <form th:action="@{/mocks/create-slot}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Target Company / Track <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="companyName" list="dashCompanyList"
+                                   th:value="${myProfile != null ? myProfile.companyName : ''}" placeholder="e.g. Microsoft / General Tech" required>
+                            <datalist id="dashCompanyList">
+                                <option th:each="c : ${companies}" th:value="${c.name}"></option>
+                            </datalist>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Session Start Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="startTime" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Session End Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="endTime" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-4">
+                        <i class="bi bi-send-check me-1"></i> Publish Slot for Juniors
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4 Mentorship Impact KPI Stat Widgets -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${totalSlots}">3</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">
+                            Hosted Mock Slots (<span class="text-success" th:text="${availableSlots}">2</span> open)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${studentBookings.size()}">1</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">
+                            Junior Students Mentored
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-info-subtle text-info">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold mb-0" th:text="${myExperiences.size()}">1</div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">
+                            Placement Guides Contributed
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-widget">
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fs-5 fw-bold mb-0">
+                            <span th:text="${currentUser.points}">260</span> <small class="fs-6 text-muted">pts</small>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.8rem;">
+                            Mentor Rating: <strong class="text-warning">★ <span th:text="${avgRating}">5.0</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Main Column (8 cols) -->
+            <div class="col-lg-8">
+
+                <!-- 1. Active Student Bookings Card -->
+                <div class="app-card p-4 mb-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-video3 text-primary me-2"></i>Upcoming Student Mock Sessions
+                        </h5>
+                        <a th:href="@{/mocks}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Manage in Mock Suite &rarr;</a>
+                    </div>
+
+                    <!-- If student bookings exist -->
+                    <div class="d-flex flex-column gap-3" th:if="${studentBookings != null and !studentBookings.isEmpty()}">
+                        <div class="p-3 bg-body-tertiary rounded-3 border" th:each="b : ${studentBookings}">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2 mb-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="fw-bold mb-0" th:text="${b.student != null ? b.student.fullName : 'Junior Student'}">Student Name</h6>
+                                        <span class="badge badge-soft-primary" th:text="${b.student != null ? b.student.branch : 'CSE'}">CSE</span>
+                                        <span class="badge badge-soft-warning" th:if="${b.student != null and b.student.cgpa != null}" th:text="${'CGPA ' + b.student.cgpa}">CGPA 8.45</span>
+                                    </div>
+                                    <div class="small text-muted mt-1">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${b.mockSlot != null ? #temporals.format(b.mockSlot.startTime, 'dd MMM yyyy, HH:mm') : ''}">Date</span>
+                                        &ndash;
+                                        <span th:text="${b.mockSlot != null ? #temporals.format(b.mockSlot.endTime, 'HH:mm') : ''}">Time</span>
+                                        &bull;
+                                        Target: <strong class="text-dark" th:text="${b.mockSlot != null ? b.mockSlot.companyName : 'Tech'}">Microsoft</strong>
+                                    </div>
+                                </div>
+                                <span class="badge" th:classappend="${b.status.name() == 'CONFIRMED' ? 'bg-success-subtle text-success' : (b.status.name() == 'COMPLETED' ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary')}" th:text="${b.status}">CONFIRMED</span>
+                            </div>
+
+                            <div class="p-2 bg-body rounded small text-secondary border-start border-3 border-primary mb-2" th:if="${b.notes != null and !b.notes.isBlank()}">
+                                <strong class="text-dark d-block">Junior's Prep Notes:</strong>
+                                <span th:text="${b.notes}">Need guidance on Microsoft Round 2 System Design and Dynamic Programming.</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center small pt-2 border-top">
+                                <span class="text-muted"><i class="bi bi-envelope me-1"></i> <span th:text="${b.student != null ? b.student.email : ''}">student@jecrcu.edu.in</span></span>
+                                <div class="d-flex gap-2">
+                                    <form th:action="@{/mocks/cancel/{bookingId}(bookingId=${b.id})}" method="post" th:if="${b.status.name() == 'CONFIRMED'}">
+                                        <button type="submit" class="btn btn-xs btn-outline-danger rounded-pill px-2 py-0" onclick="return confirm('Cancel this interview session?')">Cancel Slot</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State for Bookings -->
+                    <div class="text-center py-4 text-muted" th:if="${studentBookings == null or studentBookings.isEmpty()}">
+                        <i class="bi bi-calendar-x fs-2 d-block mb-2 text-muted"></i>
+                        <h6 class="fw-semibold mb-1">No student bookings yet</h6>
+                        <p class="small text-muted mb-3">Publish an open mock slot so junior students can reserve 1-on-1 practice sessions with you.</p>
+                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#hostSlotCollapse">
+                            <i class="bi bi-plus-lg me-1"></i> Publish Your First Slot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. My Active Availability Slots Card -->
+                <div class="app-card p-4 mb-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-clock-history text-success me-2"></i>My Availability Slots
+                        </h5>
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#hostSlotCollapse">
+                            <i class="bi bi-plus-circle me-1"></i> New Slot
+                        </button>
+                    </div>
+
+                    <div class="row g-3" th:if="${mySlots != null and !mySlots.isEmpty()}">
+                        <div class="col-md-6" th:each="slot : ${mySlots}">
+                            <div class="p-3 bg-body-tertiary rounded-3 border h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge badge-soft-primary" th:text="${slot.companyName}">Microsoft</span>
+                                        <span class="badge" th:classappend="${slot.status.name() == 'AVAILABLE' ? 'bg-success-subtle text-success' : (slot.status.name() == 'BOOKED' ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary')}" th:text="${slot.status}">AVAILABLE</span>
+                                    </div>
+                                    <p class="small text-secondary mb-0">
+                                        <i class="bi bi-calendar-event me-1 text-primary"></i>
+                                        <span th:text="${#temporals.format(slot.startTime, 'dd MMM yyyy, HH:mm')}">Date</span> &ndash;
+                                        <span th:text="${#temporals.format(slot.endTime, 'HH:mm')}">End</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-3 text-muted" th:if="${mySlots == null or mySlots.isEmpty()}">
+                        <p class="small mb-0">No active slots published. Click <strong>+ Offer Mock Slot</strong> above to schedule availability.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Company Q&A: Student Inquiries Awaiting Senior Advice -->
+                <div class="app-card p-4 shadow-sm border-0" th:if="${mentorCompany != null}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-chat-quote-fill text-warning me-2"></i>Student Questions about <span th:text="${mentorCompany.name}">Microsoft</span>
+                            </h5>
+                            <p class="text-muted small mb-0">Juniors preparing for campus visits often seek your insights on rounds and preparation.</p>
+                        </div>
+                        <a th:href="@{'/companies/' + ${mentorCompany.id}}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Company Hub &rarr;</a>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3" th:if="${companyDiscussions != null and !companyDiscussions.isEmpty()}">
+                        <div class="p-3 bg-body-tertiary rounded-3 border" th:each="c : ${companyDiscussions}">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold small text-dark" th:text="${c.author != null ? c.author.fullName : 'JECRC Student'}">Student Name</span>
+                                <span class="small text-muted" th:text="${#temporals.format(c.createdAt, 'dd MMM yyyy')}">Date</span>
+                            </div>
+                            <p class="small text-secondary mb-2" th:text="${c.content}">What are the most frequent DSA topics asked in the online coding assessment?</p>
+                            <a th:href="@{'/companies/' + ${mentorCompany.id}}" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-0">
+                                <i class="bi bi-reply-fill me-1"></i> Answer Junior Candidate
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-3 text-muted small" th:if="${companyDiscussions == null or companyDiscussions.isEmpty()}">
+                        No active inquiries posted yet for <span th:text="${mentorCompany.name}">this recruiter</span>.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Sidebar Column (4 cols) -->
+            <div class="col-lg-4">
+
+                <!-- 1. Live Public Mentor Card Preview -->
+                <div class="app-card p-4 mb-4 shadow-sm border-primary">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-eye me-1"></i> Public Directory Preview</h6>
+                        <span class="badge bg-success-subtle text-success small" th:if="${myProfile != null and myProfile.visible}">Public</span>
+                        <span class="badge bg-secondary-subtle text-secondary small" th:if="${myProfile != null and !myProfile.visible}">Hidden</span>
+                    </div>
+
+                    <div class="p-3 border rounded-3 bg-body">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="avatar-circle bg-primary-subtle text-primary fw-bold fs-5 d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px;">
+                                <span th:text="${currentUser.fullName.substring(0, 1)}">A</span>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0" th:text="${currentUser.fullName}">Amit Kumar</h6>
+                                <span class="badge badge-soft-primary" th:text="${myProfile != null ? myProfile.companyName : 'Microsoft'}">Microsoft</span>
+                            </div>
+                        </div>
+                        <p class="small text-muted mb-2">
+                            <i class="bi bi-briefcase me-1"></i> <strong class="text-dark" th:text="${myProfile != null ? myProfile.jobRole : 'Senior Engineer'}">SDE-1</strong><br>
+                            <i class="bi bi-mortarboard me-1"></i> Class of <span th:text="${myProfile != null ? myProfile.graduationYear : '2024'}">2024</span> (<span th:text="${myProfile != null ? myProfile.branch : 'CSE'}">CSE</span>)
+                        </p>
+                        <div class="small mt-2" th:if="${myProfile != null and myProfile.topicsCanHelp != null and !myProfile.topicsCanHelp.isBlank()}">
+                            <span class="small fw-semibold text-dark d-block mb-1">Topics:</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-light text-secondary border small"
+                                      th:each="t : ${#strings.arraySplit(myProfile.topicsCanHelp, ',')}"
+                                      th:text="${#strings.trim(t)}">DSA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <a th:href="@{/alumni}" class="btn btn-sm btn-outline-primary rounded-pill px-3 w-100">
+                            <i class="bi bi-pencil-square me-1"></i> Edit Public Mentor Card
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. My Placement Guides & Experiences -->
+                <div class="app-card p-4 mb-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-journal-check text-info me-1"></i> Shared Experiences</h6>
+                        <a th:href="@{/contribute}" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-0">+ New</a>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2" th:if="${myExperiences != null and !myExperiences.isEmpty()}">
+                        <div class="p-2 border rounded-2 bg-body-tertiary" th:each="exp : ${myExperiences}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="small text-truncate" th:text="${exp.title}">Cracking Microsoft SDE-1</strong>
+                                <span class="badge" th:classappend="${exp.status.name() == 'APPROVED' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}" th:text="${exp.status}">APPROVED</span>
+                            </div>
+                            <div class="small text-muted mt-1 d-flex justify-content-between">
+                                <span th:text="${exp.drive != null and exp.drive.company != null ? exp.drive.company.name : ''}">Microsoft</span>
+                                <span><i class="bi bi-hand-thumbs-up me-1 text-primary"></i> <span th:text="${exp.upvotes}">12</span> upvotes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-3 text-muted small" th:if="${myExperiences == null or myExperiences.isEmpty()}">
+                        You haven't posted a placement interview experience yet.
+                        <a th:href="@{/contribute}" class="d-block mt-2 fw-semibold">Share your tips with juniors &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- 3. Upcoming Campus Visits (Recruiter Context) -->
+                <div class="app-card p-4 shadow-sm border-0">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-megaphone-fill text-danger me-1"></i> Visiting Recruiters</h6>
+                    <p class="small text-muted mb-3">Keep an eye on active campus drives to schedule timely mock sessions for candidates.</p>
+
+                    <div class="d-flex flex-column gap-2" th:if="${upcomingDrives != null and !upcomingDrives.isEmpty()}">
+                        <div class="p-2 border rounded-2 bg-body-tertiary d-flex justify-content-between align-items-center" th:each="d : ${upcomingDrives}">
+                            <div>
+                                <strong class="small d-block" th:text="${d.companyName}">Google</strong>
+                                <span class="small text-muted" th:text="${#temporals.format(d.driveDate, 'dd MMM yyyy')}">10 Nov 2026</span>
+                            </div>
+                            <span class="badge badge-soft-success small" th:text="${d.ctcOrStipend}">35 LPA</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

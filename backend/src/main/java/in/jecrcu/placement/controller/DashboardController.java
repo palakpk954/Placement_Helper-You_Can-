@@ -34,10 +34,14 @@ public class DashboardController {
         }
 
         boolean isAdmin = userDetails.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
-        boolean isStudentPreview = isAdmin && "student".equalsIgnoreCase(view);
+        boolean isAlumni = userDetails.getAuthorities().stream().anyMatch(a -> "ROLE_ALUMNI".equals(a.getAuthority()));
+        boolean isStudentPreview = (isAdmin || isAlumni) && "student".equalsIgnoreCase(view);
 
         if (isAdmin && !isStudentPreview) {
             return "redirect:/admin";
+        }
+        if (isAlumni && !isStudentPreview) {
+            return "redirect:/alumni/dashboard";
         }
 
         User user = userService.findById(userDetails.getId()).orElse(null);

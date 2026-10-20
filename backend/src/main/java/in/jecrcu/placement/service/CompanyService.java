@@ -149,6 +149,19 @@ public class CompanyService {
         return opt;
     }
 
+    public Optional<Company> findByName(String name) {
+        if (name == null || name.isBlank()) return Optional.empty();
+        Optional<Company> opt = companyRepository.findByNameIgnoreCase(name.trim());
+        if (opt.isEmpty()) {
+            List<Company> matches = companyRepository.findByNameContainingIgnoreCase(name.trim());
+            if (!matches.isEmpty()) {
+                opt = Optional.of(matches.get(0));
+            }
+        }
+        opt.ifPresent(this::enrichCompanyStats);
+        return opt;
+    }
+
     @Transactional
     public void voteDifficulty(Long companyId, User user, int rating) {
         if (rating < 1 || rating > 5) {

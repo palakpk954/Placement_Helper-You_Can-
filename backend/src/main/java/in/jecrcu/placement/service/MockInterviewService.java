@@ -32,6 +32,10 @@ public class MockInterviewService {
         return slotRepository.findByMentorIdOrderByStartTimeDesc(mentorId);
     }
 
+    public List<MockBooking> getMentorBookings(Long mentorId) {
+        return bookingRepository.findByMockSlotMentorIdOrderByMockSlotStartTimeDesc(mentorId);
+    }
+
     public List<MockBooking> getStudentBookings(Long studentId) {
         return bookingRepository.findByStudentIdOrderByMockSlotStartTimeDesc(studentId);
     }

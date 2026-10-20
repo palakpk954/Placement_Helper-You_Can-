@@ -1,12 +1,12 @@
 package in.jecrcu.placement.controller;
 
 import in.jecrcu.placement.config.CustomUserDetails;
-import in.jecrcu.placement.entity.AlumniProfile;
-import in.jecrcu.placement.entity.Company;
-import in.jecrcu.placement.entity.User;
-import in.jecrcu.placement.service.AlumniService;
-import in.jecrcu.placement.service.CompanyService;
-import in.jecrcu.placement.service.UserService;
+import in.jecrcu.placement.entity.*;
+import in.jecrcu.placement.entity.enums.BookingStatus;
+import in.jecrcu.placement.entity.enums.SlotStatus;
+import in.jecrcu.placement.repository.CommentRepository;
+import in.jecrcu.placement.repository.UpcomingDriveRepository;
+import in.jecrcu.placement.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,6 +24,69 @@ public class AlumniController {
     private final AlumniService alumniService;
     private final CompanyService companyService;
     private final UserService userService;
+    private final MockInterviewService mockService;
+    private final ExperienceService experienceService;
+    private final CommentRepository commentRepository;
+    private final UpcomingDriveRepository upcomingDriveRepository;
+
+    @GetMapping("/dashboard")
+    public String alumniDashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) return "redirect:/login";
+
+        User user = userService.findById(userDetails.getId()).orElse(null);
+        if (user == null) return "redirect:/login";
+
+        AlumniProfile profile = alumniService.getProfileByUserId(user.getId()).orElse(null);
+        model.addAttribute("currentUser", user);
+        model.addAttribute("myProfile", profile);
+
+        // 1. Hosted mock slots
+        List<MockSlot> mySlots = mockService.getMentorSlots(user.getId());
+        model.addAttribute("mySlots", mySlots);
+
+        // 2. Booked mock sessions with students
+        List<MockBooking> studentBookings = mockService.getMentorBookings(user.getId());
+        model.addAttribute("studentBookings", studentBookings);
+
+        // 3. Contributed experiences
+        List<Experience> myExperiences = experienceService.getUserExperiences(user);
+        model.addAttribute("myExperiences", myExperiences);
+
+        // 4. Questions & Discussions from juniors about mentor's company
+        if (profile != null && profile.getCompanyName() != null) {
+            companyService.findByName(profile.getCompanyName()).ifPresent(comp -> {
+                model.addAttribute("mentorCompany", comp);
+                List<Comment> companyDiscussions = commentRepository.findByCompanyIdAndParentIsNullAndStatusOrderByCreatedAtDesc(comp.getId(), "VISIBLE");
+                model.addAttribute("companyDiscussions", companyDiscussions);
+            });
+        }
+
+        // 5. Impact metrics
+        long totalSlots = mySlots.size();
+        long availableSlots = mySlots.stream().filter(s -> s.getStatus() == SlotStatus.AVAILABLE).count();
+        long bookedSlots = mySlots.stream().filter(s -> s.getStatus() == SlotStatus.BOOKED).count();
+        long completedMocks = studentBookings.stream().filter(b -> b.getStatus() == BookingStatus.COMPLETED).count();
+
+        double avgRating = studentBookings.stream()
+                .filter(b -> b.getRating() != null && b.getRating() > 0)
+                .mapToInt(MockBooking::getRating)
+                .average()
+                .orElse(5.0);
+
+        model.addAttribute("totalSlots", totalSlots);
+        model.addAttribute("availableSlots", availableSlots);
+        model.addAttribute("bookedSlots", bookedSlots);
+        model.addAttribute("completedMocks", completedMocks);
+        model.addAttribute("avgRating", String.format(java.util.Locale.US, "%.1f", avgRating));
+
+        // 6. Upcoming campus drives for recruiter context
+        model.addAttribute("upcomingDrives", upcomingDriveRepository.findByActiveTrueOrderByDriveDateAsc());
+
+        // 7. Companies list for hosting new slots
+        model.addAttribute("companies", companyService.getAllCompanies());
+
+        return "alumni/dashboard";
+    }
 
     @GetMapping
     public String directory(

@@ -35,4 +35,5 @@ build/
 ### Local runtime data & uploads ###
 data/
 uploads/
+scratch/
 
