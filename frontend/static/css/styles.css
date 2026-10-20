@@ -80,6 +80,11 @@
 /* ==========================================================================
    Global Reset & Base
    ========================================================================== */
+html, body {
+    max-width: 100%;
+    overflow-x: clip;
+}
+
 body {
     font-family: var(--font-body);
     background-color: var(--bg-page);
@@ -88,6 +93,11 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Universal Responsive Container Alignment across all viewports */
+.container, .container-xl, .container-xxl {
+    max-width: 1360px;
 }
 
 main {
@@ -119,6 +129,11 @@ a:hover {
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
     z-index: 1030;
+    width: 100%;
+}
+
+.custom-navbar .navbar-brand {
+    flex-shrink: 0;
 }
 
 .brand-badge {
@@ -134,12 +149,19 @@ a:hover {
 
 .nav-link {
     font-weight: 500;
-    font-size: 0.86rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    padding: 0.35rem 0.55rem !important;
+    padding: 0.35rem 0.5rem !important;
     border-radius: var(--radius-md);
     transition: all 0.15s ease;
     white-space: nowrap;
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+    .nav-link {
+        font-size: 0.81rem;
+        padding: 0.28rem 0.42rem !important;
+    }
 }
 .nav-link:hover, .nav-link.active {
     color: var(--primary-blue);

@@ -30,6 +30,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Dedicated REST endpoint controller `ResumeApiController` (`/api/resume/enhance-bullet` and `/api/resume/match-jd`).
   - Added comprehensive unit tests in `AiServiceTest.java` verifying 100% test pass rate (37/37 passing).
 
+### Fixed
+- **100% Desktop Zoom Navbar Clipping & Horizontal Alignment**:
+  - Replaced restrictive `container-xl` (1140px max) with `container-xxl` (1360px max) in both navbar and footer.
+  - Streamlined student navigation into 5 balanced clusters (`Companies`, `Upcoming`, `Calendar`, `Prep Tools ▾`, `Community ▾`), eliminating ~210px of redundant horizontal menu sprawl.
+  - Added `flex-shrink: 0` to all right toolbar controls (Theme toggle, unread notification badge, AI Assistant pill, and Student Profile dropdown).
+  - Unified container grid across `/upcoming` to align with the dashboard and navbar, eliminating horizontal scroll and right-edge avatar clipping.
+
 ---
 
 ## [1.1.0] - 2026-10-20 - Bug Fixes, Role Hardening & UI Overhaul

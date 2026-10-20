@@ -29,7 +29,7 @@
          TOP NAVIGATION BAR
          ========================================== -->
     <nav class="navbar navbar-expand-xl custom-navbar sticky-top">
-        <div class="container-xl px-3 px-md-4">
+        <div class="container-xxl px-3 px-md-4">
             <!-- Brand -->
             <a class="navbar-brand d-flex align-items-center gap-2 me-3" sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">
                 <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center shadow-xs" style="width: 2.25rem; height: 2.25rem;">
@@ -151,28 +151,24 @@
                         <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/eligibility}"><i class="bi bi-check2-circle me-1"></i> Eligibility</a>
+                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-journal-code me-1"></i> Prep Tools
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
+                            <li><a class="dropdown-item py-2" th:href="@{/resume}"><i class="bi bi-file-earmark-person me-2 text-primary"></i> Resume Scanner &amp; ATS Suite</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/questions}"><i class="bi bi-collection me-2 text-primary"></i> Question Bank</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/practice}"><i class="bi bi-lightning-charge me-2 text-warning"></i> Practice Mode</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/roadmap}"><i class="bi bi-map me-2 text-success"></i> 1-8 Wk Roadmap</a></li>
-                            <li><a class="dropdown-item py-2" th:href="@{/compare}"><i class="bi bi-arrow-left-right me-2 text-info"></i> Compare Companies</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/checklists}"><i class="bi bi-card-checklist me-2 text-danger"></i> Prep Checklists</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/compare}"><i class="bi bi-arrow-left-right me-2 text-info"></i> Compare Companies</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2" th:href="@{/resume}"><i class="bi bi-file-earmark-person me-2 text-primary"></i> Resume Scanner</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2 text-primary fw-semibold" th:href="@{/ai-assistant}"><i class="bi bi-robot me-2 text-primary"></i> AI Placement Assistant <span class="badge bg-primary-subtle text-primary ms-1" style="font-size: 0.65rem;">PHASE 4</span></a></li>
+                            <li><a class="dropdown-item py-2 text-primary fw-semibold" th:href="@{/ai-assistant}"><i class="bi bi-robot me-2 text-primary"></i> AI Placement Assistant</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -182,20 +178,19 @@
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
                             <li><a class="dropdown-item py-2" th:href="@{/alumni}"><i class="bi bi-person-badge me-2 text-primary"></i> Alumni Mentors</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/mocks}"><i class="bi bi-calendar-event me-2 text-success"></i> Mock Interviews</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/eligibility}"><i class="bi bi-check2-circle me-2 text-success"></i> Eligibility Engine</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/statistics}"><i class="bi bi-graph-up-arrow me-2 text-info"></i> Placement Stats</a></li>
                             <li><a class="dropdown-item py-2" th:href="@{/leaderboard}"><i class="bi bi-trophy me-2 text-warning"></i> Leaderboard &amp; Badges</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2" th:href="@{/statistics}"><i class="bi bi-graph-up-arrow me-2 text-info"></i> Placement Stats</a></li>
+                            <li><a class="dropdown-item py-2 text-primary fw-semibold" th:href="@{/contribute}"><i class="bi bi-plus-circle me-2 text-primary"></i> Contribute Experience</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-primary fw-semibold py-2 py-xl-1 px-2" th:href="@{/contribute}"><i class="bi bi-plus-circle me-1"></i> Contribute</a>
                     </li>
                 </ul>
 
                 <!-- Right Actions: Switcher, AI, Theme, Notifications, User Menu -->
                 <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 mt-3 mt-xl-0 flex-shrink-0 ms-xl-auto pt-2 pt-xl-0 border-top border-xl-0">
                     <!-- Admin Panel Switcher Dropdown -->
-                    <div class="dropdown" sec:authorize="hasRole('ADMIN')">
+                    <div class="dropdown flex-shrink-0" sec:authorize="hasRole('ADMIN')">
                         <button class="btn btn-sm btn-outline-danger dropdown-toggle rounded-pill px-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Switch Portal View">
                             <i class="bi bi-grid-fill"></i>
                             <span class="small fw-semibold">Switch Panel</span>
@@ -221,20 +216,20 @@
                     </div>
 
                     <!-- AI Assistant Quick Launch -->
-                    <a class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs" th:href="@{/ai-assistant}" title="AI Placement Assistant">
+                    <a class="btn btn-sm btn-outline-primary rounded-pill px-2 px-xxl-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs flex-shrink-0" th:href="@{/ai-assistant}" title="AI Placement Assistant">
                         <i class="bi bi-robot text-primary"></i>
-                        <span class="small fw-semibold">AI Assistant</span>
+                        <span class="small fw-semibold d-none d-sm-inline">AI Assistant</span>
                     </a>
 
                     <!-- Utilities Toolbar (Theme, Notifications, Profile) -->
-                    <div class="d-flex align-items-center justify-content-between justify-content-xl-start gap-2 mt-1 mt-xl-0">
+                    <div class="d-flex align-items-center justify-content-between justify-content-xl-start gap-1 gap-xl-2 mt-1 mt-xl-0 flex-shrink-0">
                         <!-- Dark / Light Mode Button -->
-                        <button class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2" id="themeToggleBtn" type="button" title="Toggle Dark/Light Mode">
+                        <button class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 flex-shrink-0" id="themeToggleBtn" type="button" title="Toggle Dark/Light Mode">
                             <i class="bi bi-moon-stars-fill text-dark" id="themeToggleIcon"></i>
                         </button>
 
                         <!-- Notifications Bell (Authenticated) -->
-                        <div sec:authorize="isAuthenticated()">
+                        <div sec:authorize="isAuthenticated()" class="flex-shrink-0">
                             <a class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 position-relative d-inline-flex" th:href="@{/notifications}" title="Notifications">
                                 <i class="bi bi-bell-fill"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.25em 0.45em;"
@@ -243,8 +238,8 @@
                         </div>
 
                         <!-- User Profile & Admin dropdown (Authenticated) -->
-                        <div class="dropdown flex-grow-1 flex-xl-grow-0" sec:authorize="isAuthenticated()">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-3 py-1 d-flex align-items-center justify-content-center gap-2 shadow-xs w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown flex-shrink-0" sec:authorize="isAuthenticated()">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-2 px-sm-3 py-1 d-flex align-items-center justify-content-center gap-2 shadow-xs" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle fs-6 text-primary"></i>
                                 <span class="small fw-semibold" sec:authorize="hasRole('ADMIN')">Admin</span>
                                 <span class="small fw-semibold" sec:authorize="!hasRole('ADMIN')">Student</span>
@@ -274,7 +269,7 @@
                         </div>
 
                         <!-- Sign In button (Unauthenticated) -->
-                        <div sec:authorize="!isAuthenticated()" class="flex-grow-1 flex-xl-grow-0">
+                        <div sec:authorize="!isAuthenticated()" class="flex-grow-1 flex-xl-grow-0 flex-shrink-0">
                             <a class="btn btn-primary btn-sm rounded-pill px-3 w-100" th:href="@{/login}">Sign In</a>
                         </div>
                     </div>
@@ -310,7 +305,7 @@
          UNIVERSITY FOOTER
          ========================================== -->
     <footer class="custom-footer mt-auto">
-        <div class="container-xl px-3 px-md-4">
+        <div class="container-xxl px-3 px-md-4">
             <div class="row g-4 justify-content-between mb-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center gap-2 mb-3">

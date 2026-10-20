@@ -320,6 +320,17 @@ During development and continuous verification, the following technical issues w
 - **Root Cause**: The endpoints were initially declared inside `ResumeController.java`, which had a class-level `@RequestMapping("/resume")` annotation. Spring MVC automatically prepends class-level mappings, causing the routes to resolve to `/resume/api/resume/enhance-bullet`.
 - **Resolution**: Refactored the architecture by extracting all resume intelligence JSON endpoints into a dedicated `@RestController` class `ResumeApiController.java` mapped cleanly to `@RequestMapping("/api/resume")`. Updated unit and integration test scripts to verify 200 OK responses.
 
+### 15. 100% Desktop Zoom Navbar User Profile Clipping & Container Misalignment
+- **Symptom**: On 100% zoom laptops (1366x768, 1440x900, 1536x864), the user profile dropdown button and unread notification badge were partially or completely clipped by the right viewport boundary, and `/upcoming` cards did not align with the navbar.
+- **Root Cause**:
+  1. `base.html` wrapped navbar items in `container-xl`, which enforces an artificial `max-width: 1140px` between 1200px and 1400px.
+  2. The student navbar links took ~720px across 7 separate top-level items, which when combined with brand (200px) and right action toolbar (320px) exceeded 1240px.
+  3. Right action elements lacked `flex-shrink: 0`.
+- **Resolution**:
+  1. Replaced `container-xl` with `container-xxl` (max-width 1360px) in both navbar and footer.
+  2. Streamlined student navigation into 5 balanced groups (`Companies`, `Upcoming`, `Calendar`, `Prep Tools ▾`, `Community ▾`), eliminating ~210px of excess width.
+  3. Added `flex-shrink: 0` to all right toolbar controls and unified container classes on `/upcoming` to match the dashboard.
+
 ---
 
 ## 🏛 System Architecture & Module Directory
