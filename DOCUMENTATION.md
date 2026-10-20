@@ -90,6 +90,7 @@ Whenever changes or new features are introduced to the repository, this file and
 | **2026-10-16** | Sprint 4 | Phase 4 AI Preparation Suite: Grounded AI Assistant page (`/ai-assistant`), question classifier, experience summarizer, conversational greeting/typo handler, unit tests (`AiServiceTest`). | ✅ Completed & Deployed |
 | **2026-10-16** | Docs | Master Documentation Hub (`DOCUMENTATION.md`) and dedicated `docs/` subsystem tracking ongoing updates. | ✅ Completed |
 | **2026-10-16** | Cloud & UI | Multi-stage Docker containerization for Render, zero-overflow responsive navbar, and SaaS compact 100% zoom dashboard layout. | ✅ Completed & Deployed |
+| **2026-10-20** | Sprint 6 | Placement intelligence bug fixes & hardening: Calendar Seasonality Matrix rendering, Resume Scanner score & checklist parsing, Statistics Average Package card, Mock Interview mentor RBAC and hosting visibility, and Notifications UI overhaul with hourly reminder deduplication. | ✅ Completed & Deployed |
 
 ---
 
@@ -173,6 +174,29 @@ Whenever changes or new features are introduced to the repository, this file and
   - **Comprehensive Verification**:
     - Complete test suite passing: **32 tests executed with 0 failures, 0 errors**.
 
+---
+
+### Sprint 6: Placement Intelligence, Role Hardening, Notifications & ATS Polish (2026-10-20)
+- **Goal**: Resolve critical UI/UX bugs, enforce strict mentor/admin RBAC on mock interview hosting, eliminate notification spam & harsh styling, and restore full visibility to resume ATS scoring and placement analytics.
+- **Key Deliverables**:
+  - **Mock Interview RBAC & Portal Visibility**:
+    - Restricted "Offer a Mock Interview Slot" creation form and `+ Host a Mock Slot` button strictly to verified placed seniors / alumni mentors (`AlumniProfile`) and placement cell admins (`ROLE_ADMIN`).
+    - Standard students now only see booking capabilities. Added backend authorization check rejecting unprivileged slot creation attempts.
+    - Integrated direct "Host Mock Slots" callouts in the Alumni Mentors directory (`/alumni`) for active mentors, and added a quick link under Admin Tools in the navbar.
+    - Fixed `MockBooking.getSlot()` property evaluation to resolve template SpEL parsing exceptions.
+  - **Notification Subsystem Redesign & Deduplication**:
+    - Eliminated gaudy 4px solid blue square bounding boxes around unread items; replaced with modern cards featuring subtle left accents (`border-left: 4px solid var(--bs-primary)`), soft background tints, and "New" badges.
+    - Added category icon bubbles for Mock Interviews (calendar), Deadlines (alarm), Recruitment Drives (megaphone), and Approvals (patch-check).
+    - Fixed `View →` button wrapping into two lines by applying `text-nowrap`.
+    - Added direct route `GET /notifications/{id}/open` automatically marking alerts as read and forwarding the student to the target destination.
+    - Added filter pills ("All" / "Unread") and inline buttons to mark single alerts as read or dismiss them.
+    - Prevented hourly duplicate alerts in `NotificationService.checkDeadlineReminders()` by checking `!existsByUserIdAndNotificationTypeAndTitle(...)`.
+  - **Resume Scanner & Score Rendering**:
+    - Implemented transient JSON getters on `Resume.java` (`getScore()`, `getPageCount()`, `isHasContactInfo()`, etc.) and controller data attributes so ATS score, page count, and contact checklist details properly render in the UI.
+  - **Placement Calendar Seasonality Matrix**:
+    - Fixed SpEL map access in `calendar/index.html` from `entry.value[y]` to `entry.value.get(y)`, resolving empty 0-count drive matrix cells across years.
+  - **Statistics Average Package Metric**:
+    - Implemented real-time dynamic average CTC computation in `StatsService` and added a dedicated 5th KPI metric card on the statistics dashboard (`/statistics`).
 
 ---
 
@@ -227,6 +251,46 @@ During development and continuous verification, the following technical issues w
   3. Reduced `.nav-link` padding (`0.35rem 0.55rem`) and font size (`0.86rem`).
   4. Added `flex-shrink: 0; ms-auto` to the right action bar and made username text responsive (`d-none d-xxl-inline`), guaranteeing the user avatar circle and notification bell never clip.
   5. Compacted `.stat-widget` padding, icon dimensions (`2.5rem`), and grid gaps (`g-3`), keeping *Upcoming Campus Drives* and *Practice Tracker* immediately visible above the fold.
+
+### 9. Seasonality Matrix 0-Count Drives in Placement Calendar
+- **Symptom**: On the Placement Calendar (`/calendar`), the recruitment seasonality matrix table displayed 0 drives across all months and years despite verified recruitment drives existing in the database.
+- **Root Cause**: The Thymeleaf template evaluated map lookup as `entry.value[y]`. In Spring Expression Language (SpEL), evaluating `[y]` where `y` is an integer loop variable failed or looked up `null`.
+- **Resolution**: Changed expression in `frontend/templates/calendar/index.html` to `entry.value.get(y)`. This accurately resolves the nested map entry and renders exact drive tallies.
+
+### 10. Resume Scanner Missing ATS Score & Checklist Flags
+- **Symptom**: On the Resume Scanner page (`/resume`), uploaded resumes did not display ATS scores, page count, or contact information flags.
+- **Root Cause**: `Resume.java` stored raw JSON in `checklistResultJson` without getter methods for computed properties (`getScore()`, `getPageCount()`, `isHasContactInfo()`, etc.), causing Thymeleaf property resolution to return empty strings.
+- **Resolution**: Added transient JSON parser getters on `Resume.java` and populated model attributes in `ResumeController.java` to extract and display ATS score, keyword matching, and checklist items.
+
+### 11. Placement Statistics Missing Average Package Metric
+- **Symptom**: The Placement Statistics dashboard (`/statistics`) displayed Highest Package, Placed Students, Recruiters, and Drives, but lacked the critical Institutional Average Package metric card.
+- **Root Cause**: `StatsService.java` aggregated summary statistics without computing an average CTC across drives with valid package figures.
+- **Resolution**: Implemented dynamic average CTC calculation in `StatsService.java` (filtering drives with positive CTC, averaging values, formatting to 2 decimal places) and added a dedicated 5th KPI card to `statistics/index.html`.
+
+### 12. Mock Interview Slot Creation Exposed to Students & SpEL Property Error
+- **Symptom**: Logged-in regular students saw the "Offer a Mock Interview Slot" creation form and `+ Host a Mock Slot (Mentors)` button on `/mocks`. Clicking "View" on confirmed mock notifications threw `SpelEvaluationException: EL1008E: Property or field 'slot' cannot be found on object of type MockBooking`.
+- **Root Cause**:
+  1. The slot creation form had no role-based visibility restrictions in `mocks/index.html`.
+  2. `MockBooking.java` named the field `mockSlot`, but `mocks/index.html` attempted to access `b.slot`.
+- **Resolution**:
+  1. Enclosed slot hosting controls in `th:if="${canHostSlots}"` computed as `isAdmin || isMentor` (verified via `AlumniProfile`).
+  2. Added server-side permission checks in `MockInterviewController.createSlot()` rejecting unprivileged POST requests.
+  3. Added `getSlot()` accessor to `MockBooking.java` and aligned template bindings to `b.mockSlot`.
+  4. Added direct mentor slot hosting buttons in the Alumni Mentors directory (`/alumni`) and Admin Tools.
+
+### 13. Notification Card Heavy 4px Blue Bounding Boxes & Hourly Duplicate Spam
+- **Symptom**: Notifications on `/notifications` displayed with harsh, thick 4px blue rectangular bounding boxes on all four sides. The same "Deadline Reminder: Celebal Technologies" alert appeared repeatedly. The `View →` button wrapped awkwardly into `View` and `–`.
+- **Root Cause**:
+  1. `border-primary border-4` on `.list-group-item` set `border-color` and `border-width` on all four borders.
+  2. The hourly `@Scheduled(cron = "0 0 * * * *")` deadline reminder task inserted a new notification every hour without checking if the student was already notified.
+  3. `View →` lacked `text-nowrap`.
+  4. Viewing an alert did not mark it as read.
+- **Resolution**:
+  1. Replaced heavy borders with modern cards featuring subtle left accents (`border-left: 4px solid var(--bs-primary)`) and category icons.
+  2. Added deduplication check `!existsByUserIdAndNotificationTypeAndTitle(...)` in `NotificationService.checkDeadlineReminders()` and cleaned historical duplicates in `DataInitializer`.
+  3. Added `text-nowrap` to prevent button text wrapping.
+  4. Added `GET /notifications/{id}/open` endpoint automatically marking alerts as read on view.
+  5. Added "All" / "Unread" filter pills and inline buttons to mark single alerts as read or dismiss them.
 
 ---
 

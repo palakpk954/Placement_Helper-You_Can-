@@ -6,7 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] - Post-Phase 4: Live Cloud LLM & Generative RAG
+## [1.1.0] - 2026-10-20 - Bug Fixes, Role Hardening & UI Overhaul
+
+### Added
+- **Notification Controls & Filter Tabs**:
+  - Added "All" and "Unread" filter pills on `/notifications` for fast filtering.
+  - Added single-click mark-as-read icon buttons and individual notification dismiss actions.
+  - Direct `GET /notifications/{id}/open` endpoint automatically marking alerts as read and forwarding the user to the destination page.
+  - Visual category icon badges distinguishing Mock Interviews, Deadlines, Campus Recruitment Drives, and Senior Reviews.
+- **Dynamic Average Package Metric**:
+  - Implemented real-time average package calculation in `StatsService.java` aggregating drives with valid CTC data.
+  - Added a dedicated 5th KPI metric card to the Placement Statistics dashboard (`/statistics`).
+- **Senior Mock Interview Shortcuts**:
+  - Integrated "Host / Manage Mock Slots" access directly into the Alumni Mentors directory (`/alumni`) for registered mentors.
+  - Added a quick link under Admin Tools in the top navigation bar for Placement Cell administrators.
+
+### Fixed
+- **Notification Heavy Bounding Boxes & Text Wrapping**:
+  - Removed `border-primary border-4` that caused loud 4px blue square bounding boxes around list items.
+  - Replaced with modern card styling featuring subtle left accents (`border-left: 4px solid var(--bs-primary)`) and "New" badges.
+  - Fixed `View →` button wrapping into two lines by applying `text-nowrap`.
+- **Hourly Deadline Reminder Duplication**:
+  - Fixed `@Scheduled(cron = "0 0 * * * *")` in `NotificationService.checkDeadlineReminders()` to verify `!existsByUserIdAndNotificationTypeAndTitle(...)` before dispatching, preventing hourly spam.
+  - Added startup deduplication in `DataInitializer` to purge historical duplicate notifications.
+- **Mock Interview Slot Creation RBAC**:
+  - Restricted "Offer a Mock Interview Slot" creation form and `+ Host a Mock Slot` button strictly to verified mentors (`AlumniProfile`) and placement cell admins (`ROLE_ADMIN`).
+  - Standard students now only see booking capabilities. Added server-side authorization check rejecting unprivileged slot creation attempts.
+- **Mock Booking SpEL Evaluation**:
+  - Resolved `SpelEvaluationException: EL1008E: Property or field 'slot' cannot be found on MockBooking` by updating template bindings to `mockSlot` and adding `getSlot()` accessor on `MockBooking`.
+- **Resume Scanner ATS Score & Checklist Display**:
+  - Implemented transient JSON getters on `Resume.java` and controller mapping so ATS score, page count, and contact checklist details properly render in the UI.
+- **Placement Calendar Seasonality Matrix**:
+  - Fixed SpEL map access in `calendar/index.html` from `entry.value[y]` to `entry.value.get(y)`, resolving empty 0-count drive matrix cells across years.
+
+---
+
+## [1.0.0] - Post-Phase 4: Live Cloud LLM & Generative RAG
 
 ### Added
 - **Google Gemini Cloud LLM Connectivity**:
