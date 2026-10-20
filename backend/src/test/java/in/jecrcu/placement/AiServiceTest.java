@@ -271,7 +271,6 @@ class AiServiceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testEnhanceResumeBulletOffline() {
         String bullet = "worked on a web app using react and nodejs to display student data";
         Map<String, Object> result = aiService.enhanceResumeBullet(bullet, "Full-Stack Development");
