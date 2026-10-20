@@ -2,7 +2,9 @@ package in.jecrcu.placement.service;
 
 import in.jecrcu.placement.entity.AlumniProfile;
 import in.jecrcu.placement.entity.User;
+import in.jecrcu.placement.entity.enums.Role;
 import in.jecrcu.placement.repository.AlumniProfileRepository;
+import in.jecrcu.placement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import java.util.Optional;
 public class AlumniService {
 
     private final AlumniProfileRepository alumniProfileRepository;
+    private final UserRepository userRepository;
 
     public List<AlumniProfile> getAllVisibleAlumni() {
         return alumniProfileRepository.findByVisibleTrueOrderByGraduationYearDesc();
@@ -23,7 +26,8 @@ public class AlumniService {
     public List<AlumniProfile> searchAlumni(String company, String branch, Integer year) {
         String compFilter = (company != null && !company.isBlank() && !company.equalsIgnoreCase("ALL")) ? company.trim() : null;
         String branchFilter = (branch != null && !branch.isBlank() && !branch.equalsIgnoreCase("ALL")) ? branch.trim() : null;
-        return alumniProfileRepository.searchAlumni(compFilter, branchFilter, year);
+        Integer yearFilter = (year != null && year > 1900) ? year : null;
+        return alumniProfileRepository.searchAlumni(compFilter, branchFilter, yearFilter);
     }
 
     public Optional<AlumniProfile> getProfileByUserId(Long userId) {
@@ -57,6 +61,14 @@ public class AlumniService {
                     .visible(visible)
                     .build();
         }
-        return alumniProfileRepository.save(profile);
+        AlumniProfile saved = alumniProfileRepository.save(profile);
+
+        // If user was a student, upgrade them to ROLE_ALUMNI
+        if (user.getRole() == Role.ROLE_STUDENT) {
+            user.setRole(Role.ROLE_ALUMNI);
+            userRepository.save(user);
+        }
+
+        return saved;
     }
 }

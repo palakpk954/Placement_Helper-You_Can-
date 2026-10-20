@@ -242,19 +242,27 @@
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-2 px-sm-3 py-1 d-flex align-items-center justify-content-center gap-2 shadow-xs" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle fs-6 text-primary"></i>
                                 <span class="small fw-semibold" sec:authorize="hasRole('ADMIN')">Admin</span>
-                                <span class="small fw-semibold" sec:authorize="!hasRole('ADMIN')">Student</span>
+                                <span class="small fw-semibold" sec:authorize="hasRole('ALUMNI')">Mentor</span>
+                                <span class="small fw-semibold" sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI')">Student</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 p-2" style="min-width: 220px;">
                                 <li class="px-3 py-2 border-bottom mb-1">
                                     <div class="fw-bold text-truncate" sec:authentication="name">user@jecrcu.edu.in</div>
-                                    <div class="badge badge-soft-primary" sec:authorize="hasRole('ADMIN')">Placement Coordinator</div>
-                                    <div class="badge badge-soft-success" sec:authorize="hasRole('STUDENT')">JECRC Student</div>
+                                    <div class="badge badge-soft-danger" sec:authorize="hasRole('ADMIN')">Placement Coordinator</div>
+                                    <div class="badge badge-soft-info" sec:authorize="hasRole('ALUMNI')">Alumni Mentor</div>
+                                    <div class="badge badge-soft-success" sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI')">JECRC Student</div>
                                 </li>
                                 <li sec:authorize="hasRole('ADMIN')">
                                     <a class="dropdown-item py-2 fw-semibold text-danger" th:href="@{/admin}"><i class="bi bi-shield-lock me-2"></i> Admin Panel</a>
                                 </li>
                                 <li sec:authorize="!hasRole('ADMIN')">
                                     <a class="dropdown-item py-2" th:href="@{/dashboard}"><i class="bi bi-speedometer2 me-2 text-primary"></i> My Dashboard</a>
+                                </li>
+                                <li sec:authorize="hasRole('ALUMNI')">
+                                    <a class="dropdown-item py-2 text-info" th:href="@{/alumni}"><i class="bi bi-person-badge me-2"></i> Mentor Profile</a>
+                                </li>
+                                <li sec:authorize="hasRole('ALUMNI')">
+                                    <a class="dropdown-item py-2 text-success" th:href="@{/mocks}"><i class="bi bi-calendar-plus me-2"></i> Host Mock Slots</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2" th:href="@{/notifications}"><i class="bi bi-gear me-2 text-muted"></i> Preferences</a>

@@ -65,8 +65,16 @@ public class AlumniController {
 
         User user = userService.findById(userDetails.getId()).orElse(null);
         if (user != null) {
-            alumniService.saveProfile(user, companyName, jobRole, graduationYear, branch, linkedinUrl, topicsCanHelp, visible);
-            redirectAttributes.addFlashAttribute("successMessage", "Your alumni profile has been updated.");
+            try {
+                alumniService.saveProfile(user, companyName.trim(), jobRole.trim(), graduationYear, branch.trim(),
+                        linkedinUrl != null ? linkedinUrl.trim() : null,
+                        topicsCanHelp != null ? topicsCanHelp.trim() : null, visible);
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Your alumni mentor profile has been saved successfully! You can now offer 1-on-1 mock interview slots to juniors.");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Unable to save mentor profile: " + e.getMessage());
+            }
         }
         return "redirect:/alumni";
     }

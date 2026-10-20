@@ -27,7 +27,13 @@ public class CustomUserDetails implements UserDetails {
     private final boolean hasApprovedExperience;
     private final Collection<? extends GrantedAuthority> authorities;
 
+    private final boolean mentor;
+
     public CustomUserDetails(User user, boolean hasApprovedExperience) {
+        this(user, hasApprovedExperience, false);
+    }
+
+    public CustomUserDetails(User user, boolean hasApprovedExperience, boolean isMentor) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
@@ -39,7 +45,14 @@ public class CustomUserDetails implements UserDetails {
         this.role = user.getRole();
         this.emailVerified = user.getEmailVerified() != null && user.getEmailVerified();
         this.hasApprovedExperience = hasApprovedExperience;
-        this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        this.mentor = isMentor || user.getRole() == Role.ROLE_ALUMNI;
+
+        List<GrantedAuthority> authList = new java.util.ArrayList<>();
+        authList.add(new SimpleGrantedAuthority(user.getRole().name()));
+        if (this.mentor && !user.getRole().name().equals("ROLE_ALUMNI")) {
+            authList.add(new SimpleGrantedAuthority("ROLE_ALUMNI"));
+        }
+        this.authorities = java.util.Collections.unmodifiableList(authList);
     }
 
     @Override

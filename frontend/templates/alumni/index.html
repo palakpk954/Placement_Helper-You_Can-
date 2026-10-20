@@ -5,68 +5,110 @@
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container">
+    <div class="container-xxl px-3 px-md-4">
+
+        <!-- Flash Messages -->
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 shadow-xs" role="alert" th:if="${successMessage}">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div th:text="${successMessage}">Success message</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 shadow-xs" role="alert" th:if="${errorMessage}">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div th:text="${errorMessage}">Error message</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
         <!-- Header -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>
                 <h3 class="fw-bold mb-1"><i class="bi bi-person-badge-fill text-primary me-2"></i>Placed Seniors &amp; Alumni Mentors</h3>
-                <p class="text-muted small mb-0">Connect directly with placed seniors from JECRC University who offered to mentor juniors.</p>
+                <p class="text-muted small mb-0">Connect directly with placed alumni from JECRC University offering 1-on-1 interview practice and guidance.</p>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex flex-wrap gap-2">
                 <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="btn btn-outline-danger rounded-pill px-3 shadow-xs btn-sm">
-                    <i class="bi bi-shield-lock me-1"></i> Back to Admin Panel
+                    <i class="bi bi-shield-lock me-1"></i> Admin Panel
                 </a>
-                <a th:if="${myProfile != null or #authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/mocks}" class="btn btn-outline-success rounded-pill px-3 shadow-sm btn-sm">
+                <a th:if="${myProfile != null or #authorization.expression('hasRole(''ADMIN'') or hasRole(''ALUMNI'')')}" th:href="@{/mocks}" class="btn btn-outline-success rounded-pill px-3 shadow-sm btn-sm">
                     <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
                 </a>
                 <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
-                    <i class="bi bi-pencil-square me-1"></i> Edit My Mentor Profile
+                    <i class="bi bi-pencil-square me-1"></i>
+                    <span th:text="${myProfile != null ? 'Edit My Mentor Profile' : 'Opt-In as Alumni Mentor'}">Edit My Mentor Profile</span>
                 </button>
             </div>
         </div>
 
         <!-- Active Mentor Callout -->
-        <div class="alert alert-success d-flex align-items-center justify-content-between p-3 rounded-3 shadow-xs mb-4" th:if="${myProfile != null}">
+        <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between p-3 rounded-3 shadow-xs mb-4" th:if="${myProfile != null}">
             <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <i class="bi bi-patch-check-fill text-success fs-4"></i>
                 <div>
                     <strong>You are registered as a Senior Mentor at <span th:text="${myProfile.companyName}">Company</span>!</strong>
                     <div class="small text-muted">You have mentor privileges to publish 1-on-1 mock interview slots for junior students.</div>
                 </div>
             </div>
-            <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 text-nowrap ms-2">
-                <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
-            </a>
+            <div class="d-flex gap-2 mt-2 mt-sm-0">
+                <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 text-nowrap">
+                    <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
+                </a>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
+                    <i class="bi bi-gear me-1"></i> Edit Profile
+                </button>
+            </div>
         </div>
 
         <!-- Mentor Profile Edit Form Collapse -->
         <div class="collapse mb-4" id="profileCollapse">
             <div class="app-card p-4 shadow-sm border-primary">
-                <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-success me-2"></i>Opt-In as Alumni / Senior Mentor</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-shield-check text-success me-2"></i>
+                        <span th:text="${myProfile != null ? 'Update Mentor Profile' : 'Opt-In as Alumni / Senior Mentor'}">Opt-In as Alumni / Senior Mentor</span>
+                    </h5>
+                    <button class="btn-close" type="button" data-bs-toggle="collapse" data-bs-target="#profileCollapse" aria-label="Close"></button>
+                </div>
+                <p class="text-muted small mb-4">Registering your verified role helps junior JECRC students connect with you for placement guidance and 1-on-1 mock interviews.</p>
                 <form th:action="@{/alumni/profile}" method="post">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Current Company</label>
-                            <input type="text" class="form-control" name="companyName"
-                                   th:value="${myProfile != null ? myProfile.companyName : ''}" placeholder="e.g. Amazon, Google, TCS" required>
+                            <label class="form-label small fw-semibold">Current Company <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="companyName" list="companyDatalist"
+                                   th:value="${myProfile != null ? myProfile.companyName : ''}" placeholder="e.g. Microsoft, Amazon, Google, TCS" required>
+                            <datalist id="companyDatalist">
+                                <option th:each="c : ${companies}" th:value="${c.name}"></option>
+                            </datalist>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Designation / Role</label>
+                            <label class="form-label small fw-semibold">Designation / Role <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="jobRole"
-                                   th:value="${myProfile != null ? myProfile.jobRole : ''}" placeholder="e.g. SDE-1, Cloud Engineer" required>
+                                   th:value="${myProfile != null ? myProfile.jobRole : ''}" placeholder="e.g. Software Development Engineer - 1" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Graduation Year</label>
-                            <input type="number" class="form-control" name="graduationYear"
-                                   th:value="${myProfile != null ? myProfile.graduationYear : 2025}" required>
+                            <label class="form-label small fw-semibold">Graduation Year <span class="text-danger">*</span></label>
+                            <select class="form-select" name="graduationYear" required>
+                                <option value="2026" th:selected="${myProfile != null and myProfile.graduationYear == 2026}">2026</option>
+                                <option value="2025" th:selected="${myProfile != null and myProfile.graduationYear == 2025}">2025</option>
+                                <option value="2024" th:selected="${myProfile == null or myProfile.graduationYear == 2024}">2024 (Alumni)</option>
+                                <option value="2023" th:selected="${myProfile != null and myProfile.graduationYear == 2023}">2023 (Alumni)</option>
+                                <option value="2022" th:selected="${myProfile != null and myProfile.graduationYear == 2022}">2022 (Alumni)</option>
+                                <option value="2021" th:selected="${myProfile != null and myProfile.graduationYear == 2021}">2021 (Alumni)</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Branch</label>
-                            <input type="text" class="form-control" name="branch"
-                                   th:value="${myProfile != null ? myProfile.branch : 'CSE'}" required>
+                            <label class="form-label small fw-semibold">Degree / Branch <span class="text-danger">*</span></label>
+                            <select class="form-select" name="branch" required>
+                                <option value="CSE" th:selected="${myProfile == null or myProfile.branch == 'CSE'}">CSE (Computer Science)</option>
+                                <option value="IT" th:selected="${myProfile != null and myProfile.branch == 'IT'}">IT (Information Tech)</option>
+                                <option value="ECE" th:selected="${myProfile != null and myProfile.branch == 'ECE'}">ECE (Electronics &amp; Comm)</option>
+                                <option value="EE" th:selected="${myProfile != null and myProfile.branch == 'EE'}">EE (Electrical)</option>
+                                <option value="ME" th:selected="${myProfile != null and myProfile.branch == 'ME'}">ME (Mechanical)</option>
+                                <option value="Civil" th:selected="${myProfile != null and myProfile.branch == 'Civil'}">Civil Engineering</option>
+                                <option value="MCA" th:selected="${myProfile != null and myProfile.branch == 'MCA'}">MCA</option>
+                                <option value="BCA" th:selected="${myProfile != null and myProfile.branch == 'BCA'}">BCA</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold">LinkedIn Profile URL</label>
@@ -77,14 +119,17 @@
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Topics You Can Mentor Juniors On</label>
                         <input type="text" class="form-control" name="topicsCanHelp"
-                               th:value="${myProfile != null ? myProfile.topicsCanHelp : ''}" placeholder="e.g. DSA, Resume Review, System Design, HR Rounds">
+                               th:value="${myProfile != null ? myProfile.topicsCanHelp : ''}" placeholder="e.g. DSA, System Design, Microsoft Interview Prep, Resume Review, HR Rounds">
+                        <div class="form-text small">Separate topics with commas (e.g. DSA, System Design, Resume Review)</div>
                     </div>
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" name="visible" value="true" id="visibleCheck"
                                th:checked="${myProfile != null ? myProfile.visible : true}">
                         <label class="form-check-label small" for="visibleCheck">Show my mentor card in the public alumni directory</label>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">Save Mentor Profile</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i> Save Mentor Profile
+                    </button>
                 </form>
             </div>
         </div>
@@ -92,15 +137,42 @@
         <!-- Filter Bar -->
         <div class="app-card p-3 mb-4 shadow-sm">
             <form th:action="@{/alumni}" method="get" class="row g-2 align-items-center">
-                <div class="col-md-5">
-                    <input type="text" class="form-control" name="company" th:value="${selectedCompany}" placeholder="Filter by company name (e.g. Amazon)...">
-                </div>
                 <div class="col-md-4">
-                    <input type="text" class="form-control" name="branch" th:value="${selectedBranch}" placeholder="Filter by branch (e.g. CSE)...">
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-building text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0" name="company" list="filterCompanyList"
+                               th:value="${selectedCompany}" placeholder="Filter by company (e.g. Microsoft)...">
+                        <datalist id="filterCompanyList">
+                            <option th:each="c : ${companies}" th:value="${c.name}"></option>
+                        </datalist>
+                    </div>
                 </div>
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-3">
+                    <select class="form-select" name="branch">
+                        <option value="" th:selected="${selectedBranch == null or selectedBranch == ''}">All Branches</option>
+                        <option value="CSE" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'CSE')}">CSE</option>
+                        <option value="IT" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'IT')}">IT</option>
+                        <option value="ECE" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'ECE')}">ECE</option>
+                        <option value="EE" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'EE')}">EE</option>
+                        <option value="ME" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'ME')}">ME</option>
+                        <option value="Civil" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'Civil')}">Civil</option>
+                        <option value="MCA" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'MCA')}">MCA</option>
+                        <option value="BCA" th:selected="${selectedBranch != null and #strings.equalsIgnoreCase(selectedBranch, 'BCA')}">BCA</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="year">
+                        <option value="" th:selected="${selectedYear == null}">All Graduation Years</option>
+                        <option value="2026" th:selected="${selectedYear == 2026}">Class of 2026</option>
+                        <option value="2025" th:selected="${selectedYear == 2025}">Class of 2025</option>
+                        <option value="2024" th:selected="${selectedYear == 2024}">Class of 2024</option>
+                        <option value="2023" th:selected="${selectedYear == 2023}">Class of 2023</option>
+                        <option value="2022" th:selected="${selectedYear == 2022}">Class of 2022</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary rounded-pill w-100"><i class="bi bi-filter me-1"></i> Filter</button>
-                    <a th:href="@{/alumni}" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    <a th:href="@{/alumni}" class="btn btn-outline-secondary rounded-pill" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -111,33 +183,41 @@
                 <div class="app-card p-4 h-100 shadow-sm border-0 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="avatar-circle bg-primary-subtle text-primary fw-bold fs-5 d-flex align-items-center justify-content-center rounded-circle" style="width: 50px; height: 50px;">
-                                <span th:text="${a.user != null ? a.user.fullName.substring(0, 1) : 'M'}">A</span>
+                            <div class="avatar-circle bg-primary-subtle text-primary fw-bold fs-5 d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 50px; height: 50px;">
+                                <span th:text="${a.user != null and a.user.fullName != null ? a.user.fullName.substring(0, 1) : 'M'}">A</span>
                             </div>
-                            <div>
-                                <h6 class="fw-bold mb-0" th:text="${a.user != null ? a.user.fullName : 'Senior Mentor'}">Senior Name</h6>
-                                <span class="badge badge-soft-primary" th:text="${a.companyName}">Google</span>
+                            <div class="overflow-hidden">
+                                <div class="d-flex align-items-center gap-1">
+                                    <h6 class="fw-bold mb-0 text-truncate" th:text="${a.user != null ? a.user.fullName : 'Senior Mentor'}">Senior Name</h6>
+                                    <i class="bi bi-patch-check-fill text-primary small" title="Verified Alumni Mentor"></i>
+                                </div>
+                                <span class="badge badge-soft-primary mt-1" th:text="${a.companyName}">Google</span>
                             </div>
                         </div>
 
                         <p class="small text-muted mb-2">
-                            <i class="bi bi-briefcase me-1 text-primary"></i> <span th:text="${a.jobRole}">SDE-1</span><br>
-                            <i class="bi bi-mortarboard me-1 text-muted"></i> <span th:text="${'Class of ' + a.graduationYear + ' (' + a.branch + ')'}">2025 (CSE)</span>
+                            <i class="bi bi-briefcase me-1 text-primary"></i> <strong class="text-dark" th:text="${a.jobRole}">SDE-1</strong><br>
+                            <i class="bi bi-mortarboard me-1 text-muted"></i> <span th:text="${'Class of ' + a.graduationYear + ' (' + a.branch + ')'}">2024 (CSE)</span>
                         </p>
 
                         <div class="mb-3" th:if="${a.topicsCanHelp != null and !a.topicsCanHelp.isBlank()}">
-                            <span class="small fw-semibold text-dark">Can help with:</span>
-                            <p class="small text-secondary mb-0 mt-1" th:text="${a.topicsCanHelp}">DSA, Mock Interviews, System Design</p>
+                            <span class="small fw-semibold text-dark d-block mb-1">Topics Can Help With:</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-light text-secondary border small"
+                                      th:each="t : ${#strings.arraySplit(a.topicsCanHelp, ',')}"
+                                      th:text="${#strings.trim(t)}">DSA</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="pt-3 border-top mt-2 d-flex justify-content-between align-items-center">
+                    <div class="pt-3 border-top mt-2 d-flex justify-content-between align-items-center gap-2">
                         <a th:if="${a.linkedinUrl != null and !a.linkedinUrl.isBlank()}"
                            th:href="${a.linkedinUrl}" target="_blank"
-                           class="btn btn-sm btn-outline-primary rounded-pill">
-                            <i class="bi bi-linkedin me-1"></i> Connect
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-linkedin me-1"></i> LinkedIn
                         </a>
-                        <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill ms-auto">
+                        <span th:if="${a.linkedinUrl == null or a.linkedinUrl.isBlank()}"></span>
+                        <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 ms-auto shadow-xs">
                             <i class="bi bi-calendar-check me-1"></i> Book Mock
                         </a>
                     </div>
@@ -148,8 +228,11 @@
         <!-- Empty State -->
         <div class="app-card text-center py-5" th:if="${alumniList == null or alumniList.isEmpty()}">
             <i class="bi bi-people text-muted display-4"></i>
-            <h5 class="fw-bold mt-3 mb-1">No alumni mentors found</h5>
-            <p class="text-muted small">Try adjusting your filters or be the first to opt in as a mentor!</p>
+            <h5 class="fw-bold mt-3 mb-1">No alumni mentors match your filters</h5>
+            <p class="text-muted small mb-3">Try clearing or adjusting your company and branch filters.</p>
+            <a th:href="@{/alumni}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset All Filters
+            </a>
         </div>
 
     </div>

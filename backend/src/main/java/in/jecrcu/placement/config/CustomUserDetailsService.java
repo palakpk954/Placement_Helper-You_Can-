@@ -1,6 +1,8 @@
 package in.jecrcu.placement.config;
 
 import in.jecrcu.placement.entity.User;
+import in.jecrcu.placement.entity.enums.Role;
+import in.jecrcu.placement.repository.AlumniProfileRepository;
 import in.jecrcu.placement.repository.ExperienceRepository;
 import in.jecrcu.placement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final ExperienceRepository experienceRepository;
+    private final AlumniProfileRepository alumniProfileRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -22,6 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         boolean hasApprovedExp = experienceRepository.countApprovedByAuthorId(user.getId()) > 0;
-        return new CustomUserDetails(user, hasApprovedExp);
+        boolean isMentor = user.getRole() == Role.ROLE_ALUMNI ||
+                alumniProfileRepository.findByUserId(user.getId()).isPresent();
+        return new CustomUserDetails(user, hasApprovedExp, isMentor);
     }
 }

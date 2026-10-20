@@ -20,6 +20,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final in.jecrcu.placement.repository.NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${app.upload.dir:./uploads/resumes}")
     private String uploadDir;
@@ -41,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
             log.error("Failed to initialize storage directories: {}", e.getMessage());
         }
 
-        // 2. Ensure initial seed accounts have valid encoded passwords
+        // 2. Ensure initial seed accounts have valid encoded passwords & roles
         try {
             List<User> users = userRepository.findAll();
             for (User user : users) {
@@ -52,16 +53,21 @@ public class DataInitializer implements CommandLineRunner {
                            "priya.verma@jecrcu.edu.in".equalsIgnoreCase(user.getEmail())) {
                     expectedPassword = "student123";
                 } else if ("alumni.amit@jecrcu.edu.in".equalsIgnoreCase(user.getEmail()) ||
-                           "sneha.patel@jecrcu.edu.in".equalsIgnoreCase(user.getEmail())) {
+                           "sneha.patel@jecrcu.edu.in".equalsIgnoreCase(user.getEmail()) ||
+                           "rohit.meena@jecrcu.edu.in".equalsIgnoreCase(user.getEmail())) {
                     expectedPassword = "mentor123";
+                    if (user.getRole() != in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI) {
+                        user.setRole(in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI);
+                    }
                 }
 
                 // If password doesn't match expected BCrypt encoding, update it
-                if (!passwordEncoder.matches(expectedPassword, user.getPassword())) {
+                if (!passwordEncoder.matches(expectedPassword, user.getPassword()) ||
+                    ("alumni.amit@jecrcu.edu.in".equalsIgnoreCase(user.getEmail()) && user.getRole() != in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI)) {
                     user.setPassword(passwordEncoder.encode(expectedPassword));
                     user.setEmailVerified(true);
                     userRepository.save(user);
-                    log.info("Normalized seed password for user: {}", user.getEmail());
+                    log.info("Normalized seed password and role for user: {}", user.getEmail());
                 }
             }
         } catch (Exception e) {
@@ -87,6 +93,28 @@ public class DataInitializer implements CommandLineRunner {
             }
         } catch (Exception e) {
             log.warn("Could not deduplicate notifications: {}", e.getMessage());
+        }
+
+        // 4. Synchronize all table primary key identity sequences to prevent unique constraint collisions
+        try {
+            String[] tables = {
+                "users", "companies", "drives", "rounds", "experiences", "questions",
+                "interview_questions", "alumni_profiles", "upcoming_drives", "mock_slots",
+                "mock_bookings", "badges", "bookmarks", "notifications", "company_ratings"
+            };
+            for (String table : tables) {
+                try {
+                    Long maxId = jdbcTemplate.queryForObject("SELECT COALESCE(MAX(id), 0) FROM " + table, Long.class);
+                    if (maxId != null) {
+                        jdbcTemplate.execute("ALTER TABLE " + table + " ALTER COLUMN id RESTART WITH " + (maxId + 1));
+                    }
+                } catch (Exception ex) {
+                    log.debug("Skipping sequence reset for table {}: {}", table, ex.getMessage());
+                }
+            }
+            log.info("Synchronized identity sequences for all tables");
+        } catch (Exception e) {
+            log.warn("Sequence synchronization error: {}", e.getMessage());
         }
     }
 }

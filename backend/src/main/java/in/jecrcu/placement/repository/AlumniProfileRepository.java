@@ -20,7 +20,7 @@ public interface AlumniProfileRepository extends JpaRepository<AlumniProfile, Lo
 
     @Query("SELECT a FROM AlumniProfile a WHERE a.visible = true " +
            "AND (:company IS NULL OR LOWER(a.companyName) LIKE LOWER(CONCAT('%', :company, '%'))) " +
-           "AND (:branch IS NULL OR a.branch = :branch) " +
+           "AND (:branch IS NULL OR UPPER(TRIM(a.branch)) = UPPER(TRIM(:branch))) " +
            "AND (:year IS NULL OR a.graduationYear = :year) " +
            "ORDER BY a.graduationYear DESC")
     List<AlumniProfile> searchAlumni(
@@ -29,5 +29,9 @@ public interface AlumniProfileRepository extends JpaRepository<AlumniProfile, Lo
             @Param("year") Integer year
     );
 
-    List<AlumniProfile> findByCompanyNameIgnoreCaseAndVisibleTrue(String companyName);
+    @Query("SELECT a FROM AlumniProfile a WHERE a.visible = true AND " +
+           "(LOWER(a.companyName) = LOWER(:companyName) OR " +
+           " LOWER(:companyName) LIKE LOWER(CONCAT('%', a.companyName, '%')) OR " +
+           " LOWER(a.companyName) LIKE LOWER(CONCAT('%', :companyName, '%')))")
+    List<AlumniProfile> findByCompanyNameIgnoreCaseAndVisibleTrue(@Param("companyName") String companyName);
 }
