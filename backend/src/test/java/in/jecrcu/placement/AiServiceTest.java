@@ -269,4 +269,78 @@ class AiServiceTest {
         assertNotNull(answer);
         assertTrue(answer.contains("Microsoft offers 45 LPA"));
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testEnhanceResumeBulletOffline() {
+        String bullet = "worked on a web app using react and nodejs to display student data";
+        Map<String, Object> result = aiService.enhanceResumeBullet(bullet, "Full-Stack Development");
+
+        assertNotNull(result);
+        assertNotNull(result.get("weakness"));
+        String weakness = (String) result.get("weakness");
+        assertTrue(weakness.toLowerCase().contains("verb") || weakness.toLowerCase().contains("metric"));
+
+        assertNotNull(result.get("metricDriven"));
+        assertNotNull(result.get("technicalDepth"));
+        assertNotNull(result.get("conciseOneLiner"));
+
+        Integer originalScore = (Integer) result.get("originalScore");
+        Integer enhancedScore = (Integer) result.get("enhancedScore");
+        assertNotNull(originalScore);
+        assertNotNull(enhancedScore);
+        assertTrue(enhancedScore > originalScore);
+
+        String tip = (String) result.get("tip");
+        assertNotNull(tip);
+        assertTrue(tip.contains("STAR"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testMatchJobDescriptionHighMatch() {
+        String resume = "Experienced in Java, Spring Boot, Microservices, REST API, MySQL, Docker, AWS, Git, JUnit.";
+        String jd = "We are seeking a Backend Engineer with strong skills in Java, Spring Boot, REST APIs, Microservices, and MySQL. Experience with Docker and AWS is preferred.";
+
+        Map<String, Object> result = aiService.matchJobDescription(resume, jd);
+
+        assertNotNull(result);
+        Integer matchScore = (Integer) result.get("matchScore");
+        assertNotNull(matchScore);
+        assertTrue(matchScore >= 70, "Expected match >= 70%, was: " + matchScore);
+
+        assertTrue(((String) result.get("verdict")).contains("Strong ATS Match"));
+
+        List<String> matched = (List<String>) result.get("matchedKeywords");
+        assertNotNull(matched);
+        assertTrue(matched.contains("Java"));
+        assertTrue(matched.contains("Spring Boot") || matched.contains("MySQL"));
+
+        List<String> recs = (List<String>) result.get("recommendations");
+        assertNotNull(recs);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testMatchJobDescriptionLowMatch() {
+        String resume = "Graphic designer skilled in Photoshop, Illustrator, Premiere Pro, typography, and video editing.";
+        String jd = "Looking for a cloud backend engineer proficient in Java, Spring Boot, Kubernetes, Docker, MySQL, Redis, AWS.";
+
+        Map<String, Object> result = aiService.matchJobDescription(resume, jd);
+
+        assertNotNull(result);
+        Integer matchScore = (Integer) result.get("matchScore");
+        assertNotNull(matchScore);
+        assertTrue(matchScore < 40, "Expected match < 40%, was: " + matchScore);
+
+        assertTrue(((String) result.get("verdict")).contains("Low"));
+
+        List<String> missing = (List<String>) result.get("missingKeywords");
+        assertNotNull(missing);
+        assertTrue(missing.contains("Java") || missing.contains("Spring Boot") || missing.contains("Kubernetes"));
+
+        List<String> recs = (List<String>) result.get("recommendations");
+        assertNotNull(recs);
+        assertFalse(recs.isEmpty());
+    }
 }

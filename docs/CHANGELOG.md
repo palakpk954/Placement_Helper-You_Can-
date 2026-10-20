@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.2.0] - 2026-10-20 - Resume Bullet Enhancer & Job Description Matcher (Preparation Suite)
+
+### Added
+- **AI STAR Resume Bullet Enhancer**:
+  - Added engineering domain selection (Full-Stack, Backend/Systems, Frontend/UI, Data & AI, Cloud & DevOps, Core CS).
+  - Implemented automated weakness diagnosis detecting passive action verbs ("worked on", "helped", "did") and missing quantifiable metrics.
+  - Generates 3 ATS-optimized STAR rewrites per bullet:
+    - *Metric-Driven*: Quantified performance and business metrics (e.g., latency reduction %, active user scale).
+    - *Technical Depth*: Architectural patterns, protocols, test coverage, and design principles.
+    - *Concise One-Liner*: Impactful, punchy single-line format for tight resume layouts.
+  - Added before/after scoring progression (e.g., 45 -> 94 / 100) and interview coaching tips.
+  - 1-click clipboard copy buttons with live visual confirmation.
+- **Job Description & Recruiter Keyword Matcher**:
+  - Direct integration with Apache PDFBox `PDFTextStripper` in `ResumeService.extractResumeText()` automatically extracting text from student's active uploaded PDF resume.
+  - "Quick-Select Upcoming Campus Drive" dropdown instantly pre-populating recruiter requirements from scheduled campus visits (e.g., Celebal, Microsoft, Deloitte).
+  - Evaluates resume text against an industry catalog of 70+ technical keywords (languages, frameworks, cloud platforms, databases, DevOps, system design).
+  - Real-time ATS match percentage calculation with dynamic progress bar and color-coded status badges (`Strong ATS Match`, `Moderate Match`, `Low Match`).
+  - Visual breakdown rendering green pill badges for matched keywords and red pill badges for missing recruiter keywords.
+  - Actionable keyword incorporation advice and resume length guidance.
+- **Architecture & Resilient Fallback (AI-5)**:
+  - Dual-mode execution: cloud-powered with Google Gemini (`gemini-1.5-flash`) and instant deterministic local fallback.
+  - Dedicated REST endpoint controller `ResumeApiController` (`/api/resume/enhance-bullet` and `/api/resume/match-jd`).
+  - Added comprehensive unit tests in `AiServiceTest.java` verifying 100% test pass rate (37/37 passing).
+
+---
+
 ## [1.1.0] - 2026-10-20 - Bug Fixes, Role Hardening & UI Overhaul
 
 ### Added

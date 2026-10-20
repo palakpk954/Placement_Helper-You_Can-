@@ -89,8 +89,8 @@ Whenever changes or new features are introduced to the repository, this file and
 | **2026-10-15** | Docs | Comprehensive README overhaul (`README.md`) featuring ASCII system architecture, ER diagrams, security matrix, and route tables. | ✅ Completed |
 | **2026-10-16** | Sprint 4 | Phase 4 AI Preparation Suite: Grounded AI Assistant page (`/ai-assistant`), question classifier, experience summarizer, conversational greeting/typo handler, unit tests (`AiServiceTest`). | ✅ Completed & Deployed |
 | **2026-10-16** | Docs | Master Documentation Hub (`DOCUMENTATION.md`) and dedicated `docs/` subsystem tracking ongoing updates. | ✅ Completed |
-| **2026-10-16** | Cloud & UI | Multi-stage Docker containerization for Render, zero-overflow responsive navbar, and SaaS compact 100% zoom dashboard layout. | ✅ Completed & Deployed |
 | **2026-10-20** | Sprint 6 | Placement intelligence bug fixes & hardening: Calendar Seasonality Matrix rendering, Resume Scanner score & checklist parsing, Statistics Average Package card, Mock Interview mentor RBAC and hosting visibility, and Notifications UI overhaul with hourly reminder deduplication. | ✅ Completed & Deployed |
+| **2026-10-20** | Sprint 7 | AI Preparation Suite: AI STAR Resume Bullet Enhancer & Job Description Matcher, Apache PDFBox resume text extraction, dynamic ATS keyword scoring, upcoming drive pre-population. | ✅ Completed & Deployed |
 
 ---
 
@@ -200,6 +200,29 @@ Whenever changes or new features are introduced to the repository, this file and
 
 ---
 
+### Sprint 7: AI Preparation Suite — Resume Bullet Enhancer & Job Description Matcher
+- **Goal**: Empower students with self-service AI tools to optimize their resumes for applicant tracking systems (ATS) and match keywords directly against scheduled campus recruitment drives.
+- **Key Deliverables**:
+  - **AI STAR Resume Bullet Enhancer**:
+    - Engineering domain selector (Full-Stack, Backend/Systems, Frontend/UI, Data Science & AI, Cloud & DevOps, Core CS).
+    - Heuristic weakness diagnosis detecting passive/generic verb phrasing ("worked on", "helped", "did") and absence of quantifiable metrics (`%`, latency, user volume).
+    - Generates 3 ATS-tailored STAR rewrites per bullet: *Metric-Driven*, *Technical Depth*, and *Concise One-Liner*.
+    - Provides before/after score progression (e.g. 45 -> 94 / 100) and interview coaching tips explaining how to articulate the bullet during real rounds.
+    - 1-click clipboard copy buttons with dynamic "Copied!" feedback.
+  - **Job Description & Recruiter Keyword Matcher**:
+    - Automatic PDF text extraction via Apache PDFBox `PDFTextStripper` (`ResumeService.extractResumeText()`).
+    - Quick-select dropdown pre-filling job requirements from active upcoming drives (e.g. Celebal, Microsoft, Deloitte) or custom pasted JDs.
+    - Tokenizes and cross-references against a 70+ technical skill catalog (languages, frameworks, cloud platforms, databases, DevOps tools).
+    - Calculates real-time ATS match percentage with dynamic progress bar and color-coded status badges (`Strong ATS Match`, `Moderate Match`, `Low Match`).
+    - Visual breakdown highlighting matched skills (green pill badges) and missing recruiter requirements (red '+ skill' pill badges) with actionable suggestions.
+  - **Architecture & Resilient Fallback (AI-5)**:
+    - Dual-engine support: live cloud LLM (Google Gemini `gemini-1.5-flash`) with automatic, zero-latency deterministic fallback if API keys or quotas are unavailable.
+    - Clean separation of concerns with dedicated REST endpoint controller `ResumeApiController` (`/api/resume/enhance-bullet` and `/api/resume/match-jd`).
+    - Exemption of `/api/**` in Spring Security CSRF filter for seamless AJAX communication.
+    - 100% unit and integration test coverage with 37 tests passing across the suite.
+
+---
+
 ## 🔧 Troubleshooting & Bug Fix Journal
 
 During development and continuous verification, the following technical issues were identified, analyzed, and resolved:
@@ -291,6 +314,11 @@ During development and continuous verification, the following technical issues w
   3. Added `text-nowrap` to prevent button text wrapping.
   4. Added `GET /notifications/{id}/open` endpoint automatically marking alerts as read on view.
   5. Added "All" / "Unread" filter pills and inline buttons to mark single alerts as read or dismiss them.
+
+### 14. Spring MVC Class-Level `@RequestMapping("/resume")` API Route Nesting
+- **Symptom**: Calling `POST /api/resume/enhance-bullet` or `POST /api/resume/match-jd` returned `404 Not Found`.
+- **Root Cause**: The endpoints were initially declared inside `ResumeController.java`, which had a class-level `@RequestMapping("/resume")` annotation. Spring MVC automatically prepends class-level mappings, causing the routes to resolve to `/resume/api/resume/enhance-bullet`.
+- **Resolution**: Refactored the architecture by extracting all resume intelligence JSON endpoints into a dedicated `@RestController` class `ResumeApiController.java` mapped cleanly to `@RequestMapping("/api/resume")`. Updated unit and integration test scripts to verify 200 OK responses.
 
 ---
 

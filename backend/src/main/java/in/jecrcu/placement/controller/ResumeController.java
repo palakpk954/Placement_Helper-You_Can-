@@ -32,6 +32,7 @@ public class ResumeController {
 
     private final ResumeService resumeService;
     private final UserService userService;
+    private final in.jecrcu.placement.repository.UpcomingDriveRepository upcomingDriveRepository;
 
     @GetMapping
     public String resumePage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -39,9 +40,15 @@ public class ResumeController {
 
         Optional<Resume> myResume = resumeService.getLatestResumeForUser(userDetails.getId());
         List<Resume> sampleResumes = resumeService.getSharedResumes();
+        List<in.jecrcu.placement.entity.UpcomingDrive> upcomingDrives = upcomingDriveRepository.findByActiveTrueOrderByDriveDateAsc();
+
+        String extractedText = myResume.map(resumeService::extractResumeText).orElse("");
 
         model.addAttribute("myResume", myResume.orElse(null));
         model.addAttribute("sampleResumes", sampleResumes);
+        model.addAttribute("upcomingDrives", upcomingDrives);
+        model.addAttribute("extractedText", extractedText);
+        model.addAttribute("hasExtractedText", !extractedText.isBlank());
 
         return "resume/index";
     }

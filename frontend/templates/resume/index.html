@@ -1,110 +1,619 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
 <head>
-    <title>Resume Analyzer &amp; Tips — You_can</title>
+    <title>Resume Intelligence &amp; ATS Matcher — You_can</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container" style="max-width: 960px;">
+    <div class="container" style="max-width: 1000px;">
 
         <!-- Header -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
             <div>
-                <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-person-fill text-primary me-2"></i>Automated Resume Scanner</h3>
-                <p class="text-muted small mb-0">Upload your PDF resume for automated formatting checks, length verification, and placement recommendations.</p>
+                <h3 class="fw-bold mb-1">
+                    <i class="bi bi-file-earmark-person-fill text-primary me-2"></i>Resume Intelligence Suite
+                </h3>
+                <p class="text-muted small mb-0">Audit your resume, optimize bullet points with AI, and test your ATS keyword match against campus recruiters.</p>
             </div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 small fw-semibold">
+                <i class="bi bi-stars me-1"></i> ATS &amp; Generative AI Powered
+            </span>
         </div>
 
-        <!-- Upload Form Card -->
-        <div class="app-card p-4 shadow-sm border-0 mb-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-upload text-primary me-2"></i>Upload Resume (PDF, max 2 MB)</h5>
-            <form th:action="@{/resume/upload}" method="post" enctype="multipart/form-data">
-                <div class="row g-3 mb-3">
-                    <div class="col-md-8">
-                        <input type="file" class="form-control" name="file" accept="application/pdf" required>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills custom-pills mb-4 gap-2 border-bottom pb-3" id="resumeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill px-3 py-2 d-flex align-items-center gap-2" id="scanner-tab" data-bs-toggle="pill" data-bs-target="#tab-scanner" type="button" role="tab">
+                    <i class="bi bi-file-earmark-check"></i>
+                    <span>Scanner &amp; Audit</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill px-3 py-2 d-flex align-items-center gap-2" id="bullet-tab" data-bs-toggle="pill" data-bs-target="#tab-bullet" type="button" role="tab">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>AI Bullet Enhancer</span>
+                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.65rem;">STAR</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill px-3 py-2 d-flex align-items-center gap-2" id="matcher-tab" data-bs-toggle="pill" data-bs-target="#tab-matcher" type="button" role="tab">
+                    <i class="bi bi-bullseye"></i>
+                    <span>JD &amp; ATS Matcher</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.65rem;">NEW</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="resumeTabContent">
+
+            <!-- ==========================================
+                 TAB 1: SCANNER & AUDIT
+                 ========================================== -->
+            <div class="tab-pane fade show active" id="tab-scanner" role="tabpanel">
+
+                <!-- Upload Form Card -->
+                <div class="app-card p-4 shadow-sm border mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-upload text-primary me-2"></i>Upload PDF Resume (max 2 MB)</h5>
+                        <span class="small text-muted">Single-page format recommended</span>
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary rounded-pill w-100 fw-semibold">
-                            <i class="bi bi-search me-1"></i> Scan &amp; Analyze
+                    <form th:action="@{/resume/upload}" method="post" enctype="multipart/form-data">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <input type="file" class="form-control" name="file" accept="application/pdf" required>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary rounded-pill w-100 fw-semibold shadow-xs">
+                                    <i class="bi bi-search me-1"></i> Scan &amp; Analyze
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="shareConsent" value="true" id="shareCheck">
+                            <label class="form-check-label small text-muted" for="shareCheck">
+                                Allow juniors to view this resume as a verified sample (anonymously).
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Analysis Results if uploaded -->
+                <div class="app-card p-4 shadow-sm border mb-4" th:if="${myResume != null}">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fw-bold mb-0 text-dark" th:text="${myResume.fileName}">resume.pdf</h5>
+                                <span class="badge bg-secondary-subtle text-secondary"
+                                      th:text="${myResume.pageCount != null ? myResume.pageCount + ' Page(s)' : '1 Page'}">1 Page</span>
+                            </div>
+                            <small class="text-muted" th:text="${'Uploaded on ' + #temporals.format(myResume.uploadedAt, 'dd MMM yyyy, HH:mm')}">Date</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge"
+                                  th:classappend="${myResume.score != null and myResume.score >= 80 ? 'badge-soft-success fs-6' : (myResume.score != null and myResume.score >= 60 ? 'badge-soft-warning fs-6' : 'badge-soft-danger fs-6')}"
+                                  th:text="${'ATS Score: ' + (myResume.score != null ? myResume.score : 0) + ' / 100'}">Score: 85/100</span>
+                        </div>
+                    </div>
+
+                    <!-- Four Section Checks -->
+                    <div class="row g-3 mt-1 mb-3">
+                        <div class="col-6 col-md-3">
+                            <div class="p-3 bg-body-tertiary rounded-3 text-center border">
+                                <i class="bi fs-4" th:classappend="${myResume.hasContactInfo ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                                <div class="small fw-semibold mt-1">Contact Info</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-3 bg-body-tertiary rounded-3 text-center border">
+                                <i class="bi fs-4" th:classappend="${myResume.hasProjectsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                                <div class="small fw-semibold mt-1">Projects</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-3 bg-body-tertiary rounded-3 text-center border">
+                                <i class="bi fs-4" th:classappend="${myResume.hasSkillsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                                <div class="small fw-semibold mt-1">Skills Section</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-3 bg-body-tertiary rounded-3 text-center border">
+                                <i class="bi fs-4" th:classappend="${myResume.hasEducationSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
+                                <div class="small fw-semibold mt-1">Education</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback / Suggestions -->
+                    <div th:if="${myResume.feedback != null and !myResume.feedback.isBlank()}">
+                        <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-lightbulb-fill text-warning me-1"></i>Automated ATS Feedback</h6>
+                        <div class="p-3 bg-body-tertiary rounded-3 small text-secondary border" th:text="${myResume.feedback}">
+                            Great structure! Consider adding measurable metrics to your projects (e.g. reduced load time by 30%).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Resumes Section -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-star-fill text-warning me-2"></i>Verified Student Resume Samples</h5>
+                    <span class="small text-muted">Placed seniors from JECRC University</span>
+                </div>
+                <div class="row g-3" th:if="${sampleResumes != null and !sampleResumes.isEmpty()}">
+                    <div class="col-md-6" th:each="sr : ${sampleResumes}">
+                        <div class="app-card p-3 shadow-sm border d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">Verified Sample Resume</h6>
+                                <span class="small text-muted" th:text="${'Score: ' + sr.score + ' / 100'}">Score: 90/100</span>
+                            </div>
+                            <a th:href="@{/resume/download/{id}(id=${sr.id})}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs">
+                                <i class="bi bi-eye me-1"></i> View Sample
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 TAB 2: AI RESUME BULLET ENHANCER
+                 ========================================== -->
+            <div class="tab-pane fade" id="tab-bullet" role="tabpanel">
+                <div class="app-card p-4 shadow-sm border mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-magic text-warning me-2"></i>STAR Resume Bullet Optimizer
+                        </h5>
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2">Impact &amp; Metrics</span>
+                    </div>
+                    <p class="text-muted small mb-4">Paste any weak bullet point from your projects or experience. The AI analyzes passive phrasing, adds quantifiable scale, and generates 3 high-impact industry variations.</p>
+
+                    <form id="bulletForm" onsubmit="event.preventDefault(); optimizeBullet();">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Target Domain / Role</label>
+                                <select class="form-select form-select-sm" id="bulletDomain">
+                                    <option value="Full Stack &amp; Web Development">Full Stack &amp; Web Development</option>
+                                    <option value="Backend, APIs &amp; Cloud Systems" selected>Backend, APIs &amp; Cloud Systems</option>
+                                    <option value="Data Science &amp; Machine Learning">Data Science &amp; Machine Learning</option>
+                                    <option value="DevOps, CI/CD &amp; Systems">DevOps, CI/CD &amp; Systems</option>
+                                    <option value="General Software Engineering">General Software Engineering</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <span class="small text-muted align-self-center me-1">Try example:</span>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0 px-2" style="font-size: 0.75rem;" onclick="fillExample('web')">Web App</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0 px-2" style="font-size: 0.75rem;" onclick="fillExample('ml')">ML Model</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0 px-2" style="font-size: 0.75rem;" onclick="fillExample('api')">Backend API</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Your Current Resume Bullet Point</label>
+                            <textarea class="form-control" id="bulletInput" rows="3" placeholder="e.g. Worked on an attendance management website using Python and Django." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-xs" id="btnOptimize">
+                            <i class="bi bi-stars me-1"></i> Optimize &amp; Elevate Bullet
                         </button>
+                    </form>
+                </div>
+
+                <!-- Optimization Loading Spinner -->
+                <div id="bulletLoading" class="text-center py-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="small text-muted mt-2">Analyzing bullet structure, action verbs, and impact metrics...</div>
+                </div>
+
+                <!-- Optimization Results Container -->
+                <div id="bulletResults" class="d-none">
+                    <!-- Score & Diagnosis Banner -->
+                    <div class="app-card p-3 shadow-sm border mb-3 bg-light">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div>
+                                <span class="small fw-semibold text-muted text-uppercase" style="letter-spacing: 0.05em;">ATS Impact Progression</span>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2" id="scoreBefore">45 / 100</span>
+                                    <i class="bi bi-arrow-right text-muted"></i>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 fs-6 fw-bold" id="scoreAfter">94 / 100</span>
+                                    <span class="badge bg-success rounded-pill px-2 py-1 small" style="font-size: 0.7rem;">+49 PTS</span>
+                                </div>
+                            </div>
+                            <div class="text-md-end">
+                                <span class="small fw-semibold text-dark d-block">Weakness Diagnosis:</span>
+                                <span class="small text-danger" id="bulletWeakness">Lacks quantifiable metrics and uses passive phrasing.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3 Generated Variations -->
+                    <div class="row g-3 mb-4">
+                        <!-- 1. Metric-Driven STAR -->
+                        <div class="col-12">
+                            <div class="app-card p-3 shadow-sm border border-success-subtle">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2">
+                                        <i class="bi bi-graph-up-arrow me-1"></i> Metric &amp; Impact Focused (STAR Method)
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs" onclick="copyText('textMetric')">
+                                        <i class="bi bi-clipboard me-1"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="mb-0 text-dark fw-medium small lh-base" id="textMetric">
+                                    Architected responsive full-stack platform using React and Spring Boot...
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 2. Technical Depth -->
+                        <div class="col-12">
+                            <div class="app-card p-3 shadow-sm border border-primary-subtle">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2">
+                                        <i class="bi bi-cpu me-1"></i> Architecture &amp; Technical Depth
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs" onclick="copyText('textTechnical')">
+                                        <i class="bi bi-clipboard me-1"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="mb-0 text-dark fw-medium small lh-base" id="textTechnical">
+                                    Engineered scalable microservices architecture adhering to SOLID design principles...
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 3. Concise High-Impact -->
+                        <div class="col-12">
+                            <div class="app-card p-3 shadow-sm border border-secondary-subtle">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2">
+                                        <i class="bi bi-lightning-charge me-1"></i> Punchy &amp; Concise One-Liner
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs" onclick="copyText('textConcise')">
+                                        <i class="bi bi-clipboard me-1"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="mb-0 text-dark fw-medium small lh-base" id="textConcise">
+                                    Developed high-throughput data processing engine with zero downtime...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interview Tip -->
+                    <div class="alert alert-info d-flex align-items-center gap-2 rounded-3 shadow-xs mb-4">
+                        <i class="bi bi-info-circle-fill fs-5 text-info"></i>
+                        <div>
+                            <strong>Interview Coaching Tip:</strong>
+                            <span class="small d-block" id="interviewTip">Prepare to explain the technical tradeoffs you made during implementation.</span>
+                        </div>
                     </div>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="shareConsent" value="true" id="shareCheck">
-                    <label class="form-check-label small text-muted" for="shareCheck">
-                        Allow juniors to view this resume as a verified sample (anonymously).
-                    </label>
-                </div>
-            </form>
-        </div>
-
-        <!-- Analysis Results if uploaded -->
-        <div class="app-card p-4 shadow-sm border-0 mb-4" th:if="${myResume != null}">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                    <h5 class="fw-bold mb-1" th:text="${myResume.fileName}">resume.pdf</h5>
-                    <span class="badge bg-secondary-subtle text-secondary"
-                          th:text="${myResume.pageCount != null ? myResume.pageCount + ' Page(s)' : '1 Page'}">1 Page</span>
-                </div>
-                <span class="badge"
-                      th:classappend="${myResume.score != null and myResume.score >= 80 ? 'badge-soft-success fs-6' : (myResume.score != null and myResume.score >= 60 ? 'badge-soft-warning fs-6' : 'badge-soft-danger fs-6')}"
-                      th:text="${'Score: ' + (myResume.score != null ? myResume.score : 0) + ' / 100'}">Score: 85/100</span>
             </div>
 
-            <!-- Checks -->
-            <div class="row g-3 mt-1 mb-3">
-                <div class="col-md-3">
-                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
-                        <i class="bi" th:classappend="${myResume.hasContactInfo ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
-                        <div class="small fw-semibold mt-1">Contact Details</div>
+            <!-- ==========================================
+                 TAB 3: JD & ATS KEYWORD MATCHER
+                 ========================================== -->
+            <div class="tab-pane fade" id="tab-matcher" role="tabpanel">
+                <div class="app-card p-4 shadow-sm border mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-bullseye text-success me-2"></i>Recruiter JD &amp; ATS Keyword Matcher
+                        </h5>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2">Pass ATS Filters</span>
+                    </div>
+                    <p class="text-muted small mb-4">Select an active campus recruitment drive or paste any recruiter Job Description. The engine extracts required technical skills and reveals matching vs missing keywords.</p>
+
+                    <form id="matcherForm" onsubmit="event.preventDefault(); matchJobDescription();">
+                        <!-- Quick Drive Selector -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Auto-fill from Upcoming Campus Drive</label>
+                            <select class="form-select form-select-sm" id="driveSelector" onchange="loadDriveDescription(this)">
+                                <option value="" selected>-- Select an active campus recruitment drive --</option>
+                                <option th:each="d : ${upcomingDrives}"
+                                        th:value="${d.id}"
+                                        th:attr="data-company=${d.companyName}, data-roles=${d.rolesOffered}, data-eligibility=${d.eligibleBranches}, data-ctc=${d.ctcOrStipend}"
+                                        th:text="${d.companyName + ' — ' + d.rolesOffered + ' (' + d.ctcOrStipend + ')'}">
+                                    Amazon — Software Development Engineer
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Job Description Textarea -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Target Job Description / Required Skills</label>
+                            <textarea class="form-control" id="jdInput" rows="4" placeholder="Paste the recruiter's job description, technical requirements, or tech stack here..." required></textarea>
+                        </div>
+
+                        <!-- Resume Content Source -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small fw-semibold mb-0">Your Resume Content</label>
+                                <span class="badge bg-light text-secondary border small" th:if="${hasExtractedText}">
+                                    <i class="bi bi-file-earmark-check text-success me-1"></i> Auto-loaded from uploaded PDF
+                                </span>
+                            </div>
+                            <textarea class="form-control" id="resumeTextInput" rows="4"
+                                      placeholder="Paste your resume text, skills, and project descriptions here..."
+                                      th:text="${extractedText}"></textarea>
+                            <small class="text-muted">You can edit or add project details directly in this box.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-xs" id="btnMatch">
+                            <i class="bi bi-search me-1"></i> Calculate ATS Match &amp; Keyword Alignment
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Matcher Loading Spinner -->
+                <div id="matcherLoading" class="text-center py-4 d-none">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="small text-muted mt-2">Extracting technical keywords and analyzing screening alignment...</div>
+                </div>
+
+                <!-- Matcher Results Container -->
+                <div id="matcherResults" class="d-none">
+                    <!-- Match Score Card -->
+                    <div class="app-card p-4 shadow-sm border mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                            <div>
+                                <span class="small fw-semibold text-muted text-uppercase" style="letter-spacing: 0.05em;">Estimated ATS Match Rate</span>
+                                <h3 class="fw-bold mb-0 text-dark" id="matchScoreDisplay">82%</h3>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2 fs-6 fw-semibold" id="matchVerdictBadge">Strong Match</span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" id="matchProgressBar" style="width: 82%;" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted d-block" id="matchVerdictText">Your resume matches most core skills listed in the job description.</small>
+                    </div>
+
+                    <!-- Keywords Breakdown Card -->
+                    <div class="app-card p-4 shadow-sm border mb-4">
+                        <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-tags text-primary me-2"></i>ATS Skill Alignment Breakdown</h6>
+
+                        <!-- Matched Keywords -->
+                        <div class="mb-3">
+                            <span class="small fw-semibold text-success d-block mb-2">
+                                <i class="bi bi-check-circle-fill me-1"></i> Matching Skills Found in Your Resume (<span id="matchedCount">0</span>)
+                            </span>
+                            <div class="d-flex flex-wrap gap-2" id="matchedPills">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Missing Keywords -->
+                        <div class="mb-3">
+                            <span class="small fw-semibold text-danger d-block mb-2">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Missing Keywords to Add (<span id="missingCount">0</span>)
+                            </span>
+                            <div class="d-flex flex-wrap gap-2" id="missingPills">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Recommendations -->
+                        <div>
+                            <span class="small fw-semibold text-dark d-block mb-2">
+                                <i class="bi bi-lightbulb-fill text-warning me-1"></i> Actionable Next Steps to Pass Recruiter Filters
+                            </span>
+                            <ul class="small text-secondary mb-0 ps-3" id="recommendationsList">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
-                        <i class="bi" th:classappend="${myResume.hasProjectsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
-                        <div class="small fw-semibold mt-1">Projects Section</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
-                        <i class="bi" th:classappend="${myResume.hasSkillsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
-                        <div class="small fw-semibold mt-1">Skills Section</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
-                        <i class="bi" th:classappend="${myResume.hasEducationSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
-                        <div class="small fw-semibold mt-1">Education Section</div>
-                    </div>
-                </div>
+
             </div>
 
-            <!-- Feedback / Suggestions -->
-            <div th:if="${myResume.feedback != null and !myResume.feedback.isBlank()}">
-                <h6 class="fw-bold mb-2">Automated Feedback</h6>
-                <div class="p-3 bg-body-tertiary rounded-3 small text-secondary border" th:text="${myResume.feedback}">
-                    Great structure! Consider adding measurable metrics to your projects (e.g. reduced load time by 30%).
-                </div>
-            </div>
-        </div>
-
-        <!-- Sample Resumes Section -->
-        <h5 class="fw-bold mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Approved Student Resume Samples</h5>
-        <div class="row g-3" th:if="${sampleResumes != null and !sampleResumes.isEmpty()}">
-            <div class="col-md-6" th:each="sr : ${sampleResumes}">
-                <div class="app-card p-3 shadow-sm border-0 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="fw-bold mb-0">Verified Sample Resume</h6>
-                        <span class="small text-muted" th:text="${'Score: ' + sr.score + ' / 100'}">Score: 90/100</span>
-                    </div>
-                    <a th:href="@{/resume/download/{id}(id=${sr.id})}" class="btn btn-sm btn-outline-primary rounded-pill">
-                        <i class="bi bi-download me-1"></i> View Sample
-                    </a>
-                </div>
-            </div>
         </div>
 
     </div>
 </div>
+
+<!-- Page JavaScript for AJAX and DOM interactions -->
+<script th:inline="javascript">
+function fillExample(type) {
+    const input = document.getElementById('bulletInput');
+    const domain = document.getElementById('bulletDomain');
+    if (type === 'web') {
+        input.value = "Created an e-commerce website using React and Node.js with MongoDB database.";
+        domain.value = "Full Stack & Web Development";
+    } else if (type === 'ml') {
+        input.value = "Built a machine learning model to predict customer churn using Python and scikit-learn.";
+        domain.value = "Data Science & Machine Learning";
+    } else if (type === 'api') {
+        input.value = "Made REST APIs for user login and payment processing using Spring Boot.";
+        domain.value = "Backend, APIs & Cloud Systems";
+    }
+}
+
+function optimizeBullet() {
+    const bulletText = document.getElementById('bulletInput').value.trim();
+    const domain = document.getElementById('bulletDomain').value;
+    const btn = document.getElementById('btnOptimize');
+    const loading = document.getElementById('bulletLoading');
+    const results = document.getElementById('bulletResults');
+
+    if (!bulletText) return;
+
+    btn.disabled = true;
+    loading.classList.remove('d-none');
+    results.classList.add('d-none');
+
+    fetch('/api/resume/enhance-bullet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bulletText: bulletText, domain: domain })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        loading.classList.add('d-none');
+        results.classList.remove('d-none');
+
+        document.getElementById('scoreBefore').innerText = (data.originalScore || 45) + ' / 100';
+        document.getElementById('scoreAfter').innerText = (data.enhancedScore || 94) + ' / 100';
+        document.getElementById('bulletWeakness').innerText = data.weakness || 'Missing measurable metrics.';
+        document.getElementById('textMetric').innerText = data.metricDriven || '';
+        document.getElementById('textTechnical').innerText = data.technicalDepth || '';
+        document.getElementById('textConcise').innerText = data.conciseOneLiner || '';
+        document.getElementById('interviewTip').innerText = data.tip || 'Structure your response using the STAR format.';
+    })
+    .catch(err => {
+        btn.disabled = false;
+        loading.classList.add('d-none');
+        alert('Optimization request failed. Please try again.');
+        console.error(err);
+    });
+}
+
+function loadDriveDescription(selectElem) {
+    const selectedOpt = selectElem.options[selectElem.selectedIndex];
+    if (!selectedOpt.value) return;
+
+    const company = selectedOpt.getAttribute('data-company') || '';
+    const roles = selectedOpt.getAttribute('data-roles') || '';
+    const eligibility = selectedOpt.getAttribute('data-eligibility') || '';
+    const ctc = selectedOpt.getAttribute('data-ctc') || '';
+
+    const generatedJd = `Company: ${company}
+Role: ${roles}
+Compensation / CTC: ${ctc}
+Eligible Branches: ${eligibility}
+
+Key Requirements & Technical Expectations:
+- Strong knowledge of Data Structures, Algorithms, and Object-Oriented Programming.
+- Hands-on experience developing projects using Java, Python, C++, or modern Web technologies (React, Node.js, Spring Boot).
+- Good understanding of Relational Databases (SQL, MySQL, PostgreSQL) and RESTful API architecture.
+- Familiarity with Git, Linux command line, and software engineering design patterns.
+- Excellent problem-solving, communication skills, and collaborative team mindset.`;
+
+    document.getElementById('jdInput').value = generatedJd;
+}
+
+function matchJobDescription() {
+    const jd = document.getElementById('jdInput').value.trim();
+    const resumeText = document.getElementById('resumeTextInput').value.trim();
+    const btn = document.getElementById('btnMatch');
+    const loading = document.getElementById('matcherLoading');
+    const results = document.getElementById('matcherResults');
+
+    if (!jd) return;
+
+    btn.disabled = true;
+    loading.classList.remove('d-none');
+    results.classList.add('d-none');
+
+    fetch('/api/resume/match-jd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeText: resumeText, jobDescription: jd })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        loading.classList.add('d-none');
+        results.classList.remove('d-none');
+
+        const score = data.matchScore || 0;
+        document.getElementById('matchScoreDisplay').innerText = score + '%';
+        const pBar = document.getElementById('matchProgressBar');
+        pBar.style.width = score + '%';
+        pBar.setAttribute('aria-valuenow', score);
+
+        const vBadge = document.getElementById('matchVerdictBadge');
+        if (score >= 80) {
+            pBar.className = 'progress-bar bg-success';
+            vBadge.className = 'badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 fs-6 fw-semibold';
+            vBadge.innerText = 'Strong ATS Match';
+        } else if (score >= 55) {
+            pBar.className = 'progress-bar bg-warning';
+            vBadge.className = 'badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fs-6 fw-semibold';
+            vBadge.innerText = 'Moderate Match';
+        } else {
+            pBar.className = 'progress-bar bg-danger';
+            vBadge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 fs-6 fw-semibold';
+            vBadge.innerText = 'Low Match';
+        }
+
+        document.getElementById('matchVerdictText').innerText = data.verdict || '';
+
+        // Matched pills
+        const matchedContainer = document.getElementById('matchedPills');
+        matchedContainer.innerHTML = '';
+        const matched = data.matchedKeywords || [];
+        document.getElementById('matchedCount').innerText = matched.length;
+        if (matched.length === 0) {
+            matchedContainer.innerHTML = '<span class="text-muted small">No direct keyword overlap detected.</span>';
+        } else {
+            matched.forEach(kw => {
+                const span = document.createElement('span');
+                span.className = 'badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1';
+                span.innerText = kw;
+                matchedContainer.appendChild(span);
+            });
+        }
+
+        // Missing pills
+        const missingContainer = document.getElementById('missingPills');
+        missingContainer.innerHTML = '';
+        const missing = data.missingKeywords || [];
+        document.getElementById('missingCount').innerText = missing.length;
+        if (missing.length === 0) {
+            missingContainer.innerHTML = '<span class="text-success small"><i class="bi bi-check-circle me-1"></i>All key recruiter requirements are present!</span>';
+        } else {
+            missing.forEach(kw => {
+                const span = document.createElement('span');
+                span.className = 'badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1';
+                span.innerText = '+ ' + kw;
+                missingContainer.appendChild(span);
+            });
+        }
+
+        // Recommendations
+        const recList = document.getElementById('recommendationsList');
+        recList.innerHTML = '';
+        const recs = data.recommendations || [];
+        recs.forEach(r => {
+            const li = document.createElement('li');
+            li.className = 'mb-1';
+            li.innerText = r;
+            recList.appendChild(li);
+        });
+    })
+    .catch(err => {
+        btn.disabled = false;
+        loading.classList.add('d-none');
+        alert('Match calculation failed. Please try again.');
+        console.error(err);
+    });
+}
+
+function copyText(elementId) {
+    const text = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Copied to clipboard!');
+    });
+}
+</script>
 </body>
 </html>

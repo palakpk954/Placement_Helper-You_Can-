@@ -51,6 +51,16 @@ public interface AiService {
     String answerPrepQuestion(String userQuery, String relevantContext);
 
     /**
+     * AI-6: Enhances a resume bullet point into high-impact, metric-driven STAR format.
+     */
+    Map<String, Object> enhanceResumeBullet(String bulletText, String domain);
+
+    /**
+     * AI-7: Analyzes keyword match between a student's resume and a target job description.
+     */
+    Map<String, Object> matchJobDescription(String resumeText, String jobDescription);
+
+    /**
      * Returns the active model identifier (e.g. "gemini-1.5-flash").
      */
     default String getModelName() {

@@ -155,4 +155,17 @@ public class ResumeService {
         }
         return report;
     }
+
+    public String extractResumeText(Resume resume) {
+        if (resume == null || resume.getFilePath() == null) return "";
+        File file = new File(resume.getFilePath());
+        if (!file.exists()) return "";
+        try (PDDocument document = Loader.loadPDF(file)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        } catch (Exception e) {
+            log.warn("Could not extract text from resume {}: {}", resume.getId(), e.getMessage());
+            return "";
+        }
+    }
 }
