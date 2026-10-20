@@ -11,15 +11,18 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>
                 <h3 class="fw-bold mb-1"><i class="bi bi-calendar-check-fill text-success me-2"></i>1-on-1 Senior Mock Interviews</h3>
-                <p class="text-muted small mb-0">Book mock interview practice slots with placed seniors or open up slots as a mentor.</p>
+                <p class="text-muted small mb-0" th:if="${!canHostSlots}">Book 1-on-1 mock interview practice sessions with placed seniors and alumni.</p>
+                <p class="text-muted small mb-0" th:if="${canHostSlots}">Manage your mentor availability slots and host practice interviews for juniors.</p>
             </div>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#createSlotCollapse">
-                <i class="bi bi-plus-lg me-1"></i> Host a Mock Slot (Mentors)
-            </button>
+            <div class="d-flex gap-2 align-items-center" th:if="${canHostSlots}">
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#createSlotCollapse">
+                    <i class="bi bi-plus-lg me-1"></i> Offer a Mock Slot (Mentors)
+                </button>
+            </div>
         </div>
 
-        <!-- Host a Slot Collapse -->
-        <div class="collapse mb-4" id="createSlotCollapse">
+        <!-- Host a Slot Collapse (Only visible to Verified Mentors & Placement Admins) -->
+        <div class="collapse mb-4" id="createSlotCollapse" th:if="${canHostSlots}">
             <div class="app-card p-4 shadow-sm border-success">
                 <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-success me-2"></i>Offer a Mock Interview Slot</h5>
                 <form th:action="@{/mocks/create-slot}" method="post">
@@ -42,16 +45,37 @@
             </div>
         </div>
 
+        <!-- Mentor Cockpit: My Hosted Slots (Only visible to Mentors & Admins) -->
+        <div class="app-card p-4 shadow-sm mb-4 border-0" th:if="${canHostSlots and myHostedSlots != null and !myHostedSlots.isEmpty()}">
+            <h6 class="fw-bold mb-3"><i class="bi bi-person-video3 me-2 text-success"></i>My Hosted Mock Slots (Mentor View)</h6>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4" th:each="slot : ${myHostedSlots}">
+                    <div class="p-3 bg-body-tertiary rounded-3 border">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge badge-soft-success" th:text="${slot.companyName}">Company</span>
+                            <span class="badge" th:classappend="${slot.status.name() == 'AVAILABLE' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}" th:text="${slot.status}">AVAILABLE</span>
+                        </div>
+                        <p class="small text-secondary mb-0">
+                            <i class="bi bi-calendar me-1"></i>
+                            <span th:text="${#temporals.format(slot.startTime, 'dd MMM yyyy, HH:mm')}">Date</span> &ndash;
+                            <span th:text="${#temporals.format(slot.endTime, 'HH:mm')}">End</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- My Bookings Section -->
         <div class="app-card p-4 shadow-sm mb-4 border-0" th:if="${myBookings != null and !myBookings.isEmpty()}">
             <h6 class="fw-bold mb-3"><i class="bi bi-calendar2-event me-2 text-primary"></i>My Booked Mock Sessions</h6>
             <div class="row g-3">
                 <div class="col-md-6" th:each="b : ${myBookings}">
-                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                    <div class="p-3 bg-body-tertiary rounded-3 border d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="badge badge-soft-primary" th:text="${b.slot.companyName}">Amazon</span>
-                            <h6 class="fw-bold mt-1 mb-0" th:text="${'With ' + b.slot.mentor.fullName}">With Senior</h6>
-                            <p class="small text-muted mb-0 mt-1" th:text="${#temporals.format(b.slot.startTime, 'dd MMM yyyy, HH:mm')}">Date</p>
+                            <span class="badge badge-soft-primary" th:text="${b.mockSlot != null ? b.mockSlot.companyName : ''}">Amazon</span>
+                            <h6 class="fw-bold mt-1 mb-0" th:text="${b.mockSlot != null and b.mockSlot.mentor != null ? 'With ' + b.mockSlot.mentor.fullName : 'With Senior'}">With Senior</h6>
+                            <p class="small text-muted mb-0 mt-1" th:text="${b.mockSlot != null ? #temporals.format(b.mockSlot.startTime, 'dd MMM yyyy, HH:mm') : ''}">Date</p>
+                        </div>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-sm btn-outline-warning rounded-pill" data-bs-toggle="modal" th:data-bs-target="${'#rateModal-' + b.id}">
                                 <i class="bi bi-star-fill me-1"></i> Rate
@@ -68,7 +92,7 @@
                             <div class="modal-content">
                                 <form th:action="@{/mocks/feedback/{bookingId}(bookingId=${b.id})}" method="post">
                                     <div class="modal-header">
-                                        <h5 class="modal-title fw-bold">Rate Session with <span th:text="${b.slot.mentor.fullName}">Mentor</span></h5>
+                                        <h5 class="modal-title fw-bold">Rate Session with <span th:text="${b.mockSlot != null and b.mockSlot.mentor != null ? b.mockSlot.mentor.fullName : 'Mentor'}">Mentor</span></h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">

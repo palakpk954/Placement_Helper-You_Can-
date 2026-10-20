@@ -36,4 +36,8 @@ public class MockBooking {
 
     @Column(columnDefinition = "TEXT")
     private String feedback;
+
+    public MockSlot getSlot() {
+        return mockSlot;
+    }
 }

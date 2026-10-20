@@ -30,10 +30,51 @@ public class NotificationController {
         List<Notification> list = notificationService.getUserNotifications(userDetails.getId());
         NotificationPreference preferences = notificationService.getPreferences(userDetails.getId()).orElse(null);
 
+        long unreadCount = notificationService.getUnreadCount(userDetails.getId());
+
         model.addAttribute("notifications", list);
+        model.addAttribute("unreadCount", unreadCount);
         model.addAttribute("preferences", preferences);
 
         return "notifications/index";
+    }
+
+    @GetMapping("/{id}/open")
+    public String openNotification(
+            @org.springframework.web.bind.annotation.PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails != null) {
+            java.util.Optional<Notification> opt = notificationService.markSingleAsReadAndGet(id, userDetails.getId());
+            if (opt.isPresent() && opt.get().getLink() != null && !opt.get().getLink().isBlank()) {
+                return "redirect:" + opt.get().getLink();
+            }
+        }
+        return "redirect:/notifications";
+    }
+
+    @PostMapping("/{id}/read")
+    public String markSingleRead(
+            @org.springframework.web.bind.annotation.PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails != null) {
+            notificationService.markSingleAsRead(id, userDetails.getId());
+        }
+        return "redirect:/notifications";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteSingle(
+            @org.springframework.web.bind.annotation.PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (userDetails != null) {
+            notificationService.deleteNotification(id, userDetails.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Notification dismissed.");
+        }
+        return "redirect:/notifications";
     }
 
     @PostMapping("/mark-read")

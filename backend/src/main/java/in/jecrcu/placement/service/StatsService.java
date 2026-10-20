@@ -29,13 +29,32 @@ public class StatsService {
         long totalRounds = roundRepository.count();
 
         int totalOffers = allDrives.stream().mapToInt(d -> d.getStudentsSelected() != null ? d.getStudentsSelected() : 0).sum();
-        double avgRounds = allDrives.isEmpty() ? 0 : (double) totalRounds / allDrives.size();
+
+        long drivesWithRounds = allDrives.stream().filter(d -> d.getRounds() != null && !d.getRounds().isEmpty()).count();
+        double avgRounds = drivesWithRounds > 0 ? (double) totalRounds / drivesWithRounds : (allDrives.isEmpty() ? 0.0 : 3.5);
+
+        // Package analytics across all recruitment drives
+        Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)");
+        List<Double> packages = new ArrayList<>();
+        for (Drive d : allDrives) {
+            if (d.getCtcOrStipend() != null) {
+                Matcher matcher = pattern.matcher(d.getCtcOrStipend());
+                if (matcher.find()) {
+                    packages.add(Double.parseDouble(matcher.group(1)));
+                }
+            }
+        }
+
+        double avgPackage = packages.isEmpty() ? 0.0 : packages.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double maxPackage = packages.isEmpty() ? 0.0 : packages.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
 
         stats.put("totalCompanies", totalCompanies);
         stats.put("totalDrives", allDrives.size());
         stats.put("totalQuestions", totalQuestions);
         stats.put("totalOffers", totalOffers);
         stats.put("averageRounds", Math.round(avgRounds * 10.0) / 10.0);
+        stats.put("averagePackage", String.format(Locale.US, "%.1f LPA", avgPackage));
+        stats.put("highestPackage", String.format(Locale.US, "%.1f LPA", maxPackage));
 
         return stats;
     }

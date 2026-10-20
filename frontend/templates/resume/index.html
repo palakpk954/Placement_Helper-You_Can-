@@ -54,25 +54,25 @@
             <!-- Checks -->
             <div class="row g-3 mt-1 mb-3">
                 <div class="col-md-3">
-                    <div class="p-3 bg-light rounded-3 text-center">
+                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
                         <i class="bi" th:classappend="${myResume.hasContactInfo ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
                         <div class="small fw-semibold mt-1">Contact Details</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="p-3 bg-light rounded-3 text-center">
+                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
                         <i class="bi" th:classappend="${myResume.hasProjectsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
                         <div class="small fw-semibold mt-1">Projects Section</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="p-3 bg-light rounded-3 text-center">
+                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
                         <i class="bi" th:classappend="${myResume.hasSkillsSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
                         <div class="small fw-semibold mt-1">Skills Section</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="p-3 bg-light rounded-3 text-center">
+                    <div class="p-3 bg-body-tertiary rounded-3 text-center border">
                         <i class="bi" th:classappend="${myResume.hasEducationSection ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'}"></i>
                         <div class="small fw-semibold mt-1">Education Section</div>
                     </div>
@@ -82,7 +82,7 @@
             <!-- Feedback / Suggestions -->
             <div th:if="${myResume.feedback != null and !myResume.feedback.isBlank()}">
                 <h6 class="fw-bold mb-2">Automated Feedback</h6>
-                <div class="p-3 bg-light rounded-3 small text-secondary" th:text="${myResume.feedback}">
+                <div class="p-3 bg-body-tertiary rounded-3 small text-secondary border" th:text="${myResume.feedback}">
                     Great structure! Consider adding measurable metrics to your projects (e.g. reduced load time by 30%).
                 </div>
             </div>

@@ -148,17 +148,41 @@ public class NotificationService {
         if (!closingSoon.isEmpty()) {
             List<User> students = userRepository.findAll();
             for (UpcomingDrive drive : closingSoon) {
+                String title = "Deadline Reminder: " + drive.getCompanyName();
                 for (User student : students) {
-                    // Send deadline warning notification
-                    sendNotification(
-                            student,
-                            "Deadline Reminder: " + drive.getCompanyName(),
-                            "Registration for " + drive.getCompanyName() + " (" + drive.getRolesOffered() + ") closes within 48 hours!",
-                            "/upcoming",
-                            "DEADLINE_REMINDER"
-                    );
+                    // Check if reminder was already sent to avoid duplicate hourly alerts
+                    if (!notificationRepository.existsByUserIdAndNotificationTypeAndTitle(student.getId(), "DEADLINE_REMINDER", title)) {
+                        sendNotification(
+                                student,
+                                title,
+                                "Registration for " + drive.getCompanyName() + " (" + drive.getRolesOffered() + ") closes within 48 hours!",
+                                "/upcoming",
+                                "DEADLINE_REMINDER"
+                        );
+                    }
                 }
             }
         }
+    }
+
+    @Transactional
+    public void markSingleAsRead(Long notificationId, Long userId) {
+        notificationRepository.findByIdAndUserId(notificationId, userId).ifPresent(n -> {
+            n.setRead(true);
+            notificationRepository.save(n);
+        });
+    }
+
+    @Transactional
+    public Optional<Notification> markSingleAsReadAndGet(Long notificationId, Long userId) {
+        return notificationRepository.findByIdAndUserId(notificationId, userId).map(n -> {
+            n.setRead(true);
+            return notificationRepository.save(n);
+        });
+    }
+
+    @Transactional
+    public void deleteNotification(Long notificationId, Long userId) {
+        notificationRepository.findByIdAndUserId(notificationId, userId).ifPresent(notificationRepository::delete);
     }
 }

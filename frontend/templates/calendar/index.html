@@ -80,7 +80,7 @@
                     <tbody>
                         <tr th:each="entry : ${seasonalityMatrix}">
                             <td class="text-start fw-bold" th:text="${entry.key}">July</td>
-                            <td th:each="y : ${availableYears}" th:with="cell=${entry.value[y]}">
+                            <td th:each="y : ${availableYears}" th:with="cell=${entry.value.get(y)}">
                                 <div class="heatmap-cell"
                                      th:classappend="${cell == null or cell.count == 0 ? 'heatmap-0' : (cell.count == 1 ? 'heatmap-1' : (cell.count == 2 ? 'heatmap-2' : (cell.count == 3 ? 'heatmap-3' : 'heatmap-4')))}"
                                      th:title="${cell != null and cell.companyNames != null ? T(java.lang.String).join(', ', cell.companyNames) : ''}">

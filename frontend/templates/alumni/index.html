@@ -17,10 +17,27 @@
                 <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="btn btn-outline-danger rounded-pill px-3 shadow-xs btn-sm">
                     <i class="bi bi-shield-lock me-1"></i> Back to Admin Panel
                 </a>
+                <a th:if="${myProfile != null or #authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/mocks}" class="btn btn-outline-success rounded-pill px-3 shadow-sm btn-sm">
+                    <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
+                </a>
                 <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
                     <i class="bi bi-pencil-square me-1"></i> Edit My Mentor Profile
                 </button>
             </div>
+        </div>
+
+        <!-- Active Mentor Callout -->
+        <div class="alert alert-success d-flex align-items-center justify-content-between p-3 rounded-3 shadow-xs mb-4" th:if="${myProfile != null}">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <div>
+                    <strong>You are registered as a Senior Mentor at <span th:text="${myProfile.companyName}">Company</span>!</strong>
+                    <div class="small text-muted">You have mentor privileges to publish 1-on-1 mock interview slots for junior students.</div>
+                </div>
+            </div>
+            <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 text-nowrap ms-2">
+                <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
+            </a>
         </div>
 
         <!-- Mentor Profile Edit Form Collapse -->

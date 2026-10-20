@@ -26,6 +26,7 @@ public class MockInterviewController {
     private final MockInterviewService mockService;
     private final CompanyService companyService;
     private final UserService userService;
+    private final in.jecrcu.placement.service.AlumniService alumniService;
 
     @GetMapping
     public String mocksDashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -35,10 +36,18 @@ public class MockInterviewController {
         List<MockBooking> myBookings = mockService.getStudentBookings(userDetails.getId());
         List<MockSlot> myHostedSlots = mockService.getMentorSlots(userDetails.getId());
 
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isMentor = alumniService.getProfileByUserId(userDetails.getId()).isPresent();
+        boolean canHostSlots = isAdmin || isMentor;
+
         model.addAttribute("availableSlots", availableSlots);
         model.addAttribute("myBookings", myBookings);
         model.addAttribute("myHostedSlots", myHostedSlots);
         model.addAttribute("companies", companyService.getAllCompanies());
+        model.addAttribute("canHostSlots", canHostSlots);
+        model.addAttribute("isMentor", isMentor);
+        model.addAttribute("isAdmin", isAdmin);
 
         return "mocks/index";
     }
@@ -53,10 +62,20 @@ public class MockInterviewController {
     ) {
         if (userDetails == null) return "redirect:/login";
 
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isMentor = alumniService.getProfileByUserId(userDetails.getId()).isPresent();
+
+        if (!isAdmin && !isMentor) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Permission denied: Only placed seniors/alumni mentors and placement cell administrators can host mock interview slots.");
+            return "redirect:/mocks";
+        }
+
         User mentor = userService.findById(userDetails.getId()).orElse(null);
         if (mentor != null) {
             mockService.createSlot(mentor, companyName, startTime, endTime);
-            redirectAttributes.addFlashAttribute("successMessage", "New mock interview slot made available!");
+            redirectAttributes.addFlashAttribute("successMessage", "New mock interview slot published successfully!");
         }
         return "redirect:/mocks";
     }

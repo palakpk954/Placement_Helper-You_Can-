@@ -47,4 +47,72 @@ public class Resume {
             uploadedAt = LocalDateTime.now();
         }
     }
+
+    @Transient
+    public String getFileName() {
+        return originalFilename != null ? originalFilename : "resume.pdf";
+    }
+
+    @Transient
+    public Integer getScore() {
+        return extractInt("score", 70);
+    }
+
+    @Transient
+    public Integer getPageCount() {
+        return extractInt("pages", 1);
+    }
+
+    @Transient
+    public boolean isHasContactInfo() {
+        return extractBool("email") || extractBool("phone");
+    }
+
+    @Transient
+    public boolean isHasProjectsSection() {
+        return extractBool("projects");
+    }
+
+    @Transient
+    public boolean isHasSkillsSection() {
+        return extractBool("skills");
+    }
+
+    @Transient
+    public boolean isHasEducationSection() {
+        return extractBool("education");
+    }
+
+    @Transient
+    public String getFeedback() {
+        if (checklistResultJson != null && checklistResultJson.contains("\"feedback\":")) {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"feedback\":\\s*\"([^\"]+)\"").matcher(checklistResultJson);
+            if (m.find()) return m.group(1);
+        }
+
+        java.util.List<String> tips = new java.util.ArrayList<>();
+        if (!isHasContactInfo()) tips.add("Add your professional email address and phone number at the top.");
+        if (getPageCount() > 1) tips.add("Format your resume into a single page (currently " + getPageCount() + " pages).");
+        if (!isHasProjectsSection()) tips.add("Include a Projects section highlighting at least two technical projects with measurable outcomes.");
+        if (!isHasSkillsSection()) tips.add("Add a Technical Skills section grouped by Languages, Frameworks, and Tools.");
+        if (!isHasEducationSection()) tips.add("Include your degree, institution name, and current CGPA.");
+
+        if (tips.isEmpty()) {
+            return "Excellent resume structure! All core sections, contact information, and formatting checks passed. Consider adding quantitative metrics to project impact (e.g. 'improved query performance by 40%').";
+        } else {
+            return String.join(" ", tips);
+        }
+    }
+
+    private int extractInt(String key, int defaultValue) {
+        if (checklistResultJson == null) return defaultValue;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + key + "\":\\s*(\\d+)").matcher(checklistResultJson);
+        return m.find() ? Integer.parseInt(m.group(1)) : defaultValue;
+    }
+
+    private boolean extractBool(String key) {
+        if (checklistResultJson == null) return false;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + key + "\":\\s*(true|false)").matcher(checklistResultJson);
+        return m.find() && Boolean.parseBoolean(m.group(1));
+    }
 }

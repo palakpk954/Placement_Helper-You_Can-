@@ -18,6 +18,7 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final in.jecrcu.placement.repository.NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.upload.dir:./uploads/resumes}")
@@ -65,6 +66,27 @@ public class DataInitializer implements CommandLineRunner {
             }
         } catch (Exception e) {
             log.warn("Could not check/update seed passwords: {}", e.getMessage());
+        }
+
+        // 3. Deduplicate any duplicate notifications by (userId, title, type)
+        try {
+            List<in.jecrcu.placement.entity.Notification> allNotifs = notificationRepository.findAll();
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            List<in.jecrcu.placement.entity.Notification> duplicates = new java.util.ArrayList<>();
+            // Sort by ID descending so we keep the newest
+            allNotifs.sort((a, b) -> b.getId().compareTo(a.getId()));
+            for (in.jecrcu.placement.entity.Notification n : allNotifs) {
+                String key = (n.getUser() != null ? n.getUser().getId() : 0) + "|" + n.getTitle() + "|" + n.getNotificationType();
+                if (!seen.add(key)) {
+                    duplicates.add(n);
+                }
+            }
+            if (!duplicates.isEmpty()) {
+                notificationRepository.deleteAll(duplicates);
+                log.info("Deduplicated {} redundant notifications on startup", duplicates.size());
+            }
+        } catch (Exception e) {
+            log.warn("Could not deduplicate notifications: {}", e.getMessage());
         }
     }
 }

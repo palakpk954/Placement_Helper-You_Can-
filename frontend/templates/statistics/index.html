@@ -13,10 +13,10 @@
             <p class="text-muted small mb-0">Interactive visual trends, compensation packages, and branch statistics for JECRC University.</p>
         </div>
 
-        <!-- 4 Metric Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
+        <!-- 5 Metric Cards -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
+            <div class="col">
+                <div class="stat-widget h-100">
                     <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-building"></i></div>
                     <div>
                         <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
@@ -24,27 +24,36 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
+            <div class="col">
+                <div class="stat-widget h-100">
                     <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-cash-stack"></i></div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0">48.0 LPA</div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['highestPackage']}">48.0 LPA</div>
                         <div class="small text-muted">Highest Campus Package</div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
+            <div class="col">
+                <div class="stat-widget h-100">
+                    <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0 text-info" th:text="${overallStats['averagePackage']}">14.2 LPA</div>
+                        <div class="small text-muted">Average Campus Package</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-widget h-100">
                     <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-trophy"></i></div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,475</div>
                         <div class="small text-muted">Total Selections</div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
-                    <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-stopwatch"></i></div>
+            <div class="col">
+                <div class="stat-widget h-100">
+                    <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-stopwatch"></i></div>
                     <div>
                         <div class="fs-4 fw-bold mb-0" th:text="${overallStats['averageRounds']}">3.5</div>
                         <div class="small text-muted">Avg Rounds per Drive</div>

@@ -1,84 +1,173 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
 <head>
-    <title>Notifications &amp; Preferences — You_can</title>
+    <title>Notifications &amp; Alerts — You_can</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container" style="max-width: 900px;">
+    <div class="container" style="max-width: 920px;">
 
         <!-- Header -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
             <div>
-                <h3 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>Notifications &amp; Alerts</h3>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h3 class="fw-bold mb-0"><i class="bi bi-bell-fill text-primary me-2"></i>Notifications &amp; Alerts</h3>
+                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount + ' Unread'}">3 Unread</span>
+                </div>
                 <p class="text-muted small mb-0">Stay updated with placement announcements, deadlines, and mock interview alerts.</p>
             </div>
-            <form th:action="@{/notifications/mark-read}" method="post" th:if="${notifications != null and !notifications.isEmpty()}">
-                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                    <i class="bi bi-check2-all me-1"></i> Mark All as Read
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs" type="button" data-bs-toggle="collapse" data-bs-target="#preferencesCollapse" aria-expanded="false" aria-controls="preferencesCollapse">
+                    <i class="bi bi-gear me-1"></i> Email Settings
                 </button>
-            </form>
-        </div>
-
-        <!-- Preferences Card -->
-        <div class="app-card p-4 shadow-sm border-0 mb-4" th:if="${preferences != null}">
-            <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill text-secondary me-2"></i>Email Notification Settings</h5>
-            <form th:action="@{/notifications/preferences}" method="post">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="emailDrives" value="true" id="drivesSwitch"
-                                   th:checked="${preferences.emailDrives}">
-                            <label class="form-check-label small" for="drivesSwitch">Matching Upcoming Drives &amp; Eligibility</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="emailDeadlines" value="true" id="deadlineSwitch"
-                                   th:checked="${preferences.emailDeadlines}">
-                            <label class="form-check-label small" for="deadlineSwitch">Application Deadlines within 48 hours</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="emailExperiences" value="true" id="expSwitch"
-                                   th:checked="${preferences.emailExperiences}">
-                            <label class="form-check-label small" for="expSwitch">New Experiences on Bookmarked Companies</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="emailBookings" value="true" id="bookingSwitch"
-                                   th:checked="${preferences.emailBookings}">
-                            <label class="form-check-label small" for="bookingSwitch">Mock Interview Bookings &amp; Reminders</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2 border-top">
-                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">Save Preferences</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Notification List -->
-        <div class="app-card shadow-sm border-0 mb-4 overflow-hidden">
-            <div class="p-3 bg-light border-bottom">
-                <h6 class="fw-bold mb-0"><i class="bi bi-inbox-fill text-primary me-2"></i>Recent In-App Alerts</h6>
+                <form th:action="@{/notifications/mark-read}" method="post" th:if="${unreadCount != null and unreadCount > 0}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs">
+                        <i class="bi bi-check2-all me-1"></i> Mark All as Read
+                    </button>
+                </form>
             </div>
-            <div class="list-group list-group-flush" th:if="${notifications != null and !notifications.isEmpty()}">
-                <div class="list-group-item p-3" th:each="n : ${notifications}"
-                     th:classappend="${!n.read ? 'bg-light border-start border-primary border-4' : ''}">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="fw-bold mb-1" th:text="${n.title}">Notification Title</h6>
-                            <p class="small text-secondary mb-1" th:text="${n.message}">Notification message details.</p>
-                            <span class="small text-muted" th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, HH:mm')}">Date</span>
+        </div>
+
+        <!-- Email Preferences Card (Collapsible) -->
+        <div class="collapse mb-4" id="preferencesCollapse" th:if="${preferences != null}">
+            <div class="app-card p-4 shadow-sm border">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-sliders text-secondary me-2"></i>Email Notification Preferences</h6>
+                    <span class="small text-muted">Customize the alerts sent to your student email</span>
+                </div>
+                <form th:action="@{/notifications/preferences}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="emailDrives" value="true" id="drivesSwitch"
+                                       th:checked="${preferences.emailDrives}">
+                                <label class="form-check-label small" for="drivesSwitch">Matching Upcoming Drives &amp; Eligibility</label>
+                            </div>
                         </div>
-                        <a th:if="${n.link != null and !n.link.isBlank()}" th:href="${n.link}"
-                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                            View &rarr;
-                        </a>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="emailDeadlines" value="true" id="deadlineSwitch"
+                                       th:checked="${preferences.emailDeadlines}">
+                                <label class="form-check-label small" for="deadlineSwitch">Application Deadlines within 48 hours</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="emailExperiences" value="true" id="expSwitch"
+                                       th:checked="${preferences.emailExperiences}">
+                                <label class="form-check-label small" for="expSwitch">New Experiences on Bookmarked Companies</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="emailBookings" value="true" id="bookingSwitch"
+                                       th:checked="${preferences.emailBookings}">
+                                <label class="form-check-label small" for="bookingSwitch">Mock Interview Bookings &amp; Reminders</label>
+                            </div>
+                        </div>
                     </div>
+                    <div class="mt-3 pt-3 border-top d-flex justify-content-end">
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4">Save Preferences</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- In-App Alerts Card -->
+        <div class="app-card shadow-sm border mb-4 overflow-hidden">
+            <!-- Header bar with filter tabs -->
+            <div class="p-3 bg-light border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-inbox-fill text-primary me-2"></i>Recent In-App Alerts</h6>
+                </div>
+                <!-- Filter Pills -->
+                <div class="btn-group btn-group-sm" role="group" aria-label="Notification Filters" th:if="${notifications != null and !notifications.isEmpty()}">
+                    <button type="button" class="btn btn-outline-secondary active" id="btnFilterAll" onclick="filterNotifs('all')">
+                        All (<span th:text="${notifications.size()}">0</span>)
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnFilterUnread" onclick="filterNotifs('unread')">
+                        Unread (<span th:text="${unreadCount != null ? unreadCount : 0}">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications Stream -->
+            <div class="notif-stream" th:if="${notifications != null and !notifications.isEmpty()}">
+                <div class="notif-row p-3 border-bottom d-flex align-items-start gap-3"
+                     th:each="n : ${notifications}"
+                     th:attr="data-read=${n.read ? 'true' : 'false'}"
+                     th:style="${!n.read ? 'border-left: 4px solid var(--bs-primary) !important; background-color: rgba(13, 110, 253, 0.035);' : 'border-left: 4px solid transparent; background-color: #ffffff;'}"
+                     style="transition: background-color 0.15s ease;">
+                    
+                    <!-- Icon Bubble -->
+                    <div class="flex-shrink-0 pt-1">
+                        <!-- Mock Interview -->
+                        <div th:if="${n.notificationType == 'MOCK_BOOKED' or n.notificationType == 'MOCK_CANCELLED'}"
+                             class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                            <i class="bi bi-calendar-check-fill fs-5"></i>
+                        </div>
+                        <!-- Deadline Reminder -->
+                        <div th:if="${n.notificationType == 'DEADLINE_REMINDER'}"
+                             class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                            <i class="bi bi-alarm-fill fs-5"></i>
+                        </div>
+                        <!-- Upcoming Drive -->
+                        <div th:if="${n.notificationType == 'NEW_UPCOMING_DRIVE' or n.notificationType == 'UPCOMING_DRIVE'}"
+                             class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                            <i class="bi bi-megaphone-fill fs-5"></i>
+                        </div>
+                        <!-- Experience Approval / Question -->
+                        <div th:if="${n.notificationType == 'EXPERIENCE_APPROVED' or n.notificationType == 'NEW_EXPERIENCE'}"
+                             class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                            <i class="bi bi-patch-check-fill fs-5"></i>
+                        </div>
+                        <!-- Default / General Notification -->
+                        <div th:if="${n.notificationType != 'MOCK_BOOKED' and n.notificationType != 'MOCK_CANCELLED' and n.notificationType != 'DEADLINE_REMINDER' and n.notificationType != 'NEW_UPCOMING_DRIVE' and n.notificationType != 'UPCOMING_DRIVE' and n.notificationType != 'EXPERIENCE_APPROVED' and n.notificationType != 'NEW_EXPERIENCE'}"
+                             class="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                            <i class="bi bi-bell-fill fs-5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Content Body -->
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="fw-bold mb-0 text-dark" th:text="${n.title}">Notification Title</h6>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" style="font-size: 0.65rem;" th:if="${!n.read}">New</span>
+                        </div>
+                        <p class="small text-secondary mb-1" th:text="${n.message}">Notification message details.</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="small text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                <span th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, HH:mm')}">Date</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
+                        <!-- Direct Link with automatic mark-read -->
+                        <a th:if="${n.link != null and !n.link.isBlank()}"
+                           th:href="@{'/notifications/' + ${n.id} + '/open'}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3 text-nowrap d-inline-flex align-items-center gap-1 shadow-xs"
+                           title="Open related page">
+                            <span>View</span> <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                        <!-- Mark Single as Read Button -->
+                        <form th:if="${!n.read}" th:action="@{'/notifications/' + ${n.id} + '/read'}" method="post" class="d-inline mb-0">
+                            <button type="submit" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center shadow-xs text-secondary" style="width: 32px; height: 32px;" title="Mark as read">
+                                <i class="bi bi-check2"></i>
+                            </button>
+                        </form>
+
+                        <!-- Dismiss Notification Button -->
+                        <form th:action="@{'/notifications/' + ${n.id} + '/delete'}" method="post" class="d-inline mb-0">
+                            <button type="submit" class="btn btn-sm btn-light border-0 rounded-circle d-flex align-items-center justify-content-center text-muted" style="width: 32px; height: 32px;" title="Dismiss notification">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
 
@@ -86,11 +175,49 @@
             <div class="text-center py-5" th:if="${notifications == null or notifications.isEmpty()}">
                 <i class="bi bi-bell-slash text-muted display-4"></i>
                 <h6 class="fw-bold mt-3 mb-1">No notifications yet</h6>
-                <p class="text-muted small">You're all caught up!</p>
+                <p class="text-muted small">You're all caught up with campus placement announcements!</p>
+            </div>
+            
+            <div id="unreadEmptyState" class="text-center py-5 d-none">
+                <i class="bi bi-check2-circle text-success display-4"></i>
+                <h6 class="fw-bold mt-3 mb-1">All caught up!</h6>
+                <p class="text-muted small">No unread alerts remaining.</p>
             </div>
         </div>
 
     </div>
 </div>
+
+<script th:inline="javascript">
+function filterNotifs(filter) {
+    const rows = document.querySelectorAll('.notif-row');
+    const btnAll = document.getElementById('btnFilterAll');
+    const btnUnread = document.getElementById('btnFilterUnread');
+    const unreadEmpty = document.getElementById('unreadEmptyState');
+    let visibleCount = 0;
+
+    if (filter === 'unread') {
+        btnAll.classList.remove('active');
+        btnUnread.classList.add('active');
+        rows.forEach(r => {
+            const isRead = r.getAttribute('data-read') === 'true';
+            if (isRead) {
+                r.classList.add('d-none');
+            } else {
+                r.classList.remove('d-none');
+                visibleCount++;
+            }
+        });
+        if (visibleCount === 0 && unreadEmpty) {
+            unreadEmpty.classList.remove('d-none');
+        }
+    } else {
+        btnAll.classList.add('active');
+        btnUnread.classList.remove('active');
+        if (unreadEmpty) unreadEmpty.classList.add('d-none');
+        rows.forEach(r => r.classList.remove('d-none'));
+    }
+}
+</script>
 </body>
 </html>

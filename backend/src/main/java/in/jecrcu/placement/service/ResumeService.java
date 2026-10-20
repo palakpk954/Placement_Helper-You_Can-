@@ -48,6 +48,10 @@ public class ResumeService {
         private List<String> suggestions = new ArrayList<>();
     }
 
+    public Optional<Resume> findById(Long id) {
+        return resumeRepository.findById(id);
+    }
+
     public Optional<Resume> getLatestResumeForUser(Long userId) {
         return resumeRepository.findTopByUserIdOrderByUploadedAtDesc(userId);
     }
@@ -82,11 +86,17 @@ public class ResumeService {
         // Run PDFBox Analysis
         ResumeChecklistReport report = analyzePdf(targetFile.toFile());
 
+        String feedback = report.getSuggestions().isEmpty()
+                ? "Excellent resume structure! All core sections, contact information, and formatting checks passed."
+                : String.join(" ", report.getSuggestions());
+        String escapedFeedback = feedback.replace("\"", "\\\"");
+
         String jsonResult = String.format(
-                "{\"score\":%d,\"pages\":%d,\"email\":%b,\"phone\":%b,\"linkedin\":%b,\"projects\":%b,\"skills\":%b,\"education\":%b,\"words\":%d}",
+                "{\"score\":%d,\"pages\":%d,\"email\":%b,\"phone\":%b,\"linkedin\":%b,\"projects\":%b,\"skills\":%b,\"education\":%b,\"words\":%d,\"feedback\":\"%s\"}",
                 report.getScorePercentage(), report.getPageCount(), report.isHasContactEmail(),
                 report.isHasPhoneNumber(), report.isHasLinkedInOrGitHub(), report.isHasProjects(),
-                report.isHasTechnicalSkills(), report.isHasEducation(), report.getTotalWordCount()
+                report.isHasTechnicalSkills(), report.isHasEducation(), report.getTotalWordCount(),
+                escapedFeedback
         );
 
         Resume resume = Resume.builder()
