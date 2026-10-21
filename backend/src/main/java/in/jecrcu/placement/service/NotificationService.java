@@ -72,6 +72,21 @@ public class NotificationService {
     }
 
     @Transactional
+    public void notifyStudentsOfNewOpportunity(in.jecrcu.placement.entity.Opportunity opp) {
+        List<User> students = userRepository.findAll();
+        String deadlineStr = opp.getDeadline() != null ? opp.getDeadline().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")) : "Soon";
+        for (User student : students) {
+            sendNotification(
+                    student,
+                    "New " + (opp.getType() != null ? opp.getType().getDisplayName() : "Opportunity") + ": " + opp.getTitle(),
+                    opp.getOrganization() + " announced: " + opp.getTitle() + " (" + opp.getCompensationOrPrize() + "). Apply by " + deadlineStr + "!",
+                    "/opportunities",
+                    "OPPORTUNITY_ALERT"
+            );
+        }
+    }
+
+    @Transactional
     public void notifySubmissionOutcome(User author, String companyName, boolean approved, String reason) {
         if (approved) {
             sendNotification(

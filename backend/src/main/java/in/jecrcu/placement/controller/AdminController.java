@@ -35,6 +35,7 @@ public class AdminController {
     private final UserService userService;
     private final UpcomingDriveRepository upcomingDriveRepository;
     private final NotificationService notificationService;
+    private final OpportunityService opportunityService;
 
     // In-memory cache for import preview before user commits
     private ImportService.ImportPreviewResult cachedImportPreview;
@@ -276,6 +277,99 @@ public class AdminController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Upcoming drive deleted.");
         return "redirect:/admin/upcoming-drives";
+    }
+
+    // ==========================================
+    // 2.2 Off-Campus Internships & Hackathons Management
+    // ==========================================
+    @GetMapping("/opportunities")
+    public String manageOpportunities(Model model) {
+        model.addAttribute("opportunities", opportunityService.getAllForAdmin());
+        model.addAttribute("types", in.jecrcu.placement.entity.enums.OpportunityType.values());
+        model.addAttribute("stats", opportunityService.getStatistics());
+        return "admin/opportunities";
+    }
+
+    @PostMapping("/opportunities/save")
+    public String saveOpportunity(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam("title") String title,
+            @RequestParam("organization") String organization,
+            @RequestParam("type") in.jecrcu.placement.entity.enums.OpportunityType type,
+            @RequestParam(value = "category", defaultValue = "Technology") String category,
+            @RequestParam(value = "mode", defaultValue = "Remote") String mode,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam("compensationOrPrize") String compensationOrPrize,
+            @RequestParam(value = "eligibleBatches", defaultValue = "All Batches") String eligibleBatches,
+            @RequestParam(value = "eligibleBranches", defaultValue = "All Branches") String eligibleBranches,
+            @RequestParam("deadline") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime deadline,
+            @RequestParam(value = "eventDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate eventDate,
+            @RequestParam("registrationUrl") String registrationUrl,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "perks", required = false) String perks,
+            @RequestParam(value = "featured", defaultValue = "false") boolean featured,
+            @RequestParam(value = "active", defaultValue = "true") boolean active,
+            @RequestParam(value = "notifyStudents", defaultValue = "false") boolean notifyStudents,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        Opportunity opp = (id != null) ? opportunityService.findById(id).orElse(new Opportunity()) : new Opportunity();
+        opp.setTitle(title.trim());
+        opp.setOrganization(organization.trim());
+        opp.setType(type);
+        opp.setCategory(category.trim());
+        opp.setMode(mode.trim());
+        opp.setLocation(location != null ? location.trim() : null);
+        opp.setCompensationOrPrize(compensationOrPrize.trim());
+        opp.setEligibleBatches(eligibleBatches.trim());
+        opp.setEligibleBranches(eligibleBranches.trim());
+        opp.setDeadline(deadline);
+        opp.setEventDate(eventDate);
+        opp.setRegistrationUrl(registrationUrl.trim());
+        opp.setDescription(description != null ? description.trim() : null);
+        opp.setPerks(perks != null ? perks.trim() : null);
+        opp.setFeatured(featured);
+        opp.setActive(active);
+
+        opportunityService.saveOpportunity(opp);
+
+        User actor = (userDetails != null) ? userService.findById(userDetails.getId()).orElse(null) : null;
+        auditService.logAction(actor, (id != null ? "UPDATE_OPPORTUNITY" : "CREATE_OPPORTUNITY"), "Opportunity", opp.getId(), null, opp.getTitle() + " (" + opp.getOrganization() + ")");
+
+        if (notifyStudents || id == null) {
+            notificationService.notifyStudentsOfNewOpportunity(opp);
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", "Opportunity '" + opp.getTitle() + "' saved successfully!");
+        return "redirect:/admin/opportunities";
+    }
+
+    @PostMapping("/opportunities/{id}/toggle")
+    public String toggleOpportunity(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        boolean active = opportunityService.toggleActive(id);
+        User actor = (userDetails != null) ? userService.findById(userDetails.getId()).orElse(null) : null;
+        auditService.logAction(actor, "TOGGLE_OPPORTUNITY", "Opportunity", id, null, "Active: " + active);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Opportunity status updated to " + (active ? "Active" : "Archived"));
+        return "redirect:/admin/opportunities";
+    }
+
+    @PostMapping("/opportunities/{id}/delete")
+    public String deleteOpportunity(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        opportunityService.deleteOpportunity(id);
+        User actor = (userDetails != null) ? userService.findById(userDetails.getId()).orElse(null) : null;
+        auditService.logAction(actor, "DELETE_OPPORTUNITY", "Opportunity", id, null, null);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Opportunity deleted successfully.");
+        return "redirect:/admin/opportunities";
     }
 
     // ==========================================

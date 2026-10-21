@@ -290,6 +290,52 @@
             </div>
         </div>
 
+        <!-- Trending Hackathons & Off-Campus Internships Section -->
+        <div class="app-card p-4 mb-4 border-0 shadow-sm" th:if="${trendingOpportunities != null and !trendingOpportunities.isEmpty()}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-fire text-warning me-2"></i>Trending Hackathons &amp; Off-Campus Internships
+                    </h5>
+                    <span class="small text-muted">Win cash prizes, earn PPIs, and participate in nationwide contests.</span>
+                </div>
+                <a th:href="@{/opportunities}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs">
+                    Explore All Opportunities &rarr;
+                </a>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6 col-xl-3" th:each="opp : ${trendingOpportunities}">
+                    <div class="p-3 rounded-3 border h-100 d-flex flex-column justify-content-between bg-body-tertiary">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start gap-1 mb-2">
+                                <span class="badge rounded-pill" th:classappend="${opp.type.pillClass}" style="font-size: 0.7rem;">
+                                    <i class="bi me-1" th:classappend="${opp.type.iconClass}"></i>
+                                    <span th:text="${opp.type.displayName}">Hackathon</span>
+                                </span>
+                                <span class="badge bg-light text-secondary border" style="font-size: 0.65rem;" th:text="${opp.mode}">Remote</span>
+                            </div>
+                            <h6 class="fw-bold mb-1 text-truncate" th:title="${opp.title}">
+                                <a th:href="${opp.registrationUrl}" target="_blank" rel="noopener noreferrer" class="text-dark text-decoration-none" th:text="${opp.title}">
+                                    Smart India Hackathon
+                                </a>
+                            </h6>
+                            <div class="small text-muted mb-2 text-truncate" th:text="${opp.organization}">Ministry of Education</div>
+                            <div class="small fw-semibold text-success mb-2" th:text="${opp.compensationOrPrize}">₹1,00,000 Cash Prize</div>
+                        </div>
+                        <div class="pt-2 border-top mt-2 d-flex justify-content-between align-items-center">
+                            <span class="small text-danger fw-semibold" style="font-size: 0.75rem;">
+                                <i class="bi bi-clock me-1"></i> <span th:text="${#temporals.format(opp.deadline, 'dd MMM')}">20 Nov</span>
+                            </span>
+                            <a th:href="${opp.registrationUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                                Apply <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bookmarks Section -->
         <div class="app-card p-4 mb-4" th:if="${!bookmarkedCompanies.isEmpty() or !bookmarkedQuestions.isEmpty()}">
             <h5 class="fw-bold mb-3"><i class="bi bi-bookmark-star-fill text-warning me-2"></i>My Bookmarks</h5>

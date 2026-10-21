@@ -77,6 +77,11 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item py-2" th:href="@{/admin/opportunities}">
+                                    <i class="bi bi-trophy me-2 text-warning"></i> Off-Campus &amp; Hackathons
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item py-2" th:href="@{/admin/drives}">
                                     <i class="bi bi-clock-history me-2 text-success"></i> Drives History &amp; Records
                                 </a>
@@ -152,6 +157,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link py-2 py-xl-1 px-2 position-relative" th:href="@{/opportunities}">
+                            <i class="bi bi-trophy me-1 text-warning"></i> Hackathons &amp; Internships
+                            <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.65rem;">New</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>

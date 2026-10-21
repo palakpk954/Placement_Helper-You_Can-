@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Manage Hackathons &amp; Off-Campus Opportunities — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xxl px-3 px-md-4">
+
+        <!-- Breadcrumb & Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+            <div>
+                <a th:href="@{/admin}" class="text-decoration-none small text-muted">&larr; Back to Admin Dashboard</a>
+                <h3 class="fw-bold mb-1 mt-1">
+                    <i class="bi bi-trophy-fill text-warning me-2"></i>Off-Campus Opportunities, Hackathons &amp; Internships
+                </h3>
+                <p class="text-muted small mb-0">Publish nationwide hackathons, open-source programs, and off-campus internship drives for student discovery.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/opportunities}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Preview Student View
+                </a>
+                <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#newOpportunityCollapse">
+                    <i class="bi bi-plus-lg me-1"></i> Post New Opportunity
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrics Overview Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 border-0 shadow-xs h-100 d-flex align-items-center gap-3">
+                    <div class="bg-primary-subtle text-primary rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+                        <i class="bi bi-collection-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold lh-1" th:text="${stats.totalActive != null ? stats.totalActive : 0}">0</div>
+                        <div class="text-muted small mt-1">Active Opportunities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 border-0 shadow-xs h-100 d-flex align-items-center gap-3">
+                    <div class="bg-warning-subtle text-warning rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+                        <i class="bi bi-trophy-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold lh-1" th:text="${stats.totalHackathons != null ? stats.totalHackathons : 0}">0</div>
+                        <div class="text-muted small mt-1">Live Hackathons</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 border-0 shadow-xs h-100 d-flex align-items-center gap-3">
+                    <div class="bg-info-subtle text-info rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+                        <i class="bi bi-briefcase-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold lh-1" th:text="${stats.totalInternships != null ? stats.totalInternships : 0}">0</div>
+                        <div class="text-muted small mt-1">Off-Campus Internships</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 border-0 shadow-xs h-100 d-flex align-items-center gap-3">
+                    <div class="bg-success-subtle text-success rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+                        <i class="bi bi-code-slash fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold lh-1" th:text="${stats.totalChallenges != null ? stats.totalChallenges : 0}">0</div>
+                        <div class="text-muted small mt-1">Hiring Challenges</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post / Create Form Collapse -->
+        <div class="collapse mb-4" id="newOpportunityCollapse">
+            <div class="app-card p-4 shadow-sm border border-primary">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-sparkles text-primary me-2"></i>Post New Opportunity / Hackathon
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#newOpportunityCollapse"></button>
+                </div>
+                <form th:action="@{/admin/opportunities/save}" method="post">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Opportunity Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="title" placeholder="e.g. Smart India Hackathon (SIH) 2026 or Amazon WOW" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Organizing Entity / Company <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="organization" placeholder="e.g. Ministry of Education / Google / Flipkart" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Opportunity Type <span class="text-danger">*</span></label>
+                            <select class="form-select" name="type" required>
+                                <option th:each="t : ${types}" th:value="${t.name()}" th:text="${t.displayName}">Hackathon</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Category / Domain</label>
+                            <input type="text" class="form-control" name="category" value="Technology" placeholder="e.g. Web Dev / AI / Open Source">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Work / Participation Mode</label>
+                            <select class="form-select" name="mode">
+                                <option value="Remote">Remote / Virtual</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="On-site">On-site / In-person</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Location (Optional)</label>
+                            <input type="text" class="form-control" name="location" placeholder="e.g. Bangalore / Virtual / All-India">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Prize Pool / Stipend <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="compensationOrPrize" placeholder="e.g. ₹1,00,000 Cash Prize or ₹80,000/mo" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Eligible Batches</label>
+                            <input type="text" class="form-control" name="eligibleBatches" value="2026, 2027 Batches" placeholder="e.g. 2026, 2027 Batches">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Eligible Branches</label>
+                            <input type="text" class="form-control" name="eligibleBranches" value="All Branches (B.Tech / MCA / BCA)">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Application Deadline <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="deadline" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Event / Start Date (Optional)</label>
+                            <input type="date" class="form-control" name="eventDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Registration URL <span class="text-danger">*</span></label>
+                            <input type="url" class="form-control" name="registrationUrl" placeholder="https://..." required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Opportunity Description &amp; Rounds</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Provide background, problem statement tracks, timeline, or round descriptions for students..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Perks &amp; Highlights (Comma separated)</label>
+                        <input type="text" class="form-control" name="perks" placeholder="e.g. Cash Prize, Pre-Placement Interview (PPI), Certificate, Goodies">
+                    </div>
+
+                    <div class="row g-3 align-items-center mb-4">
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="featured" value="true" id="featuredCheck">
+                                <label class="form-check-label small fw-semibold" for="featuredCheck">Pin as Featured (Top Banner)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="active" value="true" id="activeCheck" checked>
+                                <label class="form-check-label small fw-semibold" for="activeCheck">Active (Visible to Students)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="notifyStudents" value="true" id="notifyCheck" checked>
+                                <label class="form-check-label small fw-semibold text-primary" for="notifyCheck">Broadcast Notification to All Students</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#newOpportunityCollapse">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold shadow-sm">Publish Opportunity</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Opportunities Table -->
+        <div class="app-card shadow-sm border-0 overflow-hidden mb-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light-subtle">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-list-stars text-secondary me-2"></i>Catalog of Off-Campus Opportunities
+                </h6>
+                <span class="badge bg-secondary rounded-pill" th:text="${opportunities.size() + ' Total'}">0 Total</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Opportunity &amp; Org</th>
+                            <th>Type &amp; Mode</th>
+                            <th>Prize / Stipend</th>
+                            <th>Eligible Batches</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="opp : ${opportunities}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-warning text-dark px-2 py-1" th:if="${opp.featured}">
+                                        <i class="bi bi-star-fill me-1"></i> Featured
+                                    </span>
+                                    <div>
+                                        <div class="fw-bold" th:text="${opp.title}">Smart India Hackathon</div>
+                                        <small class="text-muted" th:text="${opp.organization}">Ministry of Education</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill me-1" th:classappend="${opp.type.pillClass}">
+                                    <i class="bi me-1" th:classappend="${opp.type.iconClass}"></i>
+                                    <span th:text="${opp.type.displayName}">Hackathon</span>
+                                </span>
+                                <span class="badge bg-light text-secondary border" th:text="${opp.mode}">Remote</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-success small" th:text="${opp.compensationOrPrize}">₹1,00,000</span>
+                            </td>
+                            <td>
+                                <small class="text-muted d-block" th:text="${opp.eligibleBatches}">2026, 2027</small>
+                                <small class="text-muted text-truncate d-inline-block" style="max-width: 160px;" th:text="${opp.eligibleBranches}">All Branches</small>
+                            </td>
+                            <td>
+                                <span class="small fw-semibold text-danger" th:text="${#temporals.format(opp.deadline, 'dd MMM yyyy, HH:mm')}">20 Nov 2026</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill"
+                                      th:classappend="${opp.active ? 'bg-success-subtle text-success border border-success' : 'bg-secondary-subtle text-secondary'}">
+                                    <i class="bi" th:classappend="${opp.active ? 'bi-check-circle-fill' : 'bi-archive-fill'}"></i>
+                                    <span th:text="${opp.active ? 'Active' : 'Archived'}">Active</span>
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="${opp.registrationUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary" title="Visit Registration Link">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                    <!-- Toggle Active Button -->
+                                    <form th:action="@{/admin/opportunities/{id}/toggle(id=${opp.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary"
+                                                th:title="${opp.active ? 'Archive this opportunity' : 'Activate this opportunity'}">
+                                            <i class="bi" th:classappend="${opp.active ? 'bi-eye-slash' : 'bi-eye'}"></i>
+                                        </button>
+                                    </form>
+                                    <!-- Delete Button -->
+                                    <form th:action="@{/admin/opportunities/{id}/delete(id=${opp.id})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to permanently delete this opportunity?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete Opportunity">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${opportunities == null or opportunities.isEmpty()}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                No off-campus opportunities posted yet. Click <strong>"Post New Opportunity"</strong> above to announce the first hackathon or internship.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

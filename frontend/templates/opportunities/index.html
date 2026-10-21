@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Off-Campus Internships, Hackathons &amp; Contests — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xxl px-3 px-md-4">
+
+        <!-- Hero Section -->
+        <div class="app-card p-4 p-md-5 mb-4 border-0 shadow-sm position-relative overflow-hidden" 
+             style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.08) 0%, rgba(255, 193, 7, 0.08) 100%);">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3 shadow-xs">
+                        <i class="bi bi-fire me-1"></i> National Competitions &amp; Off-Campus Hiring
+                    </span>
+                    <h2 class="display-6 fw-bold mb-2">Hackathons, Internships &amp; Tech Contests</h2>
+                    <p class="text-muted lead mb-4" style="font-size: 1.05rem;">
+                        Discover hand-picked national hackathons, open-source fellowship stipends, and prestigious off-campus internship drives. Win cash prizes, earn PPIs, and accelerate your placement journey.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                            <i class="bi bi-trophy-fill text-warning me-1"></i>
+                            <span th:text="${stats.totalHackathons != null ? stats.totalHackathons : 0}">3</span> Live Hackathons
+                        </span>
+                        <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                            <i class="bi bi-briefcase-fill text-primary me-1"></i>
+                            <span th:text="${stats.totalInternships != null ? stats.totalInternships : 0}">3</span> Off-Campus Internships
+                        </span>
+                        <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                            <i class="bi bi-code-slash text-success me-1"></i>
+                            <span th:text="${stats.totalChallenges != null ? stats.totalChallenges : 0}">2</span> Hiring Contests
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4 d-none d-lg-flex justify-content-center">
+                    <div class="text-center p-3">
+                        <div class="bg-white rounded-circle shadow-md d-inline-flex align-items-center justify-content-center mb-2" style="width: 110px; height: 110px;">
+                            <i class="bi bi-stars text-warning fs-1"></i>
+                        </div>
+                        <div class="fw-bold mt-2">100% Verified Opportunities</div>
+                        <small class="text-muted">Reviewed by JECRC Placement Cell</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="app-card p-3 shadow-xs border-0 mb-4">
+            <form th:action="@{/opportunities}" method="get" class="row g-2 align-items-center">
+                <!-- Search Input -->
+                <div class="col-md-5 col-lg-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" name="search" 
+                               th:value="${searchQuery}" 
+                               placeholder="Search hackathons, companies, tech domains, or batches...">
+                    </div>
+                </div>
+
+                <!-- Type Selector -->
+                <div class="col-md-4 col-lg-4">
+                    <select class="form-select" name="type" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${selectedType == 'ALL'}">All Opportunity Types</option>
+                        <option th:each="t : ${types}" 
+                                th:value="${t.name()}" 
+                                th:text="${t.displayName}" 
+                                th:selected="${selectedType == t.name()}">Hackathon</option>
+                    </select>
+                </div>
+
+                <!-- Action Button -->
+                <div class="col-md-3 col-lg-2 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill fw-semibold">
+                        Filter Results
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a th:href="@{/opportunities}" 
+               class="btn btn-sm rounded-pill px-3 shadow-xs"
+               th:classappend="${selectedType == 'ALL' and (searchQuery == null or searchQuery.isEmpty()) ? 'btn-primary' : 'btn-outline-secondary'}">
+                All (<span th:text="${stats.totalActive != null ? stats.totalActive : 0}">0</span>)
+            </a>
+            <a th:href="@{/opportunities(type='HACKATHON')}" 
+               class="btn btn-sm rounded-pill px-3 shadow-xs"
+               th:classappend="${selectedType == 'HACKATHON' ? 'btn-warning text-dark fw-bold' : 'btn-outline-secondary'}">
+                <i class="bi bi-trophy-fill me-1 text-warning"></i> Hackathons (<span th:text="${stats.totalHackathons != null ? stats.totalHackathons : 0}">0</span>)
+            </a>
+            <a th:href="@{/opportunities(type='INTERNSHIP')}" 
+               class="btn btn-sm rounded-pill px-3 shadow-xs"
+               th:classappend="${selectedType == 'INTERNSHIP' ? 'btn-primary fw-bold' : 'btn-outline-secondary'}">
+                <i class="bi bi-briefcase-fill me-1 text-primary"></i> Internships (<span th:text="${stats.totalInternships != null ? stats.totalInternships : 0}">0</span>)
+            </a>
+            <a th:href="@{/opportunities(type='HIRING_CHALLENGE')}" 
+               class="btn btn-sm rounded-pill px-3 shadow-xs"
+               th:classappend="${selectedType == 'HIRING_CHALLENGE' ? 'btn-info text-dark fw-bold' : 'btn-outline-secondary'}">
+                <i class="bi bi-code-slash me-1 text-info"></i> Hiring Contests (<span th:text="${stats.totalChallenges != null ? stats.totalChallenges : 0}">0</span>)
+            </a>
+        </div>
+
+        <!-- Opportunities Grid -->
+        <div class="row g-4" th:if="${opportunities != null and !opportunities.isEmpty()}">
+            <div class="col-md-6 col-xl-4" th:each="opp : ${opportunities}">
+                <div class="app-card h-100 p-4 shadow-sm d-flex flex-column justify-content-between border-0 position-relative transition-hover">
+                    <div>
+                        <!-- Top Tag Badges -->
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold" th:classappend="${opp.type.pillClass}">
+                                <i class="bi me-1" th:classappend="${opp.type.iconClass}"></i>
+                                <span th:text="${opp.type.displayName}">Hackathon</span>
+                            </span>
+
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="badge bg-warning text-dark px-2 py-1 rounded-pill" th:if="${opp.featured}">
+                                    <i class="bi bi-star-fill me-1"></i> Featured
+                                </span>
+                                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill" th:text="${opp.mode}">
+                                    Remote
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Organization & Title -->
+                        <div class="text-muted small fw-semibold text-uppercase tracking-wide mb-1" th:text="${opp.organization}">
+                            Ministry of Education &amp; AICTE
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <a th:href="${opp.registrationUrl}" target="_blank" rel="noopener noreferrer" class="text-dark text-decoration-none hover-primary" th:text="${opp.title}">
+                                Smart India Hackathon (SIH) 2026
+                            </a>
+                        </h5>
+
+                        <!-- Prize / Stipend Badge -->
+                        <div class="d-inline-flex align-items-center gap-2 p-2 rounded-3 bg-success-subtle text-success border border-success-subtle mb-3">
+                            <i class="bi bi-cash-coin fs-5"></i>
+                            <div>
+                                <small class="d-block lh-1 text-muted" style="font-size: 0.7rem; text-transform: uppercase;">Award / Stipend</small>
+                                <span class="fw-bold" th:text="${opp.compensationOrPrize}">₹1,00,000 Cash Prize</span>
+                            </div>
+                        </div>
+
+                        <!-- Eligibility Details -->
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2 text-muted small mb-1">
+                                <i class="bi bi-mortarboard text-secondary"></i>
+                                <span><strong>Batches:</strong> <span th:text="${opp.eligibleBatches}">2026, 2027</span></span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-muted small mb-1">
+                                <i class="bi bi-diagram-3 text-secondary"></i>
+                                <span><strong>Branches:</strong> <span th:text="${opp.eligibleBranches}">All Branches</span></span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-muted small" th:if="${opp.location != null and !opp.location.isEmpty()}">
+                                <i class="bi bi-geo-alt text-secondary"></i>
+                                <span th:text="${opp.location}">Virtual / All-India</span>
+                            </div>
+                        </div>
+
+                        <!-- Description Snippet -->
+                        <p class="small text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" th:text="${opp.description}">
+                            Solve pressing national challenges across healthcare, smart automation, and logistics.
+                        </p>
+
+                        <!-- Perks Tags -->
+                        <div class="d-flex flex-wrap gap-1 mb-3" th:if="${opp.perks != null and !opp.perks.isEmpty()}">
+                            <span class="badge bg-light text-dark border small" 
+                                  th:each="p : ${#strings.arraySplit(opp.perks, ',')}" 
+                                  th:text="${#strings.trim(p)}">
+                                Cash Prize
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Action Footer -->
+                    <div class="pt-3 border-top mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                            <span><i class="bi bi-clock-history me-1 text-danger"></i> Deadline:</span>
+                            <span class="fw-semibold text-danger" th:text="${#temporals.format(opp.deadline, 'dd MMM yyyy, HH:mm')}">
+                                20 Nov 2026
+                            </span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a th:href="${opp.registrationUrl}" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="btn btn-primary rounded-pill btn-sm fw-semibold shadow-xs">
+                                Register / Apply Now <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-outline-secondary rounded-pill btn-sm"
+                                    th:data-id="${opp.id}"
+                                    th:data-title="${opp.title}"
+                                    th:data-org="${opp.organization}"
+                                    th:data-type="${opp.type.displayName}"
+                                    th:data-comp="${opp.compensationOrPrize}"
+                                    th:data-batches="${opp.eligibleBatches}"
+                                    th:data-branches="${opp.eligibleBranches}"
+                                    th:data-mode="${opp.mode}"
+                                    th:data-loc="${opp.location}"
+                                    th:data-desc="${opp.description}"
+                                    th:data-perks="${opp.perks}"
+                                    th:data-url="${opp.registrationUrl}"
+                                    th:data-deadline="${#temporals.format(opp.deadline, 'dd MMM yyyy, HH:mm')}"
+                                    onclick="openOpportunityModal(this)">
+                                <i class="bi bi-info-circle me-1"></i> View Full Details &amp; Perks
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="app-card text-center py-5 shadow-sm border-0" th:if="${opportunities == null or opportunities.isEmpty()}">
+            <div class="bg-light rounded-circle p-4 d-inline-flex mb-3">
+                <i class="bi bi-search text-muted fs-1"></i>
+            </div>
+            <h5 class="fw-bold mb-1">No Matching Opportunities Found</h5>
+            <p class="text-muted small mb-4">Try clearing your search query or selecting "All Opportunities" to view the full catalog.</p>
+            <a th:href="@{/opportunities}" class="btn btn-sm btn-outline-primary rounded-pill px-4">
+                Clear Filters &amp; View All
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Quick View Details Modal -->
+    <div class="modal fade" id="opportunityDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <span id="modalTypeBadge" class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">Hackathon</span>
+                        <h4 class="modal-title fw-bold" id="modalTitle">Opportunity Title</h4>
+                        <div class="text-muted small" id="modalOrg">Organizing Entity</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Prize / Stipend</small>
+                                <span class="fw-bold text-success fs-5" id="modalComp">₹1,00,000</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Application Deadline</small>
+                                <span class="fw-bold text-danger fs-5" id="modalDeadline">20 Nov 2026</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-2"><i class="bi bi-info-circle text-primary me-2"></i>Overview &amp; Problem Tracks</h6>
+                    <p class="text-muted small mb-4 lh-base" id="modalDesc">Detailed description here.</p>
+
+                    <h6 class="fw-bold mb-2"><i class="bi bi-mortarboard text-secondary me-2"></i>Eligibility Criteria</h6>
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-1"><i class="bi bi-check2 text-success me-2"></i><strong>Eligible Batches:</strong> <span id="modalBatches">2026, 2027</span></li>
+                        <li class="mb-1"><i class="bi bi-check2 text-success me-2"></i><strong>Eligible Disciplines:</strong> <span id="modalBranches">All Engineering Branches</span></li>
+                        <li class="mb-1"><i class="bi bi-check2 text-success me-2"></i><strong>Mode &amp; Location:</strong> <span id="modalMode">Remote</span></li>
+                    </ul>
+
+                    <h6 class="fw-bold mb-2"><i class="bi bi-gift text-warning me-2"></i>Perks, Swag &amp; Recognition</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-2" id="modalPerksContainer">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="modalApplyBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                        Go to Official Application Portal <i class="bi bi-box-arrow-up-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to populate Opportunity Modal -->
+    <script>
+    function openOpportunityModal(btn) {
+        document.getElementById('modalTitle').textContent = btn.getAttribute('data-title');
+        document.getElementById('modalOrg').textContent = btn.getAttribute('data-org');
+        document.getElementById('modalTypeBadge').textContent = btn.getAttribute('data-type');
+        document.getElementById('modalComp').textContent = btn.getAttribute('data-comp');
+        document.getElementById('modalDeadline').textContent = btn.getAttribute('data-deadline');
+        document.getElementById('modalDesc').textContent = btn.getAttribute('data-desc') || 'No additional details provided.';
+        document.getElementById('modalBatches').textContent = btn.getAttribute('data-batches');
+        document.getElementById('modalBranches').textContent = btn.getAttribute('data-branches');
+        document.getElementById('modalMode').textContent = btn.getAttribute('data-mode') + (btn.getAttribute('data-loc') ? ' (' + btn.getAttribute('data-loc') + ')' : '');
+        document.getElementById('modalApplyBtn').href = btn.getAttribute('data-url');
+
+        const perksContainer = document.getElementById('modalPerksContainer');
+        perksContainer.innerHTML = '';
+        const perksStr = btn.getAttribute('data-perks');
+        if (perksStr) {
+            perksStr.split(',').forEach(p => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-warning-subtle text-dark border border-warning px-3 py-2 rounded-pill small';
+                badge.textContent = p.trim();
+                perksContainer.appendChild(badge);
+            });
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('opportunityDetailsModal'));
+        modal.show();
+    }
+    </script>
+</div>
+</body>
+</html>

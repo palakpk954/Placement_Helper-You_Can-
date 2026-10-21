@@ -22,6 +22,7 @@ public class DashboardController {
     private final BookmarkService bookmarkService;
     private final NotificationService notificationService;
     private final StatsService statsService;
+    private final OpportunityService opportunityService;
 
     @GetMapping({"/", "/dashboard"})
     public String dashboard(
@@ -78,6 +79,9 @@ public class DashboardController {
 
         // 5. Overall portal highlights
         model.addAttribute("overallStats", statsService.getOverallStats());
+
+        // 6. Trending Off-Campus Opportunities & Hackathons
+        model.addAttribute("trendingOpportunities", opportunityService.getTopTrending());
 
         return "dashboard";
     }
