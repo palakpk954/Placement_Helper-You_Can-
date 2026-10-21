@@ -25,6 +25,7 @@ The **You_can** placement portal follows an enterprise Layered Architecture buil
 |   - AuthController        - DashboardController    - CompanyController  |
 |   - CalendarController    - ExperienceController   - AlumniController   |
 |   - ContributeController  - AdminController        - AiController       |
+|   - OpportunityController - NotificationController - PracticeController |
 +------------------------------------+------------------------------------+
                                      | Service Invocations
                                      v
@@ -32,6 +33,8 @@ The **You_can** placement portal follows an enterprise Layered Architecture buil
 |                           SERVICE LAYER                                 |
 |   - CustomUserDetailsService (Identity & Credentials)                   |
 |   - EligibilityService (Dynamic CGPA / Backlog / Branch Matrix Engine)  |
+|   - OpportunityService (Off-Campus Internships, Contests & Hackathons)  |
+|   - NotificationService (In-app alerts & broadcast dispatch)            |
 |   - AiService / DefaultAiService (Grounded Q&A, Summarizer, Classifier) |
 +------------------------------------+------------------------------------+
                                      | JPA Repositories
@@ -40,13 +43,15 @@ The **You_can** placement portal follows an enterprise Layered Architecture buil
 |                         DATA ACCESS LAYER (JPA / ORM)                   |
 |   - UserRepository         - CompanyRepository      - DriveRepository   |
 |   - RoundRepository        - ExperienceRepository   - QuestionRepository|
-|   - AlumniProfileRepo      - UpcomingDriveRepo      - ContributionRepo  |
+|   - AlumniProfileRepo      - UpcomingDriveRepo      - OpportunityRepo   |
+|   - MockSlotRepository     - NotificationRepo       - AuditLogRepository|
 +------------------------------------+------------------------------------+
                                      | JDBC
                                      v
 +-------------------------------------------------------------------------+
 |                        PERSISTENCE / STORAGE                            |
 |   Embedded File-backed H2 Database (`./data/youcan.mv.db`)              |
+|   Flyway Migrations (V1 Schema, V2 Seed, V3 Registrations, V4 Opps)     |
 +-------------------------------------------------------------------------+
 ```
 
@@ -120,6 +125,8 @@ Company (1) <---> (0..N) Experience
 
 Drive (1) <---> (1..N) Round
 Round (1) <---> (0..N) Question
+
+Opportunity (1) [Standalone Catalog Item: Hackathon / Internship / Contest]
 ```
 
 ---
@@ -129,8 +136,13 @@ Round (1) <---> (0..N) Question
 1. **Unauthenticated Perimeter**:
    - `/login`, `/register`, `/forgot-password`, `/reset-password`
    - Static assets: `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`
-2. **Authenticated Student/Alumni Perimeter**:
-   - `/dashboard`, `/companies/**`, `/calendar/**`, `/experiences/**`, `/mentors/**`, `/contribute/**`, `/ai-assistant`
+   - Health & Status: `/actuator/**`, `/api/ai/status`
+2. **Authenticated Student Perimeter (`ROLE_STUDENT`)**:
+   - `/dashboard`, `/opportunities/**`, `/companies/**`, `/upcoming/**`, `/calendar/**`, `/resume/**`, `/questions/**`, `/practice/**`, `/roadmap/**`, `/checklists/**`, `/compare/**`, `/alumni/**`, `/mocks/**`, `/eligibility/**`, `/notifications/**`, `/ai-assistant`
    - REST API: `POST /api/ai/chat`, `POST /api/ai/classify`, `GET /api/ai/company-summary/{id}`
-3. **Elevated Administrative Perimeter (`ROLE_ADMIN`)**:
-   - `/admin`, `/admin/drives`, `/admin/contributions`, `/admin/users`, `/admin/audit-logs`
+3. **Dedicated Alumni Mentor Perimeter (`ROLE_ALUMNI`)**:
+   - Dedicated Mentor Cockpit: `/alumni/dashboard` (Mock slot publishing, session evaluations)
+   - Student view toggle: `/dashboard?view=student` (Mentor Preview Banner enabled)
+4. **Elevated Administrative Perimeter (`ROLE_ADMIN`)**:
+   - `/admin`, `/admin/upcoming-drives/**`, `/admin/opportunities/**`, `/admin/drives/**`, `/admin/approvals/**`, `/admin/companies/**`, `/admin/import/**`, `/admin/reports/**`, `/admin/audit-log`, `/admin/export/**`
+   - Student view toggle: `/dashboard?view=student` (Admin Preview Banner enabled)

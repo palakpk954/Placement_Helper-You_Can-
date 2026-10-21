@@ -91,6 +91,8 @@ Whenever changes or new features are introduced to the repository, this file and
 | **2026-10-16** | Docs | Master Documentation Hub (`DOCUMENTATION.md`) and dedicated `docs/` subsystem tracking ongoing updates. | ✅ Completed |
 | **2026-10-20** | Sprint 6 | Placement intelligence bug fixes & hardening: Calendar Seasonality Matrix rendering, Resume Scanner score & checklist parsing, Statistics Average Package card, Mock Interview mentor RBAC and hosting visibility, and Notifications UI overhaul with hourly reminder deduplication. | ✅ Completed & Deployed |
 | **2026-10-20** | Sprint 7 | AI Preparation Suite: AI STAR Resume Bullet Enhancer & Job Description Matcher, Apache PDFBox resume text extraction, dynamic ATS keyword scoring, upcoming drive pre-population. | ✅ Completed & Deployed |
+| **2026-10-21** | Sprint 8 | Strict Role Isolation & Mentor Cockpit: Enforced deterministic RBAC without synthetic role elevation, dedicated `/alumni/dashboard` cockpit for mentors with mock interview slot management, and safe preview return navigation. | ✅ Completed & Deployed |
+| **2026-10-21** | Sprint 9 | Off-Campus Opportunities & Hackathons Ecosystem: Flyway V4 migration, student discovery hub (`/opportunities`) with filters & quick-view modals, admin publishing portal (`/admin/opportunities`), automated student notification dispatch, and 67-point automated regression test runner. | ✅ Completed & Deployed |
 
 ---
 
@@ -220,6 +222,35 @@ Whenever changes or new features are introduced to the repository, this file and
     - Clean separation of concerns with dedicated REST endpoint controller `ResumeApiController` (`/api/resume/enhance-bullet` and `/api/resume/match-jd`).
     - Exemption of `/api/**` in Spring Security CSRF filter for seamless AJAX communication.
     - 100% unit and integration test coverage with 37 tests passing across the suite.
+
+---
+
+### Sprint 8: Strict Role Isolation & Mentor Cockpit Hardening
+- **Goal**: Guarantee complete role separation between students, alumni mentors, and administrators; prevent accidental authority elevation; and provide dedicated dashboards for each role.
+- **Key Deliverables**:
+  - **Deterministic Authority Assignment** (`CustomUserDetails.java` & `CustomUserDetailsService.java`): Removed dynamic addition of `ROLE_ALUMNI` based solely on the existence of an `AlumniProfile` entry. User authorities now strictly mirror the database `role` column (`ROLE_STUDENT`, `ROLE_ALUMNI`, `ROLE_ADMIN`).
+  - **Alumni Mentor Cockpit** (`/alumni/dashboard`): Dedicated command center for verified mentors featuring impact stats (interviews conducted, hours mentored, student rating), 1-on-1 mock slot publishing engine, and booking request manager.
+  - **Navbar Badge Integrity**: Student accounts (`rahul.sharma@jecrcu.edu.in`) consistently render the `Student ▾` badge and navigate to `/dashboard`. Alumni accounts render `Mentor ▾`.
+  - **Safe Preview Navigation**: Separated admin preview banner (`/dashboard?view=student`) and mentor preview banner. Replaced raw 403 Access Denied errors with a graceful Spring Security `AccessDeniedHandler` redirecting users back to their native dashboards.
+
+---
+
+### Sprint 9: Off-Campus Internships, Hackathons & Competitions Ecosystem
+- **Goal**: Provide university students with verified off-campus internships, nationwide hackathons, open-source fellowships, and hiring challenges, managed directly by placement cell administrators.
+- **Key Deliverables**:
+  - **Database Migration (`V4__opportunities.sql`)**: Initialized table `opportunities` with indexing on `type`, `active`, and `deadline`. Pre-seeded 8 national high-value opportunities including Smart India Hackathon (SIH 2026), Google Summer of Code (GSoC 2026), Flipkart GRiD 7.0, Amazon WOW Internship, Microsoft Imagine Cup, TCS HackQuest, Uber HackTag, and Adobe SheCodes.
+  - **Student Opportunities Hub (`/opportunities`)**:
+    - Filter pills for quick sorting: *All Opportunities*, *Hackathons*, *Internships*, and *Hiring Contests*.
+    - Real-time search across titles, organizing companies, eligible batches, and tech domains.
+    - Opportunity cards displaying financial prize/stipend badges, batch/branch eligibility, urgency deadlines, perk badges, and direct application links (`target="_blank"`).
+    - Interactive "View Full Details & Perks" modal with problem statement tracks and timeline.
+    - Student dashboard integration featuring a "Trending Hackathons & Off-Campus Internships" showcase.
+  - **Admin Command Center (`/admin/opportunities`)**:
+    - Executive metric cards displaying active counts.
+    - "Post New Opportunity" publishing engine with validation, date-time formatting, and automated student notification broadcasts (`NotificationService.notifyStudentsOfNewOpportunity()`).
+    - Catalog management table with active/archive status toggle and deletion.
+  - **End-to-End Automated Test Harness (`scratch/full_system_test.py`)**:
+    - Built comprehensive 7-suite regression runner covering 67 automated assertions with 100% pass rate.
 
 ---
 
@@ -431,6 +462,9 @@ Placement_Helper/
 | `GET` | `/experiences` | Authenticated | Verified interview reviews submitted by seniors |
 | `GET` | `/mentors` | Authenticated | Senior alumni directory with role and company filters |
 | `GET` | `/contribute` | Authenticated | Submission form for interview questions and experiences |
+| `GET` | `/opportunities` | Authenticated | Off-campus internships, hackathons, and hiring contests directory |
+| `GET` | `/opportunities/{id}` | Authenticated | JSON details for opportunity quick-view modal dialog |
+| `GET` | `/alumni/dashboard` | `ROLE_ALUMNI` | Mentor Cockpit for 1-on-1 mock slot publishing & student booking reviews |
 | `GET` | `/ai-assistant` | Authenticated | Full-page interactive AI Placement Assistant |
 
 ### AI REST Endpoints
@@ -444,8 +478,16 @@ Placement_Helper/
 | Method | Endpoint | Access | Purpose |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/admin` | `ROLE_ADMIN` | Executive placement metrics, drive statistics, and audit logs |
+| `GET` | `/admin/upcoming-drives` | `ROLE_ADMIN` | Post, edit, and manage upcoming campus recruitment drives |
+| `POST` | `/admin/upcoming-drives/save` | `ROLE_ADMIN` | Publish upcoming recruitment drive announcement |
+| `GET` | `/admin/opportunities` | `ROLE_ADMIN` | Manage off-campus internships, hackathons, and hiring challenges |
+| `POST` | `/admin/opportunities/save` | `ROLE_ADMIN` | Create or update hackathon/internship opportunity |
+| `POST` | `/admin/opportunities/{id}/toggle` | `ROLE_ADMIN` | Toggle active/archived visibility of opportunity |
+| `POST` | `/admin/opportunities/{id}/delete` | `ROLE_ADMIN` | Delete off-campus opportunity from catalog |
 | `GET` | `/admin/drives` | `ROLE_ADMIN` | Management interface to schedule and update drives |
-| `GET` | `/admin/contributions` | `ROLE_ADMIN` | Approval queue for student questions and experiences |
+| `GET` | `/admin/approvals` | `ROLE_ADMIN` | Approval queue for student questions and experiences |
+| `GET` | `/admin/export/excel` | `ROLE_ADMIN` | Export recruiters directory report to Excel (.xlsx) |
+| `GET` | `/admin/export/pdf` | `ROLE_ADMIN` | Export placement summary report to PDF document |
 
 ---
 
