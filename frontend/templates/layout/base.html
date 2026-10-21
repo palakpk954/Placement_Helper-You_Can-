@@ -58,16 +58,16 @@
             <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navContent">
                 <!-- Admin Navigation Links (Placement Cell Coordinators) -->
-                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-2 gap-0 gap-xl-1"
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-1 gap-0 gap-xxl-1"
                     sec:authorize="hasRole('ADMIN')"
                     th:if="${isAdminPreview != true}">
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2 fw-semibold text-danger" th:href="@{/admin}">
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2 fw-semibold text-danger" th:href="@{/admin}">
                             <i class="bi bi-shield-lock me-1"></i> Admin Panel
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-1 px-xxl-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-briefcase me-1"></i> Drives &amp; Calendar
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
@@ -94,17 +94,17 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/admin/approvals}">
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/admin/approvals}">
                             <i class="bi bi-check2-circle me-1"></i> Approvals
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/admin/companies}">
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/admin/companies}">
                             <i class="bi bi-building me-1"></i> Recruiters
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-1 px-xxl-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-tools me-1"></i> Admin Tools
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
@@ -150,30 +150,30 @@
                 </ul>
 
                 <!-- Student & Candidate Navigation Links (For students OR admin in student preview) -->
-                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-2 gap-0 gap-xl-1"
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-1 gap-0 gap-xxl-1"
                     th:if="${isAdminPreview == true or !#authorization.expression('hasRole(''ADMIN'')')}">
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/companies}"><i class="bi bi-building me-1"></i> Companies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/statistics}">
-                            <i class="bi bi-graph-up-arrow me-1 text-info"></i> Placement Records
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/statistics}">
+                            <i class="bi bi-graph-up-arrow me-1 text-info"></i> Placements
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/upcoming}"><i class="bi bi-megaphone me-1"></i> Upcoming</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2 position-relative" th:href="@{/opportunities}">
-                            <i class="bi bi-trophy me-1 text-warning"></i> Hackathons &amp; Internships
-                            <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.65rem;">New</span>
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2 position-relative" th:href="@{/opportunities}">
+                            <i class="bi bi-trophy me-1 text-warning"></i> Hackathons
+                            <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.6rem; padding: 0.2em 0.45em;">New</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link py-2 py-xl-1 px-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
+                        <a class="nav-link py-2 py-xl-1 px-1 px-xxl-2" th:href="@{/calendar}"><i class="bi bi-calendar3 me-1"></i> Calendar</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-1 px-xxl-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-journal-code me-1"></i> Prep Tools
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
@@ -188,7 +188,7 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle py-2 py-xl-1 px-1 px-xxl-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-people me-1"></i> Community
                         </a>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-3">
@@ -204,12 +204,13 @@
                 </ul>
 
                 <!-- Right Actions: Switcher, AI, Theme, Notifications, User Menu -->
-                <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 mt-3 mt-xl-0 flex-shrink-0 ms-xl-auto pt-2 pt-xl-0 border-top border-xl-0">
+                <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-1 gap-xl-2 mt-3 mt-xl-0 flex-shrink-0 ms-xl-auto pt-2 pt-xl-0 border-top border-xl-0">
                     <!-- Admin Panel Switcher Dropdown -->
                     <div class="dropdown flex-shrink-0" sec:authorize="hasRole('ADMIN')">
-                        <button class="btn btn-sm btn-outline-danger dropdown-toggle rounded-pill px-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Switch Portal View">
+                        <button class="btn btn-sm btn-outline-danger dropdown-toggle rounded-pill px-2 px-xxl-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Switch Portal View">
                             <i class="bi bi-grid-fill"></i>
-                            <span class="small fw-semibold">Switch Panel</span>
+                            <span class="small fw-semibold d-none d-xxl-inline">Switch Panel</span>
+                            <span class="small fw-semibold d-inline d-xxl-none">Switch</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 p-2" style="min-width: 230px;">
                             <li><h6 class="dropdown-header text-uppercase small text-muted">Portal Views</h6></li>
@@ -234,7 +235,8 @@
                     <!-- AI Assistant Quick Launch -->
                     <a class="btn btn-sm btn-outline-primary rounded-pill px-2 px-xxl-3 py-1 d-flex align-items-center justify-content-center gap-1 shadow-xs flex-shrink-0" th:href="@{/ai-assistant}" title="AI Placement Assistant">
                         <i class="bi bi-robot text-primary"></i>
-                        <span class="small fw-semibold d-none d-sm-inline">AI Assistant</span>
+                        <span class="small fw-semibold d-none d-xxl-inline">AI Assistant</span>
+                        <span class="small fw-semibold d-inline d-xxl-none">AI</span>
                     </a>
 
                     <!-- Utilities Toolbar (Theme, Notifications, Profile) -->

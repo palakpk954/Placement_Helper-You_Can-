@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 40">
+  <path d="M8 9 L32 9 L8 31 L32 31" stroke="#0D529C" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="40" y="27" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="20" fill="#0D529C">zscaler</text>
+</svg>

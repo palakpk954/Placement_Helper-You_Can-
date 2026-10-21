@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 145 40">
+  <path d="M14 10 C8 18, 8 24, 14 30 C20 24, 20 18, 14 10 Z" fill="#0070AD"/>
+  <path d="M20 14 C25 20, 25 24, 20 28 C18 24, 18 18, 20 14 Z" fill="#1EB8D0"/>
+  <text x="32" y="26" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="18" fill="#0070AD">Capgemini</text>
+</svg>

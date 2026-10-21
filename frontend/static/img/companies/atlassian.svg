@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40">
+  <path d="M18 10 C14 18, 14 26, 22 30 C18 26, 18 18, 18 10 Z" fill="#0052CC"/>
+  <path d="M24 14 C28 22, 28 26, 22 30 C24 24, 24 18, 24 14 Z" fill="#2684FF"/>
+  <text x="36" y="26" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="15" fill="#0052CC" letter-spacing="1">ATLASSIAN</text>
+</svg>

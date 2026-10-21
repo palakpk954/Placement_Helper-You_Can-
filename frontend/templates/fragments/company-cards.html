@@ -31,46 +31,56 @@
                     <!-- Header: Logo, Name, Industry, Tier -->
                     <div class="d-flex align-items-start gap-3 mb-3">
                         <div class="company-logo-frame flex-shrink-0">
-                            <img th:if="${c.logoUrl != null and !c.logoUrl.isBlank()}" th:src="${c.logoUrl}" th:alt="${c.name}" onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.alt) + '&background=0D8ABC&color=fff';">
-                            <div th:if="${c.logoUrl == null or c.logoUrl.isBlank()}" class="fw-bold text-primary fs-4" th:text="${#strings.substring(c.name, 0, 1)}">G</div>
+                            <img th:if="${c.logoUrl != null and !c.logoUrl.isBlank()}" 
+                                 th:src="${c.logoUrl}" 
+                                 th:alt="${c.name}"
+                                 loading="lazy"
+                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.classList.remove('d-none');">
+                            <div th:class="${c.logoUrl != null and !c.logoUrl.isBlank() ? 'company-fallback-badge d-none' : 'company-fallback-badge'}"
+                                 th:text="${#strings.substring(c.name, 0, 1)}">G</div>
                         </div>
                         <div class="flex-grow-1 overflow-hidden">
-                            <h6 class="fw-bold mb-0 text-truncate">
+                            <h6 class="fw-bold mb-1 text-truncate">
                                 <a th:href="@{'/companies/' + ${c.id}}" class="text-reset text-decoration-none" th:text="${c.name}">Google</a>
                             </h6>
-                            <div class="d-flex align-items-center gap-1 mt-1">
+                            <div class="d-flex align-items-center gap-1 flex-wrap">
                                 <span class="badge badge-soft-primary" th:text="${c.industry}">Product &amp; Tech</span>
                                 <span class="badge badge-soft-warning" th:text="${c.tier}">Super Dream</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Roles offered in recent visits -->
-                    <div class="small mb-3" th:if="${!c.drives.isEmpty()}">
-                        <div class="text-muted small mb-1">Recent Roles Offered:</div>
-                        <div class="fw-semibold text-truncate" th:text="${c.drives[0].roles}">Software Engineer (L3)</div>
-                        <div class="badge badge-soft-success mt-1" th:text="${c.drives[0].ctcOrStipend}">32.50 LPA</div>
+                    <!-- Roles offered in recent visits (Fixed height for uniform card layout) -->
+                    <div class="small mb-3 d-flex flex-column justify-content-center" style="min-height: 4.25rem;">
+                        <div th:if="${!c.drives.isEmpty()}">
+                            <div class="text-muted small mb-1" style="font-size: 0.72rem;">RECENT ROLES OFFERED:</div>
+                            <div class="fw-semibold text-truncate" th:text="${c.drives[0].roles}" th:title="${c.drives[0].roles}">Software Engineer (L3)</div>
+                            <div class="badge badge-soft-success mt-1" th:text="${c.drives[0].ctcOrStipend}">32.50 LPA</div>
+                        </div>
+                        <div th:if="${c.drives.isEmpty()}" class="text-muted small fst-italic">
+                            <span>No past campus drive records logged yet.</span>
+                        </div>
                     </div>
 
-                    <!-- Stats Badges: Visits, Recent, Difficulty Rating -->
+                    <!-- Stats Badges: Visits, Recent, Difficulty Rating (Equal height boxes) -->
                     <div class="row g-2 text-center small mb-3">
                         <div class="col-4">
-                            <div class="p-2 rounded bg-body-tertiary">
-                                <div class="text-muted" style="font-size: 0.7rem;">VISITS</div>
-                                <div class="fw-bold" th:text="${c.totalVisits + ' times'}">2 times</div>
+                            <div class="p-2 rounded bg-body-tertiary h-100 d-flex flex-column justify-content-center" style="min-height: 56px;">
+                                <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.04em;">VISITS</div>
+                                <div class="fw-bold text-truncate" th:text="${c.totalVisits + ' times'}">2 times</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="p-2 rounded bg-body-tertiary">
-                                <div class="text-muted" style="font-size: 0.7rem;">MOST RECENT</div>
-                                <div class="fw-bold" th:text="${c.mostRecentVisit}">Aug 2025</div>
+                            <div class="p-2 rounded bg-body-tertiary h-100 d-flex flex-column justify-content-center" style="min-height: 56px;">
+                                <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.04em;">MOST RECENT</div>
+                                <div class="fw-bold text-truncate" th:text="${c.mostRecentVisit}" th:title="${c.mostRecentVisit}">Aug 2025</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="p-2 rounded bg-body-tertiary">
-                                <div class="text-muted" style="font-size: 0.7rem;">DIFFICULTY</div>
-                                <div class="fw-bold text-warning">
-                                    <i class="bi bi-star-fill text-warning"></i> <span th:text="${c.averageDifficulty}">4.8</span>
+                            <div class="p-2 rounded bg-body-tertiary h-100 d-flex flex-column justify-content-center" style="min-height: 56px;">
+                                <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.04em;">DIFFICULTY</div>
+                                <div class="fw-bold text-warning text-nowrap">
+                                    <i class="bi bi-star-fill text-warning me-1" style="font-size: 0.75rem;"></i><span th:text="${c.averageDifficulty}">4.8</span>
                                 </div>
                             </div>
                         </div>

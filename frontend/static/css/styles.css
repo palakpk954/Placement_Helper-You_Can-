@@ -346,12 +346,36 @@ a:hover {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    padding: 0.4rem;
+    padding: 0.45rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+[data-bs-theme="dark"] .company-logo-frame {
+    background-color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 .company-logo-frame img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+}
+
+.company-fallback-badge {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .badge-soft {
@@ -657,6 +681,14 @@ a:hover {
     .custom-navbar .navbar-nav .nav-link:hover,
     .custom-navbar .navbar-nav .nav-link.active {
         background-color: var(--primary-light);
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+    .custom-navbar .navbar-nav .nav-link {
+        font-size: 0.84rem;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
     }
 }
 

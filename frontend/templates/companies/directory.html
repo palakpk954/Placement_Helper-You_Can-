@@ -64,34 +64,42 @@
 
                 <!-- Row 2: Multi-faceted filters (Collapsible on Mobile, always open on Desktop) -->
                 <div class="collapse d-md-block" id="advancedFiltersCollapse">
-                    <div class="row g-2 pt-2 pt-md-0 border-top border-md-0">
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label small text-muted mb-1">Industry</label>
-                            <select class="form-select form-select-sm" name="industry">
+                    <div class="row g-2 pt-2 pt-md-0 border-top border-md-0 align-items-end">
+                        <div class="col-6 col-md-4 col-lg">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex align-items-center gap-1">
+                                <i class="bi bi-briefcase text-primary"></i> Industry
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" name="industry">
                                 <option value="ALL">All Industries</option>
                                 <option th:each="ind : ${allIndustries}" th:value="${ind}" th:text="${ind}" th:selected="${selectedIndustry == ind}">IT Services</option>
                             </select>
                         </div>
 
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label small text-muted mb-1">Visit Year</label>
-                            <select class="form-select form-select-sm" name="year">
+                        <div class="col-6 col-md-4 col-lg">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex align-items-center gap-1">
+                                <i class="bi bi-calendar-event text-primary"></i> Visit Year
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" name="year">
                                 <option value="">All Years</option>
                                 <option th:each="y : ${allYears}" th:value="${y}" th:text="${y}" th:selected="${selectedYear == y}">2026</option>
                             </select>
                         </div>
 
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label small text-muted mb-1">Visit Month</label>
-                            <select class="form-select form-select-sm" name="month">
+                        <div class="col-6 col-md-4 col-lg">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex align-items-center gap-1">
+                                <i class="bi bi-calendar3 text-primary"></i> Visit Month
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" name="month">
                                 <option value="ALL">All Months</option>
                                 <option th:each="m : ${allMonths}" th:value="${m}" th:text="${m}" th:selected="${selectedMonth == m}">August</option>
                             </select>
                         </div>
 
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label small text-muted mb-1">Job Type</label>
-                            <select class="form-select form-select-sm" name="jobType">
+                        <div class="col-6 col-md-4 col-lg">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex align-items-center gap-1">
+                                <i class="bi bi-award text-primary"></i> Job Type
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" name="jobType">
                                 <option value="ALL">All Job Types</option>
                                 <option value="PLACEMENT" th:selected="${selectedJobType == 'PLACEMENT'}">Placement Only</option>
                                 <option value="INTERNSHIP" th:selected="${selectedJobType == 'INTERNSHIP'}">Internship Only</option>
@@ -99,9 +107,11 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label small text-muted mb-1">Eligible Branch</label>
-                            <select class="form-select form-select-sm" name="branch">
+                        <div class="col-6 col-md-4 col-lg">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex align-items-center gap-1">
+                                <i class="bi bi-mortarboard text-primary"></i> Branch
+                            </label>
+                            <select class="form-select form-select-sm rounded-3" name="branch">
                                 <option value="ALL">All Branches</option>
                                 <option value="CSE" th:selected="${selectedBranch == 'CSE'}">CSE</option>
                                 <option value="IT" th:selected="${selectedBranch == 'IT'}">IT</option>
@@ -113,8 +123,11 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-6 col-md-3 col-lg-2 d-flex align-items-end">
-                            <a th:href="@{/companies}" class="btn btn-sm btn-outline-secondary w-100">Reset Filters</a>
+                        <div class="col-12 col-md-4 col-lg-auto">
+                            <a th:href="@{/companies}" class="btn btn-sm btn-outline-secondary rounded-3 px-3 w-100 d-flex align-items-center justify-content-center gap-1" style="height: 31px;" title="Reset All Filters">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                <span>Reset</span>
+                            </a>
                         </div>
                     </div>
                 </div>

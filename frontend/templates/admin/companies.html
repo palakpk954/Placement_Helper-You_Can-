@@ -89,8 +89,12 @@
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="company-logo-frame flex-shrink-0" style="width: 2.2rem; height: 2.2rem;">
-                                        <img th:if="${c.logoUrl != null and !c.logoUrl.isBlank()}" th:src="${c.logoUrl}" th:alt="${c.name}">
-                                        <span th:if="${c.logoUrl == null or c.logoUrl.isBlank()}" class="fw-bold text-primary" th:text="${#strings.substring(c.name, 0, 1)}">C</span>
+                                        <img th:if="${c.logoUrl != null and !c.logoUrl.isBlank()}" 
+                                             th:src="${c.logoUrl}" 
+                                             th:alt="${c.name}"
+                                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.classList.remove('d-none');">
+                                        <div th:class="${c.logoUrl != null and !c.logoUrl.isBlank() ? 'company-fallback-badge fs-6 d-none' : 'company-fallback-badge fs-6'}" 
+                                             th:text="${#strings.substring(c.name, 0, 1)}">C</div>
                                     </div>
                                     <strong class="text-primary" th:text="${c.name}">Google</strong>
                                 </div>

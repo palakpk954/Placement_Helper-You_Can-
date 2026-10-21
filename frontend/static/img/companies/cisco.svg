@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">
+  <rect x="6" y="24" width="6" height="24" rx="3" fill="#049FD9"/>
+  <rect x="18" y="14" width="6" height="34" rx="3" fill="#049FD9"/>
+  <rect x="30" y="24" width="6" height="24" rx="3" fill="#049FD9"/>
+  <rect x="42" y="4" width="6" height="44" rx="3" fill="#049FD9"/>
+  <rect x="54" y="24" width="6" height="24" rx="3" fill="#049FD9"/>
+  <rect x="66" y="14" width="6" height="34" rx="3" fill="#049FD9"/>
+  <rect x="78" y="24" width="6" height="24" rx="3" fill="#049FD9"/>
+  <text x="45" y="56" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="11" fill="#049FD9" text-anchor="middle" letter-spacing="2">CISCO</text>
+</svg>
