@@ -29,18 +29,24 @@
                 <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="btn btn-outline-danger rounded-pill px-3 shadow-xs btn-sm">
                     <i class="bi bi-shield-lock me-1"></i> Admin Panel
                 </a>
-                <a th:if="${myProfile != null or #authorization.expression('hasRole(''ADMIN'') or hasRole(''ALUMNI'')')}" th:href="@{/mocks}" class="btn btn-outline-success rounded-pill px-3 shadow-sm btn-sm">
+                <a sec:authorize="hasRole('ALUMNI')" th:href="@{/alumni/dashboard}" class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm">
+                    <i class="bi bi-speedometer2 me-1"></i> Mentor Cockpit
+                </a>
+                <a sec:authorize="hasRole('ALUMNI')" th:href="@{/mocks}" class="btn btn-outline-success rounded-pill px-3 shadow-sm btn-sm">
                     <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
                 </a>
-                <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
+                <button sec:authorize="hasRole('ALUMNI') or hasRole('ADMIN')" class="btn btn-outline-primary rounded-pill px-3 shadow-sm btn-sm" data-bs-toggle="collapse" data-bs-target="#profileCollapse">
                     <i class="bi bi-pencil-square me-1"></i>
                     <span th:text="${myProfile != null ? 'Edit My Mentor Profile' : 'Opt-In as Alumni Mentor'}">Edit My Mentor Profile</span>
                 </button>
+                <a sec:authorize="hasRole('STUDENT')" th:href="@{/contribute}" class="btn btn-outline-primary rounded-pill px-3 shadow-sm btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Share Experience
+                </a>
             </div>
         </div>
 
-        <!-- Active Mentor Callout -->
-        <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between p-3 rounded-3 shadow-xs mb-4" th:if="${myProfile != null}">
+        <!-- Active Mentor Callout (Only for verified ALUMNI) -->
+        <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between p-3 rounded-3 shadow-xs mb-4" sec:authorize="hasRole('ALUMNI')" th:if="${myProfile != null}">
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-patch-check-fill text-success fs-4"></i>
                 <div>
@@ -49,6 +55,9 @@
                 </div>
             </div>
             <div class="d-flex gap-2 mt-2 mt-sm-0">
+                <a th:href="@{/alumni/dashboard}" class="btn btn-sm btn-primary rounded-pill px-3 text-nowrap">
+                    <i class="bi bi-speedometer2 me-1"></i> Open Cockpit
+                </a>
                 <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 text-nowrap">
                     <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
                 </a>

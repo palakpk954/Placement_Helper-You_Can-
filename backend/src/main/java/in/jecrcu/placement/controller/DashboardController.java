@@ -46,7 +46,8 @@ public class DashboardController {
 
         User user = userService.findById(userDetails.getId()).orElse(null);
         model.addAttribute("currentUser", user);
-        model.addAttribute("isAdminPreview", isStudentPreview);
+        model.addAttribute("isAdminPreview", isAdmin && isStudentPreview);
+        model.addAttribute("isAlumniPreview", isAlumni && isStudentPreview);
 
         // 1. Upcoming drives with eligibility
         var upcomingEligible = eligibilityService.evaluateAllUpcoming(

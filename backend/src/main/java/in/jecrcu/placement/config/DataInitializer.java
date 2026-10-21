@@ -18,6 +18,7 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final in.jecrcu.placement.repository.AlumniProfileRepository alumniProfileRepository;
     private final in.jecrcu.placement.repository.NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
@@ -42,8 +43,14 @@ public class DataInitializer implements CommandLineRunner {
             log.error("Failed to initialize storage directories: {}", e.getMessage());
         }
 
-        // 2. Ensure initial seed accounts have valid encoded passwords & roles
+        // 2. Unconditionally normalize roles and clean up any student alumni profiles in database
         try {
+            jdbcTemplate.update("UPDATE users SET role = 'ROLE_ADMIN' WHERE LOWER(email) = 'admin@jecrcu.edu.in'");
+            jdbcTemplate.update("UPDATE users SET role = 'ROLE_STUDENT' WHERE LOWER(email) IN ('rahul.sharma@jecrcu.edu.in', 'priya.verma@jecrcu.edu.in')");
+            jdbcTemplate.update("UPDATE users SET role = 'ROLE_ALUMNI' WHERE LOWER(email) IN ('alumni.amit@jecrcu.edu.in', 'sneha.patel@jecrcu.edu.in', 'rohit.meena@jecrcu.edu.in')");
+            jdbcTemplate.update("DELETE FROM alumni_profiles WHERE user_id IN (SELECT id FROM users WHERE role = 'ROLE_STUDENT')");
+            log.info("Normalized roles for all seed users and purged student alumni profiles via SQL");
+
             List<User> users = userRepository.findAll();
             for (User user : users) {
                 String expectedPassword = "password123";
@@ -56,18 +63,13 @@ public class DataInitializer implements CommandLineRunner {
                            "sneha.patel@jecrcu.edu.in".equalsIgnoreCase(user.getEmail()) ||
                            "rohit.meena@jecrcu.edu.in".equalsIgnoreCase(user.getEmail())) {
                     expectedPassword = "mentor123";
-                    if (user.getRole() != in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI) {
-                        user.setRole(in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI);
-                    }
                 }
 
-                // If password doesn't match expected BCrypt encoding, update it
-                if (!passwordEncoder.matches(expectedPassword, user.getPassword()) ||
-                    ("alumni.amit@jecrcu.edu.in".equalsIgnoreCase(user.getEmail()) && user.getRole() != in.jecrcu.placement.entity.enums.Role.ROLE_ALUMNI)) {
+                if (!passwordEncoder.matches(expectedPassword, user.getPassword())) {
                     user.setPassword(passwordEncoder.encode(expectedPassword));
                     user.setEmailVerified(true);
                     userRepository.save(user);
-                    log.info("Normalized seed password and role for user: {}", user.getEmail());
+                    log.info("Normalized seed password for user: {}", user.getEmail());
                 }
             }
         } catch (Exception e) {

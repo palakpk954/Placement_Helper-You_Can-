@@ -18,10 +18,25 @@
             </div>
             <div class="d-flex gap-2 mt-2 mt-md-0">
                 <a th:href="@{/alumni}" class="btn btn-outline-info rounded-pill px-3 py-1 btn-sm">
-                    <i class="bi bi-person-badge me-1"></i> Switch to Alumni View
+                    <i class="bi bi-person-badge me-1"></i> Alumni Directory
                 </a>
                 <a th:href="@{/admin}" class="btn btn-danger rounded-pill px-3 py-1 btn-sm">
-                    <i class="bi bi-shield-lock me-1"></i> Exit to Admin Panel
+                    <i class="bi bi-shield-lock me-1"></i> Return to Admin Panel
+                </a>
+            </div>
+        </div>
+
+        <!-- Mentor Preview Mode Banner (Alumni viewing student experience) -->
+        <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center py-2 px-3 mb-3 rounded-3 shadow-xs border-info" th:if="${isAlumniPreview}">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-mortarboard-fill fs-5 text-info"></i>
+                <div>
+                    <strong>Mentor Preview Mode:</strong> You are currently previewing the portal through the <strong>Junior Student View</strong>.
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-md-0">
+                <a th:href="@{/alumni/dashboard}" class="btn btn-primary rounded-pill px-3 py-1 btn-sm">
+                    <i class="bi bi-mortarboard me-1"></i> Return to Mentor Cockpit
                 </a>
             </div>
         </div>
@@ -54,7 +69,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-flex flex-wrap gap-2" th:if="${!isAdminPreview}" sec:authorize="hasRole('STUDENT')">
+                <div class="d-flex flex-wrap gap-2" th:if="${!isAdminPreview and !isAlumniPreview}" sec:authorize="hasRole('STUDENT')">
                     <a th:href="@{/contribute}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
                         <i class="bi bi-plus-circle me-1"></i> Share Experience
                     </a>
@@ -62,12 +77,12 @@
                         <i class="bi bi-lightning-charge me-1"></i> Practice Mode
                     </a>
                 </div>
-                <div class="d-flex flex-wrap gap-2" th:if="${!isAdminPreview}" sec:authorize="hasRole('ALUMNI')">
+                <div class="d-flex flex-wrap gap-2" th:if="${!isAdminPreview and !isAlumniPreview}" sec:authorize="hasRole('ALUMNI')">
                     <a th:href="@{/mocks}" class="btn btn-sm btn-success rounded-pill px-3 shadow-xs">
                         <i class="bi bi-calendar-plus me-1"></i> Host Mock Slots
                     </a>
-                    <a th:href="@{/alumni}" class="btn btn-sm btn-outline-info rounded-pill px-3">
-                        <i class="bi bi-person-badge me-1"></i> Mentor Directory
+                    <a th:href="@{/alumni/dashboard}" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                        <i class="bi bi-speedometer2 me-1"></i> Mentor Cockpit
                     </a>
                     <a th:href="@{/contribute}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
                         <i class="bi bi-plus-circle me-1"></i> Share Experience
@@ -78,11 +93,16 @@
                         <i class="bi bi-arrow-left me-1"></i> Return to Admin Panel
                     </a>
                 </div>
+                <div class="d-flex gap-2" th:if="${isAlumniPreview}">
+                    <a th:href="@{/alumni/dashboard}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
+                        <i class="bi bi-arrow-left me-1"></i> Return to Mentor Cockpit
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Alumni Mentor Welcome Cockpit Banner -->
-        <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center py-3 px-4 mb-3 rounded-3 shadow-xs border-info" sec:authorize="hasRole('ALUMNI')" th:if="${!isAdminPreview}">
+        <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center py-3 px-4 mb-3 rounded-3 shadow-xs border-info" sec:authorize="hasRole('ALUMNI')" th:if="${!isAdminPreview and !isAlumniPreview}">
             <div class="d-flex align-items-center gap-3">
                 <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center p-2 flex-shrink-0" style="width: 2.75rem; height: 2.75rem;">
                     <i class="bi bi-mortarboard-fill fs-4"></i>

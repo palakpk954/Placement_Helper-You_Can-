@@ -14,9 +14,15 @@
             <p class="text-muted mb-4">
                 The application encountered an unexpected issue while processing your request. Please return to the dashboard or try again.
             </p>
-            <div class="d-flex justify-content-center gap-3">
-                <a th:href="@{/dashboard}" class="btn btn-primary rounded-pill px-4">
-                    <i class="bi bi-speedometer2 me-1"></i> Go to Dashboard
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')" class="btn btn-danger rounded-pill px-4 shadow-xs">
+                    <i class="bi bi-shield-lock me-1"></i> Admin Dashboard
+                </a>
+                <a th:href="@{/alumni/dashboard}" sec:authorize="hasRole('ALUMNI')" class="btn btn-primary rounded-pill px-4 shadow-xs">
+                    <i class="bi bi-mortarboard me-1"></i> Mentor Cockpit
+                </a>
+                <a th:href="@{/dashboard}" sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI')" class="btn btn-primary rounded-pill px-4 shadow-xs">
+                    <i class="bi bi-speedometer2 me-1"></i> Student Dashboard
                 </a>
                 <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4">
                     Go Back

@@ -25,8 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         boolean hasApprovedExp = experienceRepository.countApprovedByAuthorId(user.getId()) > 0;
-        boolean isMentor = user.getRole() == Role.ROLE_ALUMNI ||
-                alumniProfileRepository.findByUserId(user.getId()).isPresent();
+        boolean isMentor = user.getRole() == Role.ROLE_ALUMNI;
         return new CustomUserDetails(user, hasApprovedExp, isMentor);
     }
 }

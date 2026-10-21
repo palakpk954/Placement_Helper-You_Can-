@@ -3,6 +3,7 @@ package in.jecrcu.placement.controller;
 import in.jecrcu.placement.config.CustomUserDetails;
 import in.jecrcu.placement.entity.*;
 import in.jecrcu.placement.entity.enums.BookingStatus;
+import in.jecrcu.placement.entity.enums.Role;
 import in.jecrcu.placement.entity.enums.SlotStatus;
 import in.jecrcu.placement.repository.CommentRepository;
 import in.jecrcu.placement.repository.UpcomingDriveRepository;
@@ -128,6 +129,11 @@ public class AlumniController {
 
         User user = userService.findById(userDetails.getId()).orElse(null);
         if (user != null) {
+            if (user.getRole() == Role.ROLE_STUDENT) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Only graduated alumni and placed seniors can register as alumni mentors. Current students can share placement experiences under Contribute Experience.");
+                return "redirect:/alumni";
+            }
             try {
                 alumniService.saveProfile(user, companyName.trim(), jobRole.trim(), graduationYear, branch.trim(),
                         linkedinUrl != null ? linkedinUrl.trim() : null,

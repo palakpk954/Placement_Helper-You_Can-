@@ -45,13 +45,10 @@ public class CustomUserDetails implements UserDetails {
         this.role = user.getRole();
         this.emailVerified = user.getEmailVerified() != null && user.getEmailVerified();
         this.hasApprovedExperience = hasApprovedExperience;
-        this.mentor = isMentor || user.getRole() == Role.ROLE_ALUMNI;
+        this.mentor = user.getRole() == Role.ROLE_ALUMNI;
 
         List<GrantedAuthority> authList = new java.util.ArrayList<>();
         authList.add(new SimpleGrantedAuthority(user.getRole().name()));
-        if (this.mentor && !user.getRole().name().equals("ROLE_ALUMNI")) {
-            authList.add(new SimpleGrantedAuthority("ROLE_ALUMNI"));
-        }
         this.authorities = java.util.Collections.unmodifiableList(authList);
     }
 

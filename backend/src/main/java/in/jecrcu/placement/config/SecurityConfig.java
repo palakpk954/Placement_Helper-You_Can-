@@ -99,6 +99,27 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**", "/api/**")
             )
+            .exceptionHandling(ex -> ex
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    org.springframework.security.core.Authentication auth =
+                            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null) {
+                        boolean isAlumni = auth.getAuthorities().stream().anyMatch(a -> "ROLE_ALUMNI".equals(a.getAuthority()));
+                        if (isAlumni) {
+                            request.getSession().setAttribute("errorMessage", "Access to Administrator tools is restricted to Placement Cell Coordinators.");
+                            response.sendRedirect("/alumni/dashboard");
+                            return;
+                        }
+                        boolean isStudent = auth.getAuthorities().stream().anyMatch(a -> "ROLE_STUDENT".equals(a.getAuthority()));
+                        if (isStudent) {
+                            request.getSession().setAttribute("errorMessage", "Access to Administrator tools is restricted to Placement Cell Coordinators.");
+                            response.sendRedirect("/dashboard");
+                            return;
+                        }
+                    }
+                    response.sendRedirect("/login");
+                })
+            )
             .headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
             );
