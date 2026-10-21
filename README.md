@@ -14,7 +14,7 @@
 
 **A production-grade, privacy-first university recruitment intelligence engine and placement preparation suite designed for JECRC University students, placed alumni mentors, and institutional placement cell administrators.**
 
-[📘 Master Documentation](DOCUMENTATION.md) • [📜 Changelog](docs/CHANGELOG.md) • [🏗 Architecture](docs/ARCHITECTURE.md) • [Explore Features](#-feature-matrix--deep-dive) • [Local Setup](#-installation--local-deployment) • [API Routes](#-api--route-catalogue)
+[📘 Master Documentation](DOCUMENTATION.md) • [🗺️ Visual Sitemap](SITEMAP.md) • [📜 Changelog](docs/CHANGELOG.md) • [🏗 Architecture](docs/ARCHITECTURE.md) • [Explore Features](#-feature-matrix--deep-dive) • [Local Setup](#-installation--local-deployment) • [API Routes](#-api--route-catalogue)
 
 </div>
 

@@ -11,7 +11,7 @@ This document serves as the **single source of truth** and **living development 
 - All technical bug fixes, troubleshooting decisions, and configuration changes.
 - Operational guides for testing, running, and extending the platform.
 
-Whenever changes or new features are introduced to the repository, this file and the companion documents in the [`docs/`](./docs/) directory are updated to reflect the exact state of the codebase.
+Whenever changes or new features are introduced to the repository, this file, the [🗺️ Visual Sitemap](SITEMAP.md), and the companion documents in the [`docs/`](./docs/) directory are updated to reflect the exact state of the codebase.
 
 ---
 
