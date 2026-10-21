@@ -1,26 +1,82 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
 <head>
-    <title>Placement Analytics &amp; Statistics — You_can JECRC</title>
+    <title>Official Placement Records &amp; Intelligence — You_can JECRC</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div class="container">
+    <div class="container-xxl px-3 px-md-4 py-2">
 
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h3 class="fw-bold mb-1">Campus Placement Intelligence &amp; Analytics</h3>
-            <p class="text-muted small mb-0">Interactive visual trends, compensation packages, and branch statistics for JECRC University.</p>
+        <!-- ==========================================
+             OFFICIAL HERO SHOWCASE BANNER
+             ========================================== -->
+        <div class="app-card p-4 p-lg-5 mb-4 shadow-sm border-0 position-relative overflow-hidden" 
+             style="background: linear-gradient(135deg, rgba(222, 24, 25, 0.05) 0%, rgba(29, 78, 216, 0.05) 100%); border-left: 5px solid #DE1819 !important;">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-danger-subtle text-danger small fw-bold mb-3">
+                        <i class="bi bi-patch-check-fill"></i> Official JECRC University Verified Placement Records
+                    </div>
+                    <h2 class="fw-extrabold text-dark tracking-tight mb-2">Campus Placement Intelligence &amp; Track Record</h2>
+                    <p class="text-muted lead fs-6 mb-4">
+                        Comprehensive year-wise hiring statistics, compensation benchmarks, and marquee recruiter datasets directly from the Training &amp; Placement Cell of JECRC Foundation.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 gap-md-3">
+                        <span class="badge bg-white text-dark border shadow-xs py-2 px-3 rounded-pill small">
+                            <i class="bi bi-clock-history text-danger me-1"></i> 230 Days Placement Season
+                        </span>
+                        <span class="badge bg-white text-dark border shadow-xs py-2 px-3 rounded-pill small">
+                            <i class="bi bi-person-check text-primary me-1"></i> 500+ Hours Industry Mentorship
+                        </span>
+                        <span class="badge bg-white text-dark border shadow-xs py-2 px-3 rounded-pill small">
+                            <i class="bi bi-building-check text-success me-1"></i> 200+ Corporate Recruiters
+                        </span>
+                        <span class="badge bg-white text-dark border shadow-xs py-2 px-3 rounded-pill small">
+                            <i class="bi bi-trophy-fill text-warning me-1"></i> 12,000+ Offers (Last 5 Years)
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="bg-white p-4 rounded-4 shadow-sm border text-center">
+                        <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.08em;">All-Time Highest Campus Package</span>
+                        <div class="display-5 fw-extrabold text-danger my-1" th:text="${officialHighlights['allTimeHighestPackage']}">₹52.00 LPA</div>
+                        <div class="small text-muted mb-3">Offered by <strong class="text-dark">Microsoft &amp; Atlassian</strong></div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-around text-center pt-2">
+                            <div>
+                                <div class="fs-5 fw-bold text-primary" th:text="${officialHighlights['currentHighestPackage']}">₹33.00 LPA</div>
+                                <span class="small text-muted" style="font-size: 0.72rem;">2025-26 Peak</span>
+                            </div>
+                            <div class="vr"></div>
+                            <div>
+                                <div class="fs-5 fw-bold text-success" th:text="${officialHighlights['top30PercentAvgPackage']}">₹10.70 LPA</div>
+                                <span class="small text-muted" style="font-size: 0.72rem;">Top 30% Avg</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- 5 Metric Cards -->
+        <!-- ==========================================
+             KEY PERFORMANCE METRIC CARDS
+             ========================================== -->
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
             <div class="col">
                 <div class="stat-widget h-100">
                     <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-building"></i></div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
+                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">40+</div>
                         <div class="small text-muted">Recruiters Registered</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-widget h-100">
+                    <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0 text-danger" th:text="${officialHighlights['currentBatchOffers']}">2,104+</div>
+                        <div class="small text-muted">AY 2025-26 Offers</div>
                     </div>
                 </div>
             </div>
@@ -28,8 +84,17 @@
                 <div class="stat-widget h-100">
                     <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-cash-stack"></i></div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['highestPackage']}">48.0 LPA</div>
+                        <div class="fs-4 fw-bold mb-0 text-success" th:text="${overallStats['highestPackage']}">52.0 LPA</div>
                         <div class="small text-muted">Highest Campus Package</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-widget h-100">
+                    <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <div class="fs-4 fw-bold mb-0 text-warning" th:text="${officialHighlights['fortune500Offers']}">856</div>
+                        <div class="small text-muted">Fortune 500 Offers</div>
                     </div>
                 </div>
             </div>
@@ -37,31 +102,144 @@
                 <div class="stat-widget h-100">
                     <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-graph-up-arrow"></i></div>
                     <div>
-                        <div class="fs-4 fw-bold mb-0 text-info" th:text="${overallStats['averagePackage']}">14.2 LPA</div>
-                        <div class="small text-muted">Average Campus Package</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="stat-widget h-100">
-                    <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-trophy"></i></div>
-                    <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,475</div>
-                        <div class="small text-muted">Total Selections</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="stat-widget h-100">
-                    <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-stopwatch"></i></div>
-                    <div>
-                        <div class="fs-4 fw-bold mb-0" th:text="${overallStats['averageRounds']}">3.5</div>
-                        <div class="small text-muted">Avg Rounds per Drive</div>
+                        <div class="fs-4 fw-bold mb-0 text-info" th:text="${officialHighlights['technicalAvgPackage']}">6.45 LPA</div>
+                        <div class="small text-muted">Tech Stream Average</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- ==========================================
+             ACADEMIC STREAM COMPENSATION BENCHMARKS
+             ========================================== -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="app-card p-3 h-100 border-start border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-cpu text-primary me-2"></i>Technical / IT</span>
+                        <span class="badge bg-primary-subtle text-primary">B.Tech / MCA</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <div>
+                            <span class="text-muted small d-block">Average Package</span>
+                            <span class="fs-5 fw-bold text-dark" th:text="${officialHighlights['technicalAvgPackage']}">₹ 6.45 LPA</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Highest Package</span>
+                            <span class="fs-5 fw-bold text-primary">₹ 33.00 LPA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="app-card p-3 h-100 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-briefcase text-success me-2"></i>Management</span>
+                        <span class="badge bg-success-subtle text-success">MBA / BBA</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <div>
+                            <span class="text-muted small d-block">Average Package</span>
+                            <span class="fs-5 fw-bold text-dark" th:text="${officialHighlights['managementAvgPackage']}">₹ 7.00 LPA</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Highest Package</span>
+                            <span class="fs-5 fw-bold text-success">₹ 11.00 LPA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="app-card p-3 h-100 border-start border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-gear text-warning me-2"></i>Core Engineering</span>
+                        <span class="badge bg-warning-subtle text-warning">ME / CE / ECE</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <div>
+                            <span class="text-muted small d-block">Average Package</span>
+                            <span class="fs-5 fw-bold text-dark" th:text="${officialHighlights['coreAvgPackage']}">₹ 5.00 LPA</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Highest Package</span>
+                            <span class="fs-5 fw-bold text-warning">₹ 13.80 LPA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="app-card p-3 h-100 border-start border-4 border-info">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-award text-info me-2"></i>Skill-Based</span>
+                        <span class="badge bg-info-subtle text-info">Sciences &amp; Allied</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <div>
+                            <span class="text-muted small d-block">Average Package</span>
+                            <span class="fs-5 fw-bold text-dark" th:text="${officialHighlights['skillAvgPackage']}">₹ 4.00 LPA</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Highest Package</span>
+                            <span class="fs-5 fw-bold text-info">₹ 6.50 LPA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             INTERACTIVE YEAR-WISE PLACEMENT RECORDS
+             ========================================== -->
+        <div class="app-card p-4 shadow-sm mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        <i class="bi bi-table text-primary me-2"></i>Official Recruiter &amp; Package Directory
+                    </h4>
+                    <p class="text-muted small mb-0">Browse through 900+ verified corporate selection records across 7 placement seasons.</p>
+                </div>
+                
+                <!-- Instant Live Search Input -->
+                <div class="d-flex align-items-center gap-2" style="max-width: 380px; width: 100%;">
+                    <div class="input-group shadow-xs">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="recordSearchInput" class="form-control border-start-0 ps-0" 
+                               placeholder="Search company (e.g. Amazon, ServiceNow, TCS)..."
+                               th:value="${searchQuery}"
+                               hx-get="/statistics/records-fragment"
+                               hx-trigger="keyup changed delay:250ms, search"
+                               hx-target="#recordsTableContainer"
+                               hx-include="#selectedYearInput"
+                               name="search">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden input for HTMX to include current active year -->
+            <input type="hidden" id="selectedYearInput" name="year" th:value="${selectedYear}">
+
+            <!-- Academic Year Filter Pills -->
+            <ul class="nav nav-pills gap-2 mb-3 pb-2 border-bottom flex-nowrap overflow-x-auto" id="academicYearTabs" style="scrollbar-width: thin;">
+                <li class="nav-item" th:each="yr : ${officialYears}">
+                    <button class="nav-link rounded-pill px-3 py-1 small fw-semibold text-nowrap"
+                            th:classappend="${yr == selectedYear ? 'active bg-primary' : 'bg-light text-secondary border'}"
+                            th:text="${'Batch ' + yr}"
+                            th:attr="data-year=${yr}"
+                            onclick="switchYear(this)">
+                        Batch 2025-26
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Records Table Container (Dynamic via HTMX) -->
+            <div id="recordsTableContainer" th:replace="~{statistics/fragments/records_table :: recordsTable}">
+                <!-- Table replacement point -->
+            </div>
+        </div>
+
+        <!-- ==========================================
+             VISUAL CHARTS (ANALYTICS & TRENDS)
+             ========================================== -->
         <!-- Row 1: Charts (Companies per Year & Package Trends) -->
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
@@ -141,6 +319,26 @@
         </div>
 
     </div>
+
+    <!-- Switch Year Script -->
+    <script>
+        function switchYear(button) {
+            const year = button.getAttribute('data-year');
+            document.getElementById('selectedYearInput').value = year;
+            
+            // Update active styling
+            document.querySelectorAll('#academicYearTabs button').forEach(b => {
+                b.classList.remove('active', 'bg-primary');
+                b.classList.add('bg-light', 'text-secondary', 'border');
+            });
+            button.classList.remove('bg-light', 'text-secondary', 'border');
+            button.classList.add('active', 'bg-primary');
+
+            // Trigger HTMX load for this year
+            const searchVal = document.getElementById('recordSearchInput').value || '';
+            htmx.ajax('GET', '/statistics/records-fragment?year=' + encodeURIComponent(year) + '&search=' + encodeURIComponent(searchVal), '#recordsTableContainer');
+        }
+    </script>
 
     <!-- Chart.js Scripts -->
     <script th:inline="javascript">

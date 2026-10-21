@@ -1,8 +1,10 @@
 package in.jecrcu.placement.service;
 
 import in.jecrcu.placement.entity.Drive;
+import in.jecrcu.placement.entity.JecrcPlacementRecord;
 import in.jecrcu.placement.repository.CompanyRepository;
 import in.jecrcu.placement.repository.DriveRepository;
+import in.jecrcu.placement.repository.JecrcPlacementRecordRepository;
 import in.jecrcu.placement.repository.QuestionRepository;
 import in.jecrcu.placement.repository.RoundRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class StatsService {
     private final CompanyRepository companyRepository;
     private final RoundRepository roundRepository;
     private final QuestionRepository questionRepository;
+    private final JecrcPlacementRecordRepository jecrcPlacementRecordRepository;
 
     public Map<String, Object> getOverallStats() {
         Map<String, Object> stats = new HashMap<>();
@@ -197,5 +200,80 @@ public class StatsService {
         data.put("labels", labels);
         data.put("values", values);
         return data;
+    }
+
+    public Map<String, Object> getOfficialHighlights() {
+        Map<String, Object> highlights = new LinkedHashMap<>();
+        highlights.put("fiveYearOffers", "12,000+");
+        highlights.put("annualOffers", "2,000+");
+        highlights.put("currentBatchOffers", "2,104+");
+        highlights.put("currentHighestPackage", "₹33.00 LPA");
+        highlights.put("allTimeHighestPackage", "₹52.00 LPA");
+        highlights.put("top30PercentAvgPackage", "₹10.70 LPA");
+        highlights.put("technicalAvgPackage", "₹6.45 LPA");
+        highlights.put("managementAvgPackage", "₹7.00 LPA");
+        highlights.put("coreAvgPackage", "₹5.00 LPA");
+        highlights.put("skillAvgPackage", "₹4.00 LPA");
+        highlights.put("fortune500Offers", "856");
+        highlights.put("annualRecruiters", "200+");
+        highlights.put("seasonDuration", "230 Days");
+        highlights.put("mentorshipHours", "500+ Hours");
+        return highlights;
+    }
+
+    public List<String> getOfficialAcademicYears() {
+        List<String> years = jecrcPlacementRecordRepository.findDistinctAcademicYears();
+        if (years.isEmpty()) {
+            return List.of("2025-26", "2024-25", "2023-24", "2022-23", "2021-22", "2020-21", "2019-20");
+        }
+        return years;
+    }
+
+    public List<JecrcPlacementRecord> getOfficialRecords(String academicYear, String search) {
+        if (academicYear == null || academicYear.isBlank()) {
+            academicYear = "2025-26";
+        }
+        if (search != null && !search.trim().isEmpty()) {
+            return jecrcPlacementRecordRepository.findByAcademicYearAndCompanyNameContainingIgnoreCaseOrderBySelectionsDesc(academicYear, search.trim());
+        }
+        return jecrcPlacementRecordRepository.findByAcademicYearOrderBySelectionsDesc(academicYear);
+    }
+
+    public Map<String, Map<String, Object>> getYearSummaryStats() {
+        List<String> years = getOfficialAcademicYears();
+        Map<String, Map<String, Object>> summary = new LinkedHashMap<>();
+
+        Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)");
+
+        for (String yr : years) {
+            List<JecrcPlacementRecord> records = jecrcPlacementRecordRepository.findByAcademicYearOrderBySelectionsDesc(yr);
+            Map<String, Object> yrData = new HashMap<>();
+            int totalSelections = records.stream().mapToInt(r -> r.getSelections() != null ? r.getSelections() : 0).sum();
+            double highestPkg = 0.0;
+            String topCompany = !records.isEmpty() ? records.get(0).getCompanyName() : "-";
+            int topCompanySel = !records.isEmpty() ? records.get(0).getSelections() : 0;
+
+            for (JecrcPlacementRecord r : records) {
+                if (r.getPackageLpa() != null) {
+                    Matcher m = pattern.matcher(r.getPackageLpa());
+                    while (m.find()) {
+                        try {
+                            double val = Double.parseDouble(m.group(1));
+                            if (val > highestPkg) {
+                                highestPkg = val;
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                }
+            }
+
+            yrData.put("totalRecords", records.size());
+            yrData.put("totalSelections", totalSelections);
+            yrData.put("highestPackage", highestPkg > 0 ? String.format(Locale.US, "%.1f LPA", highestPkg) : "N/A");
+            yrData.put("topRecruiter", topCompany);
+            yrData.put("topRecruiterSelections", topCompanySel);
+            summary.put(yr, yrData);
+        }
+        return summary;
     }
 }

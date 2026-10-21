@@ -1,0 +1,73 @@
+<div th:fragment="recordsTable" id="recordsTableContainer">
+    <!-- Batch Metrics Mini Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">
+                <i class="bi bi-calendar2-check me-1"></i> Batch <span th:text="${selectedYear}">2025-26</span>
+            </span>
+            <span class="text-muted small">
+                Showing <strong class="text-dark" th:text="${officialRecords != null ? officialRecords.size() : 0}">0</strong> recruitment records
+            </span>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-2 mt-sm-0">
+            <div class="small">
+                <span class="text-muted">Total Selections in Filter: </span>
+                <span class="fw-bold text-success fs-6" 
+                      th:text="${#aggregates.sum(officialRecords.![selections])}">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive rounded-3 border">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-uppercase small text-muted" style="letter-spacing: 0.05em; font-size: 0.75rem;">
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 35%;">Company Name</th>
+                    <th style="width: 25%;">Offered CTC / Stipend</th>
+                    <th style="width: 15%;" class="text-center">Selections</th>
+                    <th style="width: 20%;" class="text-end">Recruitment Tier</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${officialRecords == null or officialRecords.isEmpty()}">
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-search fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                        <h6 class="fw-bold mb-1">No recruitment records found</h6>
+                        <p class="small text-muted mb-0">Try clearing the search filter or select a different academic year.</p>
+                    </td>
+                </tr>
+                <tr th:each="r, iter : ${officialRecords}">
+                    <td class="text-muted small fw-semibold" th:text="${iter.count}">1</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 2.2rem; height: 2.2rem; font-size: 0.85rem;">
+                                <span th:text="${#strings.substring(r.companyName, 0, 1)}">S</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold text-dark d-block" th:text="${r.companyName}">ServiceNow</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">Verified On-Campus Drive</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-bold text-dark font-monospace" th:text="${r.packageLpa.toLowerCase().contains('lpa') ? r.packageLpa : (r.packageLpa.toLowerCase().contains('stipend') ? r.packageLpa : r.packageLpa + ' LPA')}">33.00 LPA</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge rounded-pill px-3 py-1 fs-6 font-monospace"
+                              th:classappend="${r.selections >= 50 ? 'bg-success text-white' : (r.selections >= 10 ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-light text-dark border')}"
+                              th:text="${r.selections}">1</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="badge rounded-pill px-2 py-1"
+                              th:classappend="${r.tier == 'Super Dream' ? 'bg-danger-subtle text-danger border border-danger-subtle' : (r.tier == 'Dream' ? 'bg-warning-subtle text-dark border border-warning-subtle' : (r.tier == 'Core & IT' ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'))}">
+                            <i class="bi me-1" th:classappend="${r.tier == 'Super Dream' ? 'bi-stars' : (r.tier == 'Dream' ? 'bi-lightning-charge-fill' : 'bi-building')}"></i>
+                            <span th:text="${r.tier}">Super Dream</span>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

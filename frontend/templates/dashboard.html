@@ -125,48 +125,56 @@
         <!-- 4 Stat Highlight Widgets -->
         <div class="row g-3 mb-3">
             <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
-                    <div class="stat-icon bg-primary-subtle text-primary">
-                        <i class="bi bi-building"></i>
+                <a th:href="@{/companies}" class="text-decoration-none">
+                    <div class="stat-widget h-100 app-card-lift">
+                        <div class="stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                            <div class="fs-5 fw-bold mb-0 text-dark" th:text="${overallStats['totalCompanies']}">40+</div>
+                            <div class="small text-muted" style="font-size: 0.8rem;">Recruiter Companies</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalCompanies']}">16</div>
-                        <div class="small text-muted" style="font-size: 0.8rem;">Visited Companies</div>
-                    </div>
-                </div>
+                </a>
             </div>
             <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
-                    <div class="stat-icon bg-success-subtle text-success">
-                        <i class="bi bi-briefcase"></i>
+                <a th:href="@{/statistics}" class="text-decoration-none">
+                    <div class="stat-widget h-100 app-card-lift">
+                        <div class="stat-icon bg-success-subtle text-success">
+                            <i class="bi bi-stars"></i>
+                        </div>
+                        <div>
+                            <div class="fs-5 fw-bold mb-0 text-success" th:text="${overallStats['highestPackage']}">52.0 LPA</div>
+                            <div class="small text-muted" style="font-size: 0.8rem;">Highest Package Record</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalDrives']}">36</div>
-                        <div class="small text-muted" style="font-size: 0.8rem;">Historical Drives</div>
-                    </div>
-                </div>
+                </a>
             </div>
             <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
-                    <div class="stat-icon bg-warning-subtle text-warning">
-                        <i class="bi bi-question-diamond"></i>
+                <a th:href="@{/statistics}" class="text-decoration-none">
+                    <div class="stat-widget h-100 app-card-lift">
+                        <div class="stat-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div>
+                            <div class="fs-5 fw-bold mb-0 text-danger" th:text="${overallStats['totalOffers']}">2,104+</div>
+                            <div class="small text-muted" style="font-size: 0.8rem;">Verified Campus Offers</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalQuestions']}">21</div>
-                        <div class="small text-muted" style="font-size: 0.8rem;">Real Questions</div>
-                    </div>
-                </div>
+                </a>
             </div>
             <div class="col-sm-6 col-lg-3">
-                <div class="stat-widget">
-                    <div class="stat-icon bg-danger-subtle text-danger">
-                        <i class="bi bi-trophy"></i>
+                <a th:href="@{/statistics}" class="text-decoration-none">
+                    <div class="stat-widget h-100 app-card-lift">
+                        <div class="stat-icon bg-info-subtle text-info">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div>
+                            <div class="fs-5 fw-bold mb-0 text-info">6.45 LPA</div>
+                            <div class="small text-muted" style="font-size: 0.8rem;">Tech Stream Avg</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="fs-5 fw-bold mb-0" th:text="${overallStats['totalOffers']}">1,120+</div>
-                        <div class="small text-muted" style="font-size: 0.8rem;">Campus Offers</div>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
 

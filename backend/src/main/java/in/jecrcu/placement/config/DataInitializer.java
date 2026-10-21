@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner {
             String[] tables = {
                 "users", "companies", "drives", "rounds", "experiences", "questions",
                 "interview_questions", "alumni_profiles", "upcoming_drives", "opportunities", "mock_slots",
-                "mock_bookings", "badges", "bookmarks", "notifications", "company_ratings"
+                "mock_bookings", "badges", "bookmarks", "notifications", "company_ratings", "jecrc_placement_records"
             };
             for (String table : tables) {
                 try {

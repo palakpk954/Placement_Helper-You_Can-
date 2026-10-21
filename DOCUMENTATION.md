@@ -254,6 +254,34 @@ Whenever changes or new features are introduced to the repository, this file and
 
 ---
 
+### Sprint 10: Official JECRC University Placement Records & Multi-Year Analytics Engine
+- **Goal**: Ingest, categorize, and render real-world verified placement records directly from the official JECRC University website (`https://jecrcuniversity.edu.in/placements/`), providing institutional KPIs and multi-year interactive hiring explorer.
+- **Key Deliverables**:
+  - **Web Scraping & Data Extraction Pipeline**:
+    - Scraped institutional datasets across all recorded academic batches: 2025–26, 2024–25, 2023–24, 2022–23, 2021–22, 2020–21, 2019–20.
+    - Extracted 941 verified recruitment entries encompassing company names, compensation packages (LPA/stipends), and student selection numbers.
+  - **Database Migration (`V5__real_jecrc_placements.sql`)**:
+    - Created table `jecrc_placement_records` indexed on `academic_year` and `company_name`.
+    - Seeded all 941 official placement records with computed compensation tier tags (*Super Dream* [>=15 LPA], *Dream* [>=8 LPA], *Core & IT* [>=5 LPA], *Mass & Elite*).
+    - Expanded recruiter directory in `companies` table to 40 verified corporate partners (ServiceNow, HPE, Autodesk, Commvault, Atlassian, Walmart Global Tech, Flipkart, Future First, ZS Associates, WatchGuard, Finastra, Vivnovation, Catalog, Blinkit, Zomato, BillDesk, Decathlon, AU Small Finance Bank, HDFC Life, Nestlé, Cyntexa, Coforge, Josh Technology, Wayfair).
+    - Seeded landmark campus recruitment drives into `drives` table with actual selection counts (ServiceNow 33 LPA, HPE 17.5 LPA, Capgemini 303 & 177 selections, Accenture 323 selections, Microsoft 52 LPA, Autodesk 41 LPA, Amazon 44 LPA [13 selections]).
+  - **Backend Entity & Repository Layer**:
+    - Implemented JPA Entity `JecrcPlacementRecord.java` and `JecrcPlacementRecordRepository.java` with queries for distinct academic years, year-wise ordering by selections, and search filtering.
+    - Enhanced `StatsService.java` with methods `getOfficialHighlights()`, `getOfficialAcademicYears()`, `getOfficialRecords()`, and `getYearSummaryStats()`.
+    - Updated `DataInitializer.java` to include `jecrc_placement_records` in primary key sequence synchronization.
+  - **Interactive Placement Analytics & Records Portal (`/statistics`)**:
+    - **Institutional Showcase Banner**: Verified metrics highlighting all-time peak package (**₹52.00 LPA** by Microsoft & Atlassian), current season peak (**₹33.00 LPA** by ServiceNow), Top 30% average (**₹10.70 LPA**), 230 placement days, 500+ mentoring hours, and 12,000+ 5-year offers.
+    - **Discipline Compensation Cards**: Technical/IT (₹6.45 LPA avg / ₹33.00 LPA max), Management (₹7.00 LPA avg / ₹11.00 LPA max), Core Engineering (₹5.00 LPA avg / ₹13.80 LPA max), and Skill-Based (₹4.00 LPA avg / ₹6.50 LPA max).
+    - **Multi-Year Explorer**: Interactive batch filter pills (`2025-26` to `2019-20`) with live HTMX instant search (`records-fragment`), company initial avatars, and tier badges.
+    - Direct top-level navigation link in `layout/base.html` for 1-click access.
+  - **Dashboard Metric Alignment**:
+    - Updated student and admin dashboard stat widgets to reflect 40+ verified recruiters, 52.0 LPA peak record, 2,104+ current season offers, and 6.45 LPA technical stream average.
+  - **Quality Assurance**:
+    - 67/67 automated end-to-end regression tests passed with zero errors.
+    - Full visual verification completed via headless browser subagent with WebP recording and screenshots.
+
+---
+
 ## 🔧 Troubleshooting & Bug Fix Journal
 
 During development and continuous verification, the following technical issues were identified, analyzed, and resolved:
