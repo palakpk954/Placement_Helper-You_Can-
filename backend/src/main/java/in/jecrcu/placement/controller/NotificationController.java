@@ -77,7 +77,7 @@ public class NotificationController {
         return "redirect:/notifications";
     }
 
-    @PostMapping("/mark-read")
+    @PostMapping({"/mark-read", "/mark-all-read"})
     public String markAllAsRead(@AuthenticationPrincipal CustomUserDetails userDetails, RedirectAttributes redirectAttributes) {
         if (userDetails != null) {
             notificationService.markAllAsRead(userDetails.getId());
