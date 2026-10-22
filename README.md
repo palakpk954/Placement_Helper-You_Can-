@@ -5,18 +5,23 @@
 [![Java Version](https://img.shields.io/badge/Java-21%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3.x-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)](https://www.thymeleaf.org/)
-[![HTMX](https://img.shields.io/badge/HTMX-Instant%20UI-3366CC?style=for-the-badge&logo=htmx&logoColor=white)](https://htmx.org/)
-[![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![CI Build](https://img.shields.io/github/actions/workflow/status/palakpk954/Placement_Helper-You_Can-/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI%20Build)](https://github.com/palakpk954/Placement_Helper-You_Can-/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-Monolithic%20SSR%20%2B%20HTMX-informational?style=for-the-badge)]()
 
 <br/>
 
 **A production-grade, privacy-first university recruitment intelligence engine and placement preparation suite designed for JECRC University students, placed alumni mentors, and institutional placement cell administrators.**
 
-[📘 Master Documentation](DOCUMENTATION.md) • [🗺️ Visual Sitemap](SITEMAP.md) • [📜 Changelog](docs/CHANGELOG.md) • [🏗 Architecture](docs/ARCHITECTURE.md) • [Explore Features](#-feature-matrix--deep-dive) • [Local Setup](#-installation--local-deployment) • [API Routes](#-api--route-catalogue)
+[📘 Master Documentation](DOCUMENTATION.md) • [🗄️ Database Schema & ERD](docs/DATABASE_SCHEMA.md) • [📊 Data Dictionary (HTML)](docs/DATABASE_SCHEMA.html) • [🏗 Architecture](docs/ARCHITECTURE.md) • [🗺️ Sitemap](SITEMAP.md) • [📥 Word Spec](You_can_Database_Schema_Specification.docx)
 
 </div>
+
+> 🚀 **Live Cloud Deployment**: [https://placement-helper-you-can.onrender.com](https://placement-helper-you-can.onrender.com) *(Hosted on Render)*  
+> 🔑 **Instant Demo Test Credentials**:
+> - **Student Role**: `student@jecrcu.edu.in` / `student123`
+> - **Alumni Mentor**: `alumni@jecrcu.edu.in` / `alumni123`
+> - **Placement Admin**: `admin@jecrcu.edu.in` / `admin123`
 
 ---
 
@@ -82,7 +87,7 @@ flowchart TD
 
     subgraph Data["Persistence & Integration Layer"]
         JPA["Spring Data JPA / Hibernate"]
-        Flyway["Flyway Migration Engine (V1, V2, V3)"]
+        Flyway["Flyway Migration Engine (V1 – V7)"]
         DB[("PostgreSQL / H2 in Postgres Mode")]
         Docs["Apache POI (Excel) & OpenPDF / PDFBox"]
     end
@@ -107,6 +112,12 @@ flowchart TD
 ## 🗄️ Database & Domain Model
 
 The relational schema is managed through versioned **Flyway database migrations** (`classpath:db/migration`), establishing complete data integrity, foreign key constraints, cascading policies, and automated indexing.
+
+> 📚 **Complete Schema Specifications & Data Dictionary**:
+> - 📄 **Technical Data Dictionary**: [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) (All 26 tables, columns, constraints, and enums)
+> - 🌐 **Interactive Browser Table & PDF Export**: [docs/DATABASE_SCHEMA.html](docs/DATABASE_SCHEMA.html) (Searchable catalog + Print to PDF)
+> - 🖼️ **Vector ER Diagram**: [docs/database_erd.svg](docs/database_erd.svg)
+> - 📥 **Downloadable Word Spec**: [You_can_Database_Schema_Specification.docx](You_can_Database_Schema_Specification.docx)
 
 ```mermaid
 erDiagram
