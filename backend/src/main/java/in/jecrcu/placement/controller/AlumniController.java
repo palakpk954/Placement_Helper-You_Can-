@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -31,8 +32,13 @@ public class AlumniController {
     private final UpcomingDriveRepository upcomingDriveRepository;
 
     @GetMapping("/dashboard")
-    public String alumniDashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    public String alumniDashboard(@AuthenticationPrincipal CustomUserDetails userDetails, HttpSession session, Model model) {
         if (userDetails == null) return "redirect:/login";
+
+        if (session != null && session.getAttribute("errorMessage") != null) {
+            model.addAttribute("errorMessage", session.getAttribute("errorMessage"));
+            session.removeAttribute("errorMessage");
+        }
 
         User user = userService.findById(userDetails.getId()).orElse(null);
         if (user == null) return "redirect:/login";

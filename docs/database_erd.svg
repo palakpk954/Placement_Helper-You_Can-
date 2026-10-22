@@ -1,0 +1,285 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 950" width="100%" height="100%" style="background-color: #0b1120; font-family: 'Inter', -apple-system, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="grad-user" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="grad-company" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="grad-prep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0e7490"/>
+    </linearGradient>
+    <linearGradient id="grad-exp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="grad-opp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="grad-admin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+
+    <!-- Markers for Arrows -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+
+    <!-- Card Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="50" y="55" font-size="26" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">You_can — Relational Database Schema &amp; Architecture</text>
+  <text x="50" y="82" font-size="14" font-weight="500" fill="#94a3b8">JECRC University Placement Portal • 26 Relational Tables • PostgreSQL / H2 Flyway Migrations (V1–V7)</text>
+
+  <!-- ========================================== -->
+  <!-- DOMAIN 1: USERS & IDENTITY (CENTER-LEFT)  -->
+  <!-- ========================================== -->
+  <g transform="translate(60, 130)" filter="url(#shadow)">
+    <!-- Box: users -->
+    <rect width="250" height="230" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+    <rect width="250" height="42" rx="10" fill="url(#grad-user)"/>
+    <text x="15" y="27" font-size="15" font-weight="700" fill="#ffffff">users (Central Entity)</text>
+    <text x="15" y="65" font-size="12" fill="#38bdf8" font-family="'JetBrains Mono', monospace">PK: id (BIGINT)</text>
+    <text x="15" y="87" font-size="12" fill="#f8fafc">email (UQ), password</text>
+    <text x="15" y="107" font-size="12" fill="#f8fafc">full_name, branch, cgpa</text>
+    <text x="15" y="127" font-size="12" fill="#f8fafc">active_backlogs, grad_year</text>
+    <text x="15" y="147" font-size="12" fill="#f8fafc">role (STUDENT, ALUMNI, ADMIN)</text>
+    <text x="15" y="167" font-size="12" fill="#f8fafc">points, email_verified</text>
+    <text x="15" y="187" font-size="11" fill="#94a3b8">verification_token, expiry</text>
+    <text x="15" y="207" font-size="11" fill="#64748b">created_at (TIMESTAMP)</text>
+  </g>
+
+  <!-- 1:1 alumni_profiles -->
+  <g transform="translate(60, 400)" filter="url(#shadow)">
+    <rect width="250" height="135" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="250" height="34" rx="8" fill="#334155"/>
+    <text x="15" y="22" font-size="13" font-weight="700" fill="#e2e8f0">alumni_profiles (1:1)</text>
+    <text x="15" y="55" font-size="11" fill="#38bdf8">PK: id | FK: user_id (UQ)</text>
+    <text x="15" y="75" font-size="11" fill="#f8fafc">company_name, job_role</text>
+    <text x="15" y="95" font-size="11" fill="#f8fafc">graduation_year, linkedin_url</text>
+    <text x="15" y="115" font-size="11" fill="#94a3b8">topics_can_help, visible</text>
+  </g>
+
+  <!-- 1:N resumes -->
+  <g transform="translate(60, 565)" filter="url(#shadow)">
+    <rect width="250" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="250" height="34" rx="8" fill="#334155"/>
+    <text x="15" y="22" font-size="13" font-weight="700" fill="#e2e8f0">resumes (1:N)</text>
+    <text x="15" y="55" font-size="11" fill="#38bdf8">PK: id | FK: user_id</text>
+    <text x="15" y="75" font-size="11" fill="#f8fafc">file_path, original_filename</text>
+    <text x="15" y="95" font-size="11" fill="#f8fafc">checklist_result_json (ATS)</text>
+    <text x="15" y="115" font-size="11" fill="#94a3b8">share_consent, uploaded_at</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- DOMAIN 2: COMPANIES & DRIVES (CENTER)      -->
+  <!-- ========================================== -->
+  <g transform="translate(420, 130)" filter="url(#shadow)">
+    <!-- Box: companies -->
+    <rect width="260" height="185" rx="10" fill="#1e293b" stroke="#8b5cf6" stroke-width="2"/>
+    <rect width="260" height="42" rx="10" fill="url(#grad-company)"/>
+    <text x="15" y="27" font-size="15" font-weight="700" fill="#ffffff">companies (Recruiters)</text>
+    <text x="15" y="65" font-size="12" fill="#c084fc" font-family="'JetBrains Mono', monospace">PK: id (BIGINT)</text>
+    <text x="15" y="87" font-size="12" fill="#f8fafc">name, slug (UNIQUE)</text>
+    <text x="15" y="107" font-size="12" fill="#f8fafc">logo_url, industry, website</text>
+    <text x="15" y="127" font-size="12" fill="#f8fafc">tier (Mass, Dream, Super Dream)</text>
+    <text x="15" y="147" font-size="11" fill="#94a3b8">description (TEXT)</text>
+    <text x="15" y="167" font-size="11" fill="#64748b">created_at (TIMESTAMP)</text>
+  </g>
+
+  <!-- Box: drives -->
+  <g transform="translate(420, 360)" filter="url(#shadow)">
+    <rect width="260" height="205" rx="10" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect width="260" height="38" rx="10" fill="#6d28d9"/>
+    <text x="15" y="25" font-size="14" font-weight="700" fill="#ffffff">drives (Past Placement Drives)</text>
+    <text x="15" y="60" font-size="11" fill="#c084fc">PK: id | FK: company_id</text>
+    <text x="15" y="80" font-size="11" fill="#f8fafc">drive_year, drive_month, roles</text>
+    <text x="15" y="100" font-size="11" fill="#f8fafc">ctc_or_stipend (e.g. 10.5 LPA)</text>
+    <text x="15" y="120" font-size="11" fill="#f8fafc">min_cgpa, eligible_branches</text>
+    <text x="15" y="140" font-size="11" fill="#f8fafc">max_backlogs, students_selected</text>
+    <text x="15" y="160" font-size="11" fill="#94a3b8">job_type, work_mode, bond</text>
+    <text x="15" y="180" font-size="11" fill="#94a3b8">conversion_offered (PPO)</text>
+  </g>
+
+  <!-- Box: upcoming_drives & drive_registrations -->
+  <g transform="translate(420, 600)" filter="url(#shadow)">
+    <rect width="260" height="150" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#334155"/>
+    <text x="15" y="23" font-size="13" font-weight="700" fill="#e2e8f0">upcoming_drives</text>
+    <text x="15" y="55" font-size="11" fill="#38bdf8">PK: id | FK: company_id (NULLABLE)</text>
+    <text x="15" y="75" font-size="11" fill="#f8fafc">company_name, drive_date, deadline</text>
+    <text x="15" y="95" font-size="11" fill="#f8fafc">roles_offered, ctc_or_stipend</text>
+    <text x="15" y="115" font-size="11" fill="#94a3b8">registration_link, active</text>
+  </g>
+
+  <g transform="translate(420, 780)" filter="url(#shadow)">
+    <rect width="260" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="260" height="32" rx="8" fill="#1e293b"/>
+    <text x="15" y="22" font-size="13" font-weight="700" fill="#38bdf8">drive_registrations (N:M)</text>
+    <text x="15" y="52" font-size="11" fill="#cbd5e1">PK: id | UQ(user_id, upcoming_drive_id)</text>
+    <text x="15" y="72" font-size="11" fill="#f8fafc">status (REGISTERED, SHORTLISTED)</text>
+    <text x="15" y="92" font-size="11" fill="#94a3b8">notes, registered_at</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- DOMAIN 3: ROUNDS & QUESTIONS (RIGHT)       -->
+  <!-- ========================================== -->
+  <g transform="translate(760, 360)" filter="url(#shadow)">
+    <!-- Box: rounds -->
+    <rect width="260" height="150" rx="10" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+    <rect width="260" height="38" rx="10" fill="url(#grad-prep)"/>
+    <text x="15" y="25" font-size="14" font-weight="700" fill="#ffffff">rounds (Interview Stages)</text>
+    <text x="15" y="60" font-size="11" fill="#22d3ee">PK: id | FK: drive_id</text>
+    <text x="15" y="80" font-size="11" fill="#f8fafc">round_number, name</text>
+    <text x="15" y="100" font-size="11" fill="#f8fafc">round_type (ONLINE_TEST, TECH, HR)</text>
+    <text x="15" y="120" font-size="11" fill="#94a3b8">duration_minutes, difficulty</text>
+  </g>
+
+  <g transform="translate(760, 550)" filter="url(#shadow)">
+    <!-- Box: questions -->
+    <rect width="260" height="165" rx="10" fill="#1e293b" stroke="#06b6d4" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#0e7490"/>
+    <text x="15" y="23" font-size="13" font-weight="700" fill="#ffffff">questions (Question Bank)</text>
+    <text x="15" y="55" font-size="11" fill="#22d3ee">PK: id | FK: round_id</text>
+    <text x="15" y="75" font-size="11" fill="#f8fafc">question_text (TEXT)</text>
+    <text x="15" y="95" font-size="11" fill="#f8fafc">topic_tags (DSA, SQL, DP)</text>
+    <text x="15" y="115" font-size="11" fill="#f8fafc">difficulty (EASY, MEDIUM, HARD)</text>
+    <text x="15" y="135" font-size="11" fill="#94a3b8">answer_or_hint, created_at</text>
+  </g>
+
+  <g transform="translate(760, 755)" filter="url(#shadow)">
+    <!-- Box: practice_attempts -->
+    <rect width="260" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="260" height="30" rx="8" fill="#1e293b"/>
+    <text x="15" y="21" font-size="12" font-weight="700" fill="#22d3ee">practice_attempts</text>
+    <text x="15" y="50" font-size="11" fill="#94a3b8">PK: id | UQ(user_id, question_id)</text>
+    <text x="15" y="70" font-size="11" fill="#f8fafc">status (SOLVED, ATTEMPTED)</text>
+    <text x="15" y="90" font-size="11" fill="#94a3b8">notes, updated_at</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- DOMAIN 4: EXPERIENCES & REVIEWS (TOP-RIGHT)-->
+  <!-- ========================================== -->
+  <g transform="translate(1080, 130)" filter="url(#shadow)">
+    <!-- Box: experiences -->
+    <rect width="270" height="210" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+    <rect width="270" height="42" rx="10" fill="url(#grad-exp)"/>
+    <text x="15" y="27" font-size="14" font-weight="700" fill="#ffffff">experiences (Debriefs)</text>
+    <text x="15" y="65" font-size="11" fill="#34d399">PK: id | FK: drive_id, author_id</text>
+    <text x="15" y="85" font-size="11" fill="#f8fafc">title, content (TEXT)</text>
+    <text x="15" y="105" font-size="11" fill="#f8fafc">tips, mistakes_to_avoid</text>
+    <text x="15" y="125" font-size="11" fill="#f8fafc">outcome (SELECTED, REJECTED)</text>
+    <text x="15" y="145" font-size="11" fill="#f8fafc">difficulty_rating (1..5), upvotes</text>
+    <text x="15" y="165" font-size="11" fill="#fbbf24">status (PENDING, APPROVED)</text>
+    <text x="15" y="185" font-size="11" fill="#94a3b8">is_anonymous, created_at</text>
+  </g>
+
+  <!-- Box: difficulty_votes & comments -->
+  <g transform="translate(1080, 380)" filter="url(#shadow)">
+    <rect width="270" height="110" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="270" height="32" rx="8" fill="#334155"/>
+    <text x="15" y="22" font-size="13" font-weight="700" fill="#e2e8f0">difficulty_votes (1..5 Stars)</text>
+    <text x="15" y="52" font-size="11" fill="#38bdf8">UQ(company_id, user_id)</text>
+    <text x="15" y="72" font-size="11" fill="#f8fafc">rating (1..5 CHECK)</text>
+    <text x="15" y="92" font-size="11" fill="#94a3b8">created_at (TIMESTAMP)</text>
+  </g>
+
+  <g transform="translate(1080, 520)" filter="url(#shadow)">
+    <rect width="270" height="120" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect width="270" height="32" rx="8" fill="#334155"/>
+    <text x="15" y="22" font-size="13" font-weight="700" fill="#e2e8f0">comments (Threaded)</text>
+    <text x="15" y="52" font-size="11" fill="#38bdf8">PK: id | FK: company_id, author_id</text>
+    <text x="15" y="72" font-size="11" fill="#38bdf8">FK: parent_id (Self Recursive)</text>
+    <text x="15" y="92" font-size="11" fill="#f8fafc">content (TEXT), status</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- DOMAIN 5 & 6: ROADMAPS, MOCKS, OPPs (BOTTOM) -->
+  <!-- ========================================== -->
+  <g transform="translate(1080, 680)" filter="url(#shadow)">
+    <rect width="270" height="185" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+    <rect width="270" height="40" rx="10" fill="url(#grad-opp)"/>
+    <text x="15" y="26" font-size="14" font-weight="700" fill="#ffffff">opportunities (Off-Campus)</text>
+    <text x="15" y="60" font-size="11" fill="#fde68a">PK: id (IDX: type, active, deadline)</text>
+    <text x="15" y="80" font-size="11" fill="#f8fafc">title, organization</text>
+    <text x="15" y="100" font-size="11" fill="#f8fafc">type (HACKATHON, INTERNSHIP)</text>
+    <text x="15" y="120" font-size="11" fill="#f8fafc">compensation_or_prize, deadline</text>
+    <text x="15" y="140" font-size="11" fill="#f8fafc">registration_url, featured, active</text>
+    <text x="15" y="160" font-size="11" fill="#94a3b8">eligible_batches, branches</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- CONNECTING ARROWS & RELATIONSHIPS          -->
+  <!-- ========================================== -->
+  <!-- users -> alumni_profiles (1:1) -->
+  <path d="M 185 360 L 185 400" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <!-- users -> resumes (1:N) -->
+  <path d="M 185 535 L 185 565" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+  <!-- companies -> drives (1:N) -->
+  <path d="M 550 315 L 550 360" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow-purple)"/>
+
+  <!-- drives -> rounds (1:N) -->
+  <path d="M 680 435 L 760 435" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- rounds -> questions (1:N) -->
+  <path d="M 890 510 L 890 550" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- questions -> practice_attempts (1:N) -->
+  <path d="M 890 715 L 890 755" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- drives -> experiences (1:N) -->
+  <path d="M 680 390 Q 900 320 1080 235" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+
+  <!-- users -> experiences (1:N) -->
+  <path d="M 310 180 Q 700 80 1080 180" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow-blue)"/>
+
+  <!-- companies -> upcoming_drives (1:N) -->
+  <path d="M 470 315 Q 400 460 470 600" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- upcoming_drives -> drive_registrations (1:N) -->
+  <path d="M 550 750 L 550 780" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- users -> drive_registrations (1:N) -->
+  <path d="M 185 360 Q 220 840 420 840" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow-blue)"/>
+
+  <!-- Footer Legend -->
+  <rect x="60" y="870" width="1280" height="45" rx="6" fill="#1e293b" stroke="#334155"/>
+  <text x="80" y="898" font-size="12" font-weight="700" fill="#94a3b8">LEGEND:</text>
+  <circle cx="160" cy="894" r="6" fill="#3b82f6"/>
+  <text x="175" y="898" font-size="12" fill="#cbd5e1">Identity &amp; Profiles</text>
+
+  <circle cx="340" cy="894" r="6" fill="#8b5cf6"/>
+  <text x="355" y="898" font-size="12" fill="#cbd5e1">Companies &amp; Drives</text>
+
+  <circle cx="540" cy="894" r="6" fill="#06b6d4"/>
+  <text x="555" y="898" font-size="12" fill="#cbd5e1">Rounds &amp; Questions</text>
+
+  <circle cx="730" cy="894" r="6" fill="#10b981"/>
+  <text x="745" y="898" font-size="12" fill="#cbd5e1">Experiences &amp; Reviews</text>
+
+  <circle cx="930" cy="894" r="6" fill="#f59e0b"/>
+  <text x="945" y="898" font-size="12" fill="#cbd5e1">Off-Campus &amp; Stats</text>
+
+  <line x1="1100" y1="894" x2="1140" y2="894" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="1150" y="898" font-size="12" fill="#cbd5e1">Foreign Key Link</text>
+</svg>

@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You_can Database Schema & Data Dictionary — JECRC University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-card: #243248;
+      --bg-card-subtle: #172033;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --border-color: #334155;
+      --border-accent: #3b82f6;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --badge-pk: #ef4444;
+      --badge-fk: #3b82f6;
+      --badge-uq: #f59e0b;
+      --badge-nn: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 5rem;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Header & Hero */
+    header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .header-title-block h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(to right, #ffffff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-title-block p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    /* Stats Banner */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 0.65rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Search & Filter Toolbar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+    }
+
+    .domain-filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Section & Domain styling */
+    .domain-section {
+      margin-bottom: 3rem;
+    }
+
+    .domain-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .domain-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .domain-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* Table Card */
+    .table-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      transition: border-color 0.2s;
+    }
+
+    .table-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .table-header {
+      background: var(--bg-card);
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .table-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .entity-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      background: rgba(0,0,0,0.3);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .table-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .table-desc {
+      padding: 0.75rem 1.25rem;
+      background: rgba(15, 23, 42, 0.4);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Data Dictionary Table */
+    .data-table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--bg-card-subtle);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .col-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .col-type {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-amber);
+      font-size: 0.82rem;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      margin-right: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .badge-pk {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .badge-fk {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .badge-uq {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-nn {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .badge-def {
+      background: rgba(148, 163, 184, 0.15);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    /* ER Diagram Box */
+    .diagram-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 3rem;
+      overflow-x: auto;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background-color: #ffffff;
+        color: #0f172a;
+      }
+
+      header {
+        background: #ffffff;
+        color: #0f172a;
+        box-shadow: none;
+        border: 1px solid #cbd5e1;
+      }
+
+      .header-title-block h1 {
+        background: none;
+        -webkit-text-fill-color: #0f172a;
+        color: #0f172a;
+      }
+
+      .btn, .toolbar {
+        display: none !important;
+      }
+
+      .table-card {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        break-inside: avoid;
+        margin-bottom: 2rem;
+        box-shadow: none;
+      }
+
+      .table-header {
+        background: #f1f5f9;
+        border-bottom: 1px solid #cbd5e1;
+      }
+
+      .table-name {
+        color: #1e3a8a;
+      }
+
+      th {
+        background: #f8fafc;
+        color: #475569;
+        border-bottom: 1px solid #cbd5e1;
+      }
+
+      td {
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .col-type {
+        color: #b45309;
+      }
+
+      .badge {
+        border: 1px solid #94a3b8;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Hero -->
+    <header>
+      <div class="header-top">
+        <div class="header-title-block">
+          <h1>You_can — Database Schema & Data Dictionary</h1>
+          <p>Official database specification for the JECRC University Placement & Career Readiness Portal</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="window.print()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            Print / Save as PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Tables</div>
+          <div class="stat-value">26</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Core Domains</div>
+          <div class="stat-value">7</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Flyway Migrations</div>
+          <div class="stat-value">V1 → V7</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Database Engines</div>
+          <div class="stat-value" style="font-size: 1.15rem; margin-top: 0.35rem;">PostgreSQL / H2</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toolbar: Search & Filter -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Filter tables or columns (e.g., user, company, drive)..." onkeyup="filterTables()">
+      </div>
+      <div class="domain-filters">
+        <span class="filter-chip active" onclick="filterDomain('all', this)">All (26)</span>
+        <span class="filter-chip" onclick="filterDomain('domain-identity', this)">Identity</span>
+        <span class="filter-chip" onclick="filterDomain('domain-companies', this)">Companies</span>
+        <span class="filter-chip" onclick="filterDomain('domain-rounds', this)">Questions</span>
+        <span class="filter-chip" onclick="filterDomain('domain-community', this)">Experiences</span>
+        <span class="filter-chip" onclick="filterDomain('domain-prep', this)">Roadmaps</span>
+        <span class="filter-chip" onclick="filterDomain('domain-opps', this)">Opportunities</span>
+        <span class="filter-chip" onclick="filterDomain('domain-admin', this)">Audit/Badges</span>
+      </div>
+    </div>
+
+    <!-- ER Diagram Section -->
+    <div class="domain-section">
+      <div class="domain-header">
+        <h2>Global Relationship Overview</h2>
+        <span class="domain-badge">Mermaid ERD</span>
+      </div>
+      <div class="diagram-box">
+        <pre class="mermaid">
+erDiagram
+    users ||--o| alumni_profiles : "1:1 profile"
+    users ||--o| notification_preferences : "1:1 config"
+    users ||--o{ resumes : "uploads"
+    users ||--o{ experiences : "shares"
+    users ||--o{ difficulty_votes : "rates"
+    users ||--o{ bookmarks : "saves"
+    users ||--o{ practice_attempts : "attempts"
+    users ||--o{ roadmaps : "creates"
+    users ||--o{ mock_slots : "mentors"
+    users ||--o{ mock_bookings : "books"
+    users ||--o{ user_badges : "earns"
+    users ||--o{ notifications : "receives"
+    users ||--o{ drive_registrations : "registers"
+
+    companies ||--o{ drives : "hosts past"
+    companies ||--o{ upcoming_drives : "announces"
+    companies ||--o{ difficulty_votes : "rated by"
+    companies ||--o{ roadmaps : "targeted by"
+    companies ||--o{ comments : "reviews"
+
+    drives ||--o{ rounds : "stages"
+    drives ||--o{ experiences : "reviews"
+    rounds ||--o{ questions : "interview Qs"
+    questions ||--o{ practice_attempts : "progress"
+
+    upcoming_drives ||--o{ drive_registrations : "applications"
+    roadmaps ||--o{ roadmap_items : "weekly steps"
+    mock_slots ||--o| mock_bookings : "reserved by"
+    badges ||--o{ user_badges : "achieved by"
+        </pre>
+      </div>
+    </div>
+
+    <!-- DOMAIN 1: Identity & Profile -->
+    <div class="domain-section domain-identity">
+      <div class="domain-header">
+        <h2>Domain 1: User Identity & Profile Management</h2>
+        <span class="domain-badge">4 Tables</span>
+      </div>
+
+      <!-- users -->
+      <div class="table-card" data-table="users full_name email branch cgpa role">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">users</span>
+            <span class="entity-tag">User.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Core authentication and student/alumni/admin credentials, CGPA, backlogs, and points.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td>Primary Key (Identity)</td></tr>
+              <tr><td class="col-name">email</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>Campus email address</td></tr>
+              <tr><td class="col-name">password</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>BCrypt hashed password</td></tr>
+              <tr><td class="col-name">full_name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Student/Staff full legal name</td></tr>
+              <tr><td class="col-name">branch</td><td class="col-type">VARCHAR(100)</td><td>-</td><td>Academic department (e.g. CSE, IT, ECE)</td></tr>
+              <tr><td class="col-name">graduation_year</td><td class="col-type">INT</td><td>-</td><td>Passout cohort year (e.g. 2026)</td></tr>
+              <tr><td class="col-name">cgpa</td><td class="col-type">NUMERIC(4,2)</td><td>-</td><td>Current CGPA out of 10.0</td></tr>
+              <tr><td class="col-name">active_backlogs</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Number of active backlogs</td></tr>
+              <tr><td class="col-name">role</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span> <span class="badge badge-def">DEFAULT 'ROLE_STUDENT'</span></td><td>Enum: ROLE_STUDENT, ROLE_ALUMNI, ROLE_ADMIN</td></tr>
+              <tr><td class="col-name">points</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Gamification engagement score</td></tr>
+              <tr><td class="col-name">email_verified</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT FALSE</span></td><td>Email activation state</td></tr>
+              <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-def">DEFAULT CURRENT_TIMESTAMP</span></td><td>Account registration timestamp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- alumni_profiles -->
+      <div class="table-card" data-table="alumni_profiles company_name job_role linkedin">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">alumni_profiles</span>
+            <span class="entity-tag">AlumniProfile.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">1:1 profile extension for verified alumni offering career mentorship.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">company_name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Current employer</td></tr>
+              <tr><td class="col-name">job_role</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Current designation</td></tr>
+              <tr><td class="col-name">graduation_year</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Passout cohort year</td></tr>
+              <tr><td class="col-name">branch</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Degree department</td></tr>
+              <tr><td class="col-name">linkedin_url</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>LinkedIn URL</td></tr>
+              <tr><td class="col-name">topics_can_help</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>Mentorship expertise areas</td></tr>
+              <tr><td class="col-name">visible</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Directory visibility toggle</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- resumes -->
+      <div class="table-card" data-table="resumes file_path original_filename checklist">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">resumes</span>
+            <span class="entity-tag">Resume.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Uploaded student resumes, ATS scanner checklist results, and recruiter share consent.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span> <span class="badge badge-nn">NOT NULL</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">file_path</td><td class="col-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Storage disk location</td></tr>
+              <tr><td class="col-name">original_filename</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Uploaded file name</td></tr>
+              <tr><td class="col-name">file_size</td><td class="col-type">BIGINT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>File size in bytes</td></tr>
+              <tr><td class="col-name">share_consent</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT FALSE</span></td><td>Consent to share with recruiters</td></tr>
+              <tr><td class="col-name">checklist_result_json</td><td class="col-type">TEXT</td><td>-</td><td>JSON output of ATS checklist</td></tr>
+              <tr><td class="col-name">uploaded_at</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-def">DEFAULT CURRENT_TIMESTAMP</span></td><td>Upload timestamp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- notification_preferences -->
+      <div class="table-card" data-table="notification_preferences email_drives email_deadlines">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">notification_preferences</span>
+            <span class="entity-tag">NotificationPreference.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">User-configurable email and alert dispatch preferences.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">email_drives</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Drive announcements</td></tr>
+              <tr><td class="col-name">email_deadlines</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>24h deadline reminders</td></tr>
+              <tr><td class="col-name">email_experiences</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Experience sharing updates</td></tr>
+              <tr><td class="col-name">email_bookings</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Mock interview bookings</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 2: Companies & Drives -->
+    <div class="domain-section domain-companies">
+      <div class="domain-header">
+        <h2>Domain 2: Companies & Campus Recruitment Drives</h2>
+        <span class="domain-badge">4 Tables</span>
+      </div>
+
+      <!-- companies -->
+      <div class="table-card" data-table="companies name slug tier industry">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">companies</span>
+            <span class="entity-tag">Company.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1, V6, V7</span>
+        </div>
+        <div class="table-desc">Master catalog of campus recruiters, hiring tiers, official logos, and domains.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Recruiter name (e.g. Google, Microsoft, Celebal)</td></tr>
+              <tr><td class="col-name">slug</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>Unique URL identifier</td></tr>
+              <tr><td class="col-name">logo_url</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>Local SVG / CDN vector path</td></tr>
+              <tr><td class="col-name">industry</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Industry sector</td></tr>
+              <tr><td class="col-name">tier</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'Mass Recruiters'</span></td><td>Category: Mass Recruiters, Dream, Super Dream</td></tr>
+              <tr><td class="col-name">website</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>Corporate career portal</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- drives -->
+      <div class="table-card" data-table="drives company_id roles ctc_or_stipend min_cgpa eligible_branches">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">drives</span>
+            <span class="entity-tag">Drive.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Historical on-campus drives with eligibility criteria, CTC, roles, and branch rules.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">company_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ companies(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">drive_year</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Year drive conducted</td></tr>
+              <tr><td class="col-name">drive_month</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Drive month</td></tr>
+              <tr><td class="col-name">roles</td><td class="col-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Offered job roles</td></tr>
+              <tr><td class="col-name">ctc_or_stipend</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Compensation description (e.g. 10.5 LPA)</td></tr>
+              <tr><td class="col-name">min_cgpa</td><td class="col-type">NUMERIC(4,2)</td><td><span class="badge badge-def">DEFAULT 6.00</span></td><td>Cutoff CGPA</td></tr>
+              <tr><td class="col-name">eligible_branches</td><td class="col-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Allowed branch list (CSE, IT, etc.)</td></tr>
+              <tr><td class="col-name">max_backlogs</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Backlog threshold</td></tr>
+              <tr><td class="col-name">students_selected</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Hires count</td></tr>
+              <tr><td class="col-name">job_type</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'PLACEMENT'</span></td><td>PLACEMENT, INTERNSHIP, FTE_PLUS_INTERN</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- upcoming_drives -->
+      <div class="table-card" data-table="upcoming_drives company_name deadline registration_link active">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">upcoming_drives</span>
+            <span class="entity-tag">UpcomingDrive.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1, V3</span>
+        </div>
+        <div class="table-desc">Scheduled drives with active student registration links and deadlines.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">company_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span></td><td>➔ companies(id) ON DELETE SET NULL</td></tr>
+              <tr><td class="col-name">company_name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Display company name</td></tr>
+              <tr><td class="col-name">drive_date</td><td class="col-type">DATE</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Scheduled drive date</td></tr>
+              <tr><td class="col-name">roles_offered</td><td class="col-type">VARCHAR(500)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Offered job roles</td></tr>
+              <tr><td class="col-name">ctc_or_stipend</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Remuneration</td></tr>
+              <tr><td class="col-name">min_cgpa</td><td class="col-type">NUMERIC(4,2)</td><td><span class="badge badge-def">DEFAULT 6.00</span></td><td>Minimum CGPA cutoff</td></tr>
+              <tr><td class="col-name">deadline</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Registration cutoff timestamp</td></tr>
+              <tr><td class="col-name">registration_link</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>Career portal or Google form URL</td></tr>
+              <tr><td class="col-name">active</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Visibility status</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- drive_registrations -->
+      <div class="table-card" data-table="drive_registrations user_id upcoming_drive_id status">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">drive_registrations</span>
+            <span class="entity-tag">DriveRegistration.java</span>
+          </div>
+          <span class="table-meta">Flyway: V3__drive_registrations.sql</span>
+        </div>
+        <div class="table-desc">Student applications submitted for scheduled on-campus drives.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">upcoming_drive_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ upcoming_drives(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'REGISTERED'</span></td><td>REGISTERED, SHORTLISTED, REJECTED</td></tr>
+              <tr><td class="col-name">registered_at</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-def">DEFAULT CURRENT_TIMESTAMP</span></td><td>Submission timestamp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 3: Rounds & Questions -->
+    <div class="domain-section domain-rounds">
+      <div class="domain-header">
+        <h2>Domain 3: Interview Rounds & Question Bank</h2>
+        <span class="domain-badge">3 Tables</span>
+      </div>
+
+      <!-- rounds -->
+      <div class="table-card" data-table="rounds drive_id round_number round_type difficulty">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">rounds</span>
+            <span class="entity-tag">Round.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Evaluation rounds for a drive (Online Test, Technical, HR, GD).</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">drive_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ drives(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">round_number</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Chronological sequence (1, 2, 3)</td></tr>
+              <tr><td class="col-name">name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Round name (e.g. Coding Assessment)</td></tr>
+              <tr><td class="col-name">round_type</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>ONLINE_TEST, TECHNICAL_INTERVIEW, HR, etc.</td></tr>
+              <tr><td class="col-name">duration_minutes</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 60</span></td><td>Duration in minutes</td></tr>
+              <tr><td class="col-name">difficulty</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'MEDIUM'</span></td><td>EASY, MEDIUM, HARD</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- questions -->
+      <div class="table-card" data-table="questions round_id topic_tags difficulty question_text">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">questions</span>
+            <span class="entity-tag">Question.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Questions asked during company recruitment rounds with tags and hints.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">round_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ rounds(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">question_text</td><td class="col-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Problem statement or question body</td></tr>
+              <tr><td class="col-name">topic_tags</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Comma-delimited tags (DSA, SQL, OOP)</td></tr>
+              <tr><td class="col-name">difficulty</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'MEDIUM'</span></td><td>EASY, MEDIUM, HARD</td></tr>
+              <tr><td class="col-name">answer_or_hint</td><td class="col-type">TEXT</td><td>-</td><td>Hints, solution outline, or pseudocode</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- practice_attempts -->
+      <div class="table-card" data-table="practice_attempts user_id question_id status notes">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">practice_attempts</span>
+            <span class="entity-tag">PracticeAttempt.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Tracks student problem-solving progress on interview questions.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">question_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ questions(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>ATTEMPTED, SOLVED, BOOKMARKED</td></tr>
+              <tr><td class="col-name">notes</td><td class="col-type">TEXT</td><td>-</td><td>Student solution notes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 4: Experiences & Community -->
+    <div class="domain-section domain-community">
+      <div class="domain-header">
+        <h2>Domain 4: Student Experiences & Peer Reviews</h2>
+        <span class="domain-badge">3 Tables</span>
+      </div>
+
+      <!-- experiences -->
+      <div class="table-card" data-table="experiences drive_id author_id title status outcome">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">experiences</span>
+            <span class="entity-tag">Experience.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Student interview accounts, tips, mistakes, and outcomes with admin approval workflow.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">drive_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ drives(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">author_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">title</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Post title</td></tr>
+              <tr><td class="col-name">content</td><td class="col-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Detailed walkthrough of rounds</td></tr>
+              <tr><td class="col-name">tips</td><td class="col-type">TEXT</td><td>-</td><td>Preparation suggestions</td></tr>
+              <tr><td class="col-name">outcome</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'SELECTED'</span></td><td>SELECTED, REJECTED</td></tr>
+              <tr><td class="col-name">difficulty_rating</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 3</span></td><td>Difficulty 1 to 5</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'PENDING'</span></td><td>PENDING, APPROVED, REJECTED</td></tr>
+              <tr><td class="col-name">upvotes</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Helpful votes count</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- difficulty_votes -->
+      <div class="table-card" data-table="difficulty_votes company_id user_id rating">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">difficulty_votes</span>
+            <span class="entity-tag">DifficultyVote.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Crowdsourced 1-5 star company difficulty ratings with single-vote enforcement.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">company_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ companies(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">rating</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span> (1..5)</td><td>Star rating</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- comments -->
+      <div class="table-card" data-table="comments company_id author_id parent_id content">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">comments</span>
+            <span class="entity-tag">Comment.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Hierarchical threaded discussions on recruiter profile pages.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">company_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ companies(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">author_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">parent_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span></td><td>➔ comments(id) (Self-join reply)</td></tr>
+              <tr><td class="col-name">content</td><td class="col-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Comment text</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'VISIBLE'</span></td><td>VISIBLE, HIDDEN</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 5: Roadmaps & Mentorship -->
+    <div class="domain-section domain-prep">
+      <div class="domain-header">
+        <h2>Domain 5: Personalized Roadmaps & Mock Interviews</h2>
+        <span class="domain-badge">5 Tables</span>
+      </div>
+
+      <!-- roadmaps -->
+      <div class="table-card" data-table="roadmaps user_id company_id weeks">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">roadmaps</span>
+            <span class="entity-tag">Roadmap.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">User-generated preparation roadmaps customized for target recruiters.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">company_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ companies(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">weeks</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Duration in weeks (e.g. 4, 8)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- roadmap_items -->
+      <div class="table-card" data-table="roadmap_items roadmap_id week_number topic completed">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">roadmap_items</span>
+            <span class="entity-tag">RoadmapItem.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Weekly topic goals and target practice problem counts in a roadmap.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">roadmap_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ roadmaps(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">week_number</td><td class="col-type">INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Week index</td></tr>
+              <tr><td class="col-name">topic</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Milestone subject</td></tr>
+              <tr><td class="col-name">target_questions</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 5</span></td><td>Target Q count</td></tr>
+              <tr><td class="col-name">completed</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT FALSE</span></td><td>Completion checkbox</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- mock_slots -->
+      <div class="table-card" data-table="mock_slots mentor_id company_name start_time status">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">mock_slots</span>
+            <span class="entity-tag">MockSlot.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Time slots made available by alumni mentors for 1-on-1 interview practice.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">mentor_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">company_name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Company specialization</td></tr>
+              <tr><td class="col-name">start_time</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Session start</td></tr>
+              <tr><td class="col-name">end_time</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Session end</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'AVAILABLE'</span></td><td>AVAILABLE, BOOKED, CANCELLED</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- mock_bookings -->
+      <div class="table-card" data-table="mock_bookings slot_id student_id status rating feedback">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">mock_bookings</span>
+            <span class="entity-tag">MockBooking.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Confirmed bookings, student notes, and mentor performance feedback.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">slot_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ mock_slots(id) (1:1)</td></tr>
+              <tr><td class="col-name">student_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'CONFIRMED'</span></td><td>CONFIRMED, COMPLETED, CANCELLED</td></tr>
+              <tr><td class="col-name">feedback</td><td class="col-type">TEXT</td><td>-</td><td>Mentor evaluation remarks</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- bookmarks -->
+      <div class="table-card" data-table="bookmarks user_id item_type item_id">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">bookmarks</span>
+            <span class="entity-tag">Bookmark.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Polymorphic user bookmarks for companies, questions, and experiences.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">item_type</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>COMPANY, QUESTION, EXPERIENCE, DRIVE</td></tr>
+              <tr><td class="col-name">item_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Referenced entity ID</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 6: Opportunities & Official Stats -->
+    <div class="domain-section domain-opps">
+      <div class="domain-header">
+        <h2>Domain 6: Off-Campus Opportunities & Official Placement Stats</h2>
+        <span class="domain-badge">2 Tables</span>
+      </div>
+
+      <!-- opportunities -->
+      <div class="table-card" data-table="opportunities title organization type deadline prize">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">opportunities</span>
+            <span class="entity-tag">Opportunity.java</span>
+          </div>
+          <span class="table-meta">Flyway: V4__opportunities.sql</span>
+        </div>
+        <div class="table-desc">Curated off-campus internships, hackathons (SIH), coding challenges, and fellowships.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">title</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Opportunity / Hackathon title</td></tr>
+              <tr><td class="col-name">organization</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Hosting company or ministry</td></tr>
+              <tr><td class="col-name">type</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>HACKATHON, INTERNSHIP, HIRING_CONTEST</td></tr>
+              <tr><td class="col-name">compensation_or_prize</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Prize pool or stipend (e.g. ₹1,00,000)</td></tr>
+              <tr><td class="col-name">deadline</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Application cutoff timestamp</td></tr>
+              <tr><td class="col-name">registration_url</td><td class="col-type">VARCHAR(1000)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Direct external application link</td></tr>
+              <tr><td class="col-name">featured</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT FALSE</span></td><td>Banner featured card switch</td></tr>
+              <tr><td class="col-name">active</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT TRUE</span></td><td>Display status flag</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- jecrc_placement_records -->
+      <div class="table-card" data-table="jecrc_placement_records academic_year company_name package_lpa selections">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">jecrc_placement_records</span>
+            <span class="entity-tag">JecrcPlacementRecord.java</span>
+          </div>
+          <span class="table-meta">Flyway: V5__real_jecrc_placements.sql</span>
+        </div>
+        <div class="table-desc">Official institutional placement records (2019-2026 batches) with 940+ selection entries.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">academic_year</td><td class="col-type">VARCHAR(20)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Cohort (e.g. 2025-26, 2024-25)</td></tr>
+              <tr><td class="col-name">company_name</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Hiring organization</td></tr>
+              <tr><td class="col-name">package_lpa</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Compensation in LPA (e.g. 20, 10.47)</td></tr>
+              <tr><td class="col-name">selections</td><td class="col-type">INT</td><td><span class="badge badge-def">DEFAULT 0</span></td><td>Number of students placed</td></tr>
+              <tr><td class="col-name">tier</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'Mass & Elite'</span></td><td>Tier: Mass & Elite, Dream, Super Dream</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAIN 7: Badges, Moderation & Audit -->
+    <div class="domain-section domain-admin">
+      <div class="domain-header">
+        <h2>Domain 7: Gamification, Moderation & Audit Logs</h2>
+        <span class="domain-badge">5 Tables</span>
+      </div>
+
+      <!-- badges -->
+      <div class="table-card" data-table="badges code title description icon">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">badges</span>
+            <span class="entity-tag">Badge.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Catalog of unlockable gamified community achievement badges.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">code</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-uq">UQ</span> <span class="badge badge-nn">NOT NULL</span></td><td>Token (e.g. FIRST_EXPERIENCE)</td></tr>
+              <tr><td class="col-name">title</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Display badge name</td></tr>
+              <tr><td class="col-name">description</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Award criteria</td></tr>
+              <tr><td class="col-name">icon</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Icon class / SVG identifier</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- user_badges -->
+      <div class="table-card" data-table="user_badges user_id badge_id awarded_at">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">user_badges</span>
+            <span class="entity-tag">UserBadge.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Badges earned by individual students and alumni.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">badge_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ badges(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">awarded_at</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-def">DEFAULT CURRENT_TIMESTAMP</span></td><td>Unlock timestamp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- notifications -->
+      <div class="table-card" data-table="notifications user_id title message is_read">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">notifications</span>
+            <span class="entity-tag">Notification.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">In-app notifications and announcements delivered to student portals.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">title</td><td class="col-type">VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Notice heading</td></tr>
+              <tr><td class="col-name">message</td><td class="col-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Notice content</td></tr>
+              <tr><td class="col-name">link</td><td class="col-type">VARCHAR(500)</td><td>-</td><td>Deep link</td></tr>
+              <tr><td class="col-name">is_read</td><td class="col-type">BOOLEAN</td><td><span class="badge badge-def">DEFAULT FALSE</span></td><td>Read status</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- reports -->
+      <div class="table-card" data-table="reports target_type target_id reporter_id status">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">reports</span>
+            <span class="entity-tag">Report.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Content moderation flags submitted by users for inappropriate posts or comments.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">target_type</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>EXPERIENCE, COMMENT, RESUME</td></tr>
+              <tr><td class="col-name">target_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Target record ID</td></tr>
+              <tr><td class="col-name">reporter_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span> <span class="badge badge-nn">NOT NULL</span></td><td>➔ users(id) ON DELETE CASCADE</td></tr>
+              <tr><td class="col-name">reason</td><td class="col-type">TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Report reason</td></tr>
+              <tr><td class="col-name">status</td><td class="col-type">VARCHAR(50)</td><td><span class="badge badge-def">DEFAULT 'OPEN'</span></td><td>OPEN, RESOLVED, DISMISSED</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- audit_logs -->
+      <div class="table-card" data-table="audit_logs actor_id action entity_type timestamp">
+        <div class="table-header">
+          <div class="table-title">
+            <span class="table-name">audit_logs</span>
+            <span class="entity-tag">AuditLog.java</span>
+          </div>
+          <span class="table-meta">Flyway: V1__init_schema.sql</span>
+        </div>
+        <div class="table-desc">Administrative action history log capturing create, update, and delete actions.</div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td><span class="badge badge-pk">PK</span></td><td>Primary Key</td></tr>
+              <tr><td class="col-name">actor_id</td><td class="col-type">BIGINT</td><td><span class="badge badge-fk">FK</span></td><td>➔ users(id) ON DELETE SET NULL</td></tr>
+              <tr><td class="col-name">action</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Action (e.g. APPROVE_EXP, DELETE_DRIVE)</td></tr>
+              <tr><td class="col-name">entity_type</td><td class="col-type">VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Entity class name</td></tr>
+              <tr><td class="col-name">entity_id</td><td class="col-type">BIGINT</td><td>-</td><td>Entity primary key</td></tr>
+              <tr><td class="col-name">timestamp</td><td class="col-type">TIMESTAMP</td><td><span class="badge badge-def">DEFAULT CURRENT_TIMESTAMP</span></td><td>Mutation timestamp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#1e293b',
+        primaryColor: '#38bdf8',
+        lineColor: '#64748b'
+      }
+    });
+
+    function filterTables() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.table-card');
+      cards.forEach(card => {
+        const text = (card.getAttribute('data-table') || '') + ' ' + card.innerText.toLowerCase();
+        if (text.includes(q)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function filterDomain(domainClass, el) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+
+      const sections = document.querySelectorAll('.domain-section');
+      sections.forEach(sec => {
+        if (domainClass === 'all') {
+          sec.style.display = 'block';
+        } else {
+          if (sec.classList.contains(domainClass)) {
+            sec.style.display = 'block';
+          } else {
+            sec.style.display = 'none';
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -28,10 +29,16 @@ public class DashboardController {
     public String dashboard(
             @RequestParam(value = "view", required = false) String view,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session,
             Model model
     ) {
         if (userDetails == null) {
             return "redirect:/login";
+        }
+
+        if (session != null && session.getAttribute("errorMessage") != null) {
+            model.addAttribute("errorMessage", session.getAttribute("errorMessage"));
+            session.removeAttribute("errorMessage");
         }
 
         boolean isAdmin = userDetails.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));

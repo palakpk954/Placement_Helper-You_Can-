@@ -36,4 +36,6 @@ build/
 data/
 uploads/
 scratch/
-
+~$*
+*.tmp
+.DS_Store
