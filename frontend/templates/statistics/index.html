@@ -188,56 +188,6 @@
         </div>
 
         <!-- ==========================================
-             INTERACTIVE YEAR-WISE PLACEMENT RECORDS
-             ========================================== -->
-        <div class="app-card p-4 shadow-sm mb-4">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                <div>
-                    <h4 class="fw-bold mb-1">
-                        <i class="bi bi-table text-primary me-2"></i>Official Recruiter &amp; Package Directory
-                    </h4>
-                    <p class="text-muted small mb-0">Browse through 900+ verified corporate selection records across 7 placement seasons.</p>
-                </div>
-                
-                <!-- Instant Live Search Input -->
-                <div class="d-flex align-items-center gap-2" style="max-width: 380px; width: 100%;">
-                    <div class="input-group shadow-xs">
-                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" id="recordSearchInput" class="form-control border-start-0 ps-0" 
-                               placeholder="Search company (e.g. Amazon, ServiceNow, TCS)..."
-                               th:value="${searchQuery}"
-                               hx-get="/statistics/records-fragment"
-                               hx-trigger="keyup changed delay:250ms, search"
-                               hx-target="#recordsTableContainer"
-                               hx-include="#selectedYearInput"
-                               name="search">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hidden input for HTMX to include current active year -->
-            <input type="hidden" id="selectedYearInput" name="year" th:value="${selectedYear}">
-
-            <!-- Academic Year Filter Pills -->
-            <ul class="nav nav-pills gap-2 mb-3 pb-2 border-bottom flex-nowrap overflow-x-auto" id="academicYearTabs" style="scrollbar-width: thin;">
-                <li class="nav-item" th:each="yr : ${officialYears}">
-                    <button class="nav-link rounded-pill px-3 py-1 small fw-semibold text-nowrap"
-                            th:classappend="${yr == selectedYear ? 'active bg-primary' : 'bg-light text-secondary border'}"
-                            th:text="${'Batch ' + yr}"
-                            th:attr="data-year=${yr}"
-                            onclick="switchYear(this)">
-                        Batch 2025-26
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Records Table Container (Dynamic via HTMX) -->
-            <div id="recordsTableContainer" th:replace="~{statistics/fragments/records_table :: recordsTable}">
-                <!-- Table replacement point -->
-            </div>
-        </div>
-
-        <!-- ==========================================
              VISUAL CHARTS (ANALYTICS & TRENDS)
              ========================================== -->
         <!-- Row 1: Charts (Companies per Year & Package Trends) -->
@@ -319,6 +269,58 @@
         </div>
 
     </div>
+
+        <!-- ==========================================
+             INTERACTIVE YEAR-WISE PLACEMENT RECORDS
+             ========================================== -->
+        <div class="app-card p-4 shadow-sm mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        <i class="bi bi-table text-primary me-2"></i>Official Recruiter &amp; Package Directory
+                    </h4>
+                    <p class="text-muted small mb-0">Browse through 900+ verified corporate selection records across 7 placement seasons.</p>
+                </div>
+                
+                <!-- Instant Live Search Input -->
+                <div class="d-flex align-items-center gap-2" style="max-width: 380px; width: 100%;">
+                    <div class="input-group shadow-xs">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="recordSearchInput" class="form-control border-start-0 ps-0" 
+                               placeholder="Search company (e.g. Amazon, ServiceNow, TCS)..."
+                               th:value="${searchQuery}"
+                               hx-get="/statistics/records-fragment"
+                               hx-trigger="keyup changed delay:250ms, search"
+                               hx-target="#recordsTableContainer"
+                               hx-include="#selectedYearInput"
+                               name="search">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden input for HTMX to include current active year -->
+            <input type="hidden" id="selectedYearInput" name="year" th:value="${selectedYear}">
+
+            <!-- Academic Year Filter Pills -->
+            <ul class="nav nav-pills gap-2 mb-3 pb-2 border-bottom flex-nowrap overflow-x-auto" id="academicYearTabs" style="scrollbar-width: thin;">
+                <li class="nav-item" th:each="yr : ${officialYears}">
+                    <button class="nav-link rounded-pill px-3 py-1 small fw-semibold text-nowrap"
+                            th:classappend="${yr == selectedYear ? 'active bg-primary' : 'bg-light text-secondary border'}"
+                            th:text="${'Batch ' + yr}"
+                            th:attr="data-year=${yr}"
+                            onclick="switchYear(this)">
+                        Batch 2025-26
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Records Table Container (Dynamic via HTMX) -->
+            <div id="recordsTableContainer" th:replace="~{statistics/fragments/records_table :: recordsTable}">
+                <!-- Table replacement point -->
+            </div>
+        </div>
+
+        
 
     <!-- Switch Year Script -->
     <script>
