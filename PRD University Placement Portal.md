@@ -1,6 +1,6 @@
 # Product Requirements Document: University Placement Portal
 
-Version 1.0 · Draft · October 15, 2026 · Owner: \[Your Name\] · Institution: \[University Name\]
+Version 1.0 · Draft · October 15, 2026 · Owner: Soumil Agarwal · Institution: JECRC
 
 ## 1. Overview
 
