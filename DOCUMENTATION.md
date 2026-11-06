@@ -399,6 +399,30 @@ During development and continuous verification, the following technical issues w
   3. Updated the brand logo link and user profile dropdown to route mentors directly to their *Mentor Cockpit* (`/alumni/dashboard`).
   4. Added a responsive "Student View" toggle pill in the alumni top bar.
 
+### 17. Mobile Interface Usability, Touch Targets, and Role-Aware Navigation
+- **Symptom**: On mobile devices and narrow smartphone viewports (< 768px):
+  1. The top navigation bar only showed the brand logo and hamburger button. Critical utilities like dark/light mode toggle, notification bell with unread count, and user account status were hidden inside the collapsed drawer.
+  2. When opening the mobile hamburger drawer, users had to scroll through the full link list to find the profile dropdown, which could clip or feel clumsy to tap for logging out.
+  3. The fixed mobile bottom navigation bar was hardcoded only for `ADMIN` and `STUDENT`, forcing `ALUMNI` users to see student tools (`Home`, `Companies`, `Drives`, `Practice`, `Eligibility`).
+  4. On iOS Safari, tapping input fields triggered unwanted automatic viewport zooming because font sizes were below 16px.
+  5. The recruitment Kanban board lacked touch scroll-snapping, making column navigation on phones difficult.
+- **Root Cause**:
+  1. Header action items were wrapped in `d-none d-xl-flex` without corresponding compact header items for mobile viewports.
+  2. The mobile bottom navigation lacked a dedicated `<nav class="mobile-bottom-nav">` block for `sec:authorize="hasRole('ALUMNI')"` and for unauthenticated guests.
+  3. Safe area inset variables (`env(safe-area-inset-bottom)`) were not configured on the fixed bottom bar, causing overlaps with home indicators on modern iPhones and Android gesture bars.
+  4. Form controls lacked mobile-specific font-size overrides.
+- **Resolution**:
+  1. **Mobile Header Quick Bar**: Added a dedicated compact action bar in `base.html` visible only on mobile/tablets (< 1200px) featuring a 1-tap theme toggle, notifications bell with live unread badge, quick role avatar pill (`Admin` / `Mentor` / `Student`), and direct login button for guests.
+  2. **Mobile User Profile Card in Drawer**: Added an elevated profile card at the top of the collapsed mobile menu displaying user email, verified role badge, direct dashboard button, preferences shortcut, and a prominent red **Log out** button.
+  3. **Role-Aware Mobile Bottom Navigations**: Created 4 distinct bottom bars tailored for each role:
+     - **Admin**: `Admin`, `Drives`, `Cohort`, `Approvals`, `Recruiters`.
+     - **Alumni Mentor**: `Cockpit`, `Mocks`, `Network`, `Recruiters`, `Share Exp`.
+     - **Student**: `Home`, `Pipeline`, `Drives`, `Practice`, `Records`.
+     - **Guest**: `Home`, `Companies`, `Stats`, `Drives`, `Sign In`.
+  4. **Safe Area & Viewport Insets**: Added `env(safe-area-inset-bottom, 0px)` support to `.mobile-bottom-nav`, `body`, `.custom-footer`, and `.back-to-top-btn`.
+  5. **Touch Ergonomics & iOS Zoom Prevention**: Configured `font-size: 16px !important` for all form controls on `< 768px` screens, 44px minimum tap target sizes, and added horizontal touch scroll-snap (`scroll-snap-type: x mandatory`) for the Kanban pipeline and filter chips (`.mobile-scroll-x`).
+  6. **Auto-Collapse Navigation**: Updated `app.js` to automatically close the mobile navigation drawer when tapping a navigation link.
+
 ---
 
 ## 🏛 System Architecture & Module Directory

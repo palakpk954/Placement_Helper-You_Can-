@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
     initKeyboardShortcuts();
     highlightActiveNav();
+    initMobileInteractions();
 });
 
 /**
@@ -17,28 +18,55 @@ function initTheme() {
     const savedTheme = localStorage.getItem('youcan-theme') || 'light';
     setTheme(savedTheme);
 
+    const toggleTheme = () => {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme);
+    };
+
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(nextTheme);
-        });
+        themeToggleBtn.addEventListener('click', toggleTheme);
     }
+
+    document.querySelectorAll('.mobile-theme-btn').forEach(btn => {
+        btn.addEventListener('click', toggleTheme);
+    });
 }
 
 function setTheme(theme) {
     document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('youcan-theme', theme);
 
+    const isDark = theme === 'dark';
+    const iconClass = isDark ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars-fill text-dark';
+
     const themeIcon = document.getElementById('themeToggleIcon');
     if (themeIcon) {
-        if (theme === 'dark') {
-            themeIcon.className = 'bi bi-sun-fill text-warning';
-        } else {
-            themeIcon.className = 'bi bi-moon-stars-fill text-dark';
-        }
+        themeIcon.className = iconClass;
     }
+
+    document.querySelectorAll('.mobile-theme-icon').forEach(icon => {
+        icon.className = iconClass;
+    });
+}
+
+/**
+ * Mobile-specific micro-interactions
+ */
+function initMobileInteractions() {
+    // Automatically close the mobile navbar collapse when tapping a nav link (except dropdown toggles)
+    document.querySelectorAll('#navContent .nav-link:not(.dropdown-toggle)').forEach(link => {
+        link.addEventListener('click', () => {
+            const navCollapse = document.getElementById('navContent');
+            if (navCollapse && navCollapse.classList.contains('show')) {
+                const bsCollapse = bootstrap.Collapse.getInstance(navCollapse);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
+            }
+        });
+    });
 }
 
 /**

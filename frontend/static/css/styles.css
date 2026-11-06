@@ -622,16 +622,18 @@ a:hover {
     left: 0;
     right: 0;
     background: var(--bg-surface-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 3.85rem;
+    height: calc(3.85rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     z-index: 1040;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
-    padding: 0 0.5rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
 }
 .mobile-bottom-nav .bottom-nav-item {
     display: flex;
@@ -642,45 +644,77 @@ a:hover {
     font-size: 0.7rem;
     font-weight: 500;
     text-decoration: none;
-    padding: 0.35rem 0.6rem;
+    padding: 0.35rem 0.5rem;
     border-radius: var(--radius-md);
     transition: all 0.15s ease;
     flex: 1;
     text-align: center;
+    min-height: 44px;
+    touch-action: manipulation;
 }
 .mobile-bottom-nav .bottom-nav-item i {
     font-size: 1.25rem;
     margin-bottom: 0.15rem;
     line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
 }
 .mobile-bottom-nav .bottom-nav-item.active,
 .mobile-bottom-nav .bottom-nav-item:hover {
     color: var(--primary-blue);
+    font-weight: 700;
 }
 .mobile-bottom-nav .bottom-nav-item.active i {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    color: var(--primary-blue);
+}
+
+/* Horizontal Scroll Strip for Chips, Presets & Filter Pills */
+.mobile-scroll-x {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.5rem;
+    padding-bottom: 0.25rem;
+}
+.mobile-scroll-x::-webkit-scrollbar {
+    display: none;
 }
 
 /* Responsive Main Viewport Safe Padding & Mobile Drawer */
 @media (max-width: 1199.98px) {
     .custom-navbar .navbar-collapse {
-        background: var(--bg-surface);
+        background: var(--bg-surface-elevated);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-lg);
-        padding: 1rem 1.25rem;
+        padding: 1.15rem;
         margin-top: 0.75rem;
-        box-shadow: var(--shadow-lg);
-        max-height: 80vh;
+        box-shadow: var(--shadow-xl);
+        max-height: 82vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .custom-navbar .navbar-nav .nav-link {
-        padding: 0.55rem 0.75rem !important;
+        padding: 0.65rem 0.85rem !important;
         font-size: 0.95rem;
+        font-weight: 500;
         border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        min-height: 44px;
     }
     .custom-navbar .navbar-nav .nav-link:hover,
     .custom-navbar .navbar-nav .nav-link.active {
         background-color: var(--primary-light);
+        color: var(--primary-blue);
+    }
+    .custom-navbar .dropdown-menu {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        padding: 0.5rem;
+        margin-left: 0.5rem;
+        box-shadow: none;
     }
 }
 
@@ -694,14 +728,82 @@ a:hover {
 
 @media (max-width: 767.98px) {
     body {
-        padding-bottom: 5.2rem;
+        padding-bottom: calc(4.85rem + env(safe-area-inset-bottom, 0px));
     }
     main {
-        padding-bottom: 2.5rem;
+        padding-bottom: 1.75rem;
     }
     .custom-footer {
-        padding-bottom: 6rem;
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
     }
+    .back-to-top-btn {
+        bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+        right: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+
+    /* Prevent iOS Safari auto-zoom on input focus */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select,
+    textarea,
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+    }
+
+    /* Touch target comfort */
+    .btn {
+        min-height: 38px;
+    }
+    .btn-sm {
+        min-height: 34px;
+    }
+
+    /* Responsive Data Tables with Touch Flick Scrolling */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius-md);
+        scrollbar-width: thin;
+        margin-bottom: 1rem;
+    }
+    .table-responsive table {
+        min-width: 580px;
+    }
+}
+
+/* Small Smartphone Optimization (< 576px) */
+@media (max-width: 575.98px) {
+    .app-card {
+        padding: 1.15rem !important;
+        border-radius: var(--radius-md);
+    }
+    .container, .container-fluid, .container-xxl {
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+    .dashboard-hero {
+        padding: 1.25rem 1rem !important;
+    }
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    .modal-content {
+        border-radius: var(--radius-lg);
+    }
+    h1, .h1 { font-size: 1.65rem; }
+    h2, .h2 { font-size: 1.45rem; }
+    h3, .h3 { font-size: 1.25rem; }
+    h4, .h4 { font-size: 1.1rem; }
 }
 
 /* AI Prompt Chips */
@@ -800,6 +902,24 @@ a:hover {
     flex-direction: column;
     max-height: calc(100vh - 280px);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+@media (max-width: 767.98px) {
+    .kanban-board-wrapper {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding: 0 1rem;
+        gap: 0.85rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    .kanban-column {
+        scroll-snap-align: center;
+        flex: 0 0 85vw;
+        min-width: 275px;
+        max-width: 325px;
+        max-height: calc(100vh - 220px);
+    }
 }
 
 /* Column Header Stage Accents */

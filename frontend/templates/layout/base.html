@@ -76,13 +76,78 @@
                 </div>
             </a>
 
+            <!-- Mobile Top Bar Quick Actions (Visible only on mobile/tablet viewports) -->
+            <div class="d-flex d-xl-none align-items-center gap-1 gap-sm-2 ms-auto me-2">
+                <!-- Theme Toggle Button -->
+                <button class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 mobile-theme-btn" type="button" title="Toggle Dark/Light Mode">
+                    <i class="bi bi-moon-stars-fill text-dark mobile-theme-icon"></i>
+                </button>
+
+                <!-- Notifications Bell (Authenticated) -->
+                <a sec:authorize="isAuthenticated()" class="btn btn-sm btn-outline-secondary border-0 rounded-circle p-2 position-relative d-inline-flex" th:href="@{/notifications}" title="Notifications">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.25em 0.45em;"
+                          th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">2</span>
+                </a>
+
+                <!-- Quick Role Avatar Pill (Authenticated) -->
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0 d-inline-flex align-items-center gap-1 shadow-xs" style="font-size: 0.78rem;">
+                    <i class="bi bi-shield-lock"></i>
+                    <span class="d-none d-sm-inline">Admin</span>
+                </a>
+                <a sec:authorize="hasRole('ALUMNI')" th:href="@{/alumni/dashboard}" class="btn btn-sm btn-outline-info rounded-pill px-2 py-0 d-inline-flex align-items-center gap-1 shadow-xs" style="font-size: 0.78rem;">
+                    <i class="bi bi-mortarboard"></i>
+                    <span class="d-none d-sm-inline">Mentor</span>
+                </a>
+                <a sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI') and isAuthenticated()" th:href="@{/dashboard}" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-0 d-inline-flex align-items-center gap-1 shadow-xs" style="font-size: 0.78rem;">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="d-none d-sm-inline">Student</span>
+                </a>
+                <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-sm btn-primary rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.8rem;">
+                    Sign In
+                </a>
+            </div>
+
             <!-- Mobile Navbar Toggler -->
             <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-target="#navContent" data-bs-toggle="collapse" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="bi bi-list fs-3"></i>
+                <i class="bi bi-list fs-2 text-primary"></i>
             </button>
 
             <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navContent">
+                <!-- Mobile User Quick Profile Card (Visible in mobile collapse drawer) -->
+                <div class="d-xl-none p-3 mb-3 rounded-3 border bg-body-tertiary shadow-xs" sec:authorize="isAuthenticated()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-xs" style="width: 2.75rem; height: 2.75rem;">
+                            <i class="bi bi-person-fill fs-4"></i>
+                        </div>
+                        <div class="overflow-hidden flex-grow-1">
+                            <div class="fw-bold text-truncate" sec:authentication="name">user@jecrcu.edu.in</div>
+                            <span class="badge badge-soft-danger" sec:authorize="hasRole('ADMIN')">Placement Coordinator</span>
+                            <span class="badge badge-soft-info" sec:authorize="hasRole('ALUMNI')">Alumni Mentor</span>
+                            <span class="badge badge-soft-success" sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI')">JECRC Student</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3 pt-2 border-top">
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" class="btn btn-sm btn-outline-danger flex-fill rounded-pill">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Panel
+                        </a>
+                        <a sec:authorize="hasRole('ALUMNI')" th:href="@{/alumni/dashboard}" class="btn btn-sm btn-outline-primary flex-fill rounded-pill">
+                            <i class="bi bi-speedometer2 me-1"></i> Cockpit
+                        </a>
+                        <a sec:authorize="!hasRole('ADMIN') and !hasRole('ALUMNI')" th:href="@{/dashboard}" class="btn btn-sm btn-outline-primary flex-fill rounded-pill">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                        <a th:href="@{/notifications}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Preferences">
+                            <i class="bi bi-gear"></i>
+                        </a>
+                        <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3" title="Log out">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
                 <!-- Admin Navigation Links (Placement Cell Coordinators) -->
                 <ul class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-1 gap-0 gap-xxl-1"
                     sec:authorize="hasRole('ADMIN')"
@@ -490,6 +555,10 @@
             <i class="bi bi-megaphone"></i>
             <span>Drives</span>
         </a>
+        <a th:href="@{/admin/students}" class="bottom-nav-item">
+            <i class="bi bi-people-fill"></i>
+            <span>Cohort</span>
+        </a>
         <a th:href="@{/admin/approvals}" class="bottom-nav-item position-relative">
             <i class="bi bi-check2-circle"></i>
             <span>Approvals</span>
@@ -498,22 +567,44 @@
             <i class="bi bi-building"></i>
             <span>Recruiters</span>
         </a>
-        <a th:href="@{/dashboard(view='student')}" class="bottom-nav-item">
-            <i class="bi bi-mortarboard"></i>
-            <span>Student View</span>
+    </nav>
+
+    <!-- Alumni Mentor Bottom Navigation -->
+    <nav class="mobile-bottom-nav d-md-none" aria-label="Alumni Mobile Navigation"
+         sec:authorize="hasRole('ALUMNI')" th:if="${isAlumniPreview != true}">
+        <a th:href="@{/alumni/dashboard}" class="bottom-nav-item">
+            <i class="bi bi-speedometer2"></i>
+            <span>Cockpit</span>
+        </a>
+        <a th:href="@{/mocks}" class="bottom-nav-item">
+            <i class="bi bi-calendar-check"></i>
+            <span>Mocks</span>
+        </a>
+        <a th:href="@{/alumni}" class="bottom-nav-item">
+            <i class="bi bi-person-badge"></i>
+            <span>Network</span>
+        </a>
+        <a th:href="@{/companies}" class="bottom-nav-item">
+            <i class="bi bi-building"></i>
+            <span>Recruiters</span>
+        </a>
+        <a th:href="@{/contribute}" class="bottom-nav-item">
+            <i class="bi bi-plus-circle"></i>
+            <span>Share Exp</span>
         </a>
     </nav>
 
     <!-- Student / Preview Bottom Navigation -->
     <nav class="mobile-bottom-nav d-md-none" aria-label="Student Mobile Navigation"
-         th:if="${isAdminPreview == true or !#authorization.expression('hasRole(''ADMIN'')')}">
+         sec:authorize="isAuthenticated()"
+         th:if="${isAdminPreview == true or isAlumniPreview == true or (!#authorization.expression('hasRole(''ADMIN'')') and !#authorization.expression('hasRole(''ALUMNI'')'))}">
         <a th:href="@{/dashboard}" class="bottom-nav-item">
             <i class="bi bi-speedometer2"></i>
             <span>Home</span>
         </a>
-        <a th:href="@{/companies}" class="bottom-nav-item">
-            <i class="bi bi-building"></i>
-            <span>Companies</span>
+        <a th:href="@{/pipeline}" class="bottom-nav-item position-relative">
+            <i class="bi bi-kanban"></i>
+            <span>Pipeline</span>
         </a>
         <a th:href="@{/upcoming}" class="bottom-nav-item position-relative">
             <i class="bi bi-megaphone"></i>
@@ -523,9 +614,34 @@
             <i class="bi bi-lightning-charge"></i>
             <span>Practice</span>
         </a>
-        <a th:href="@{/eligibility}" class="bottom-nav-item">
-            <i class="bi bi-check2-circle"></i>
-            <span>Eligibility</span>
+        <a th:href="@{/statistics}" class="bottom-nav-item">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Records</span>
+        </a>
+    </nav>
+
+    <!-- Guest / Unauthenticated Bottom Navigation -->
+    <nav class="mobile-bottom-nav d-md-none" aria-label="Guest Mobile Navigation"
+         sec:authorize="!isAuthenticated()">
+        <a th:href="@{/dashboard}" class="bottom-nav-item">
+            <i class="bi bi-speedometer2"></i>
+            <span>Home</span>
+        </a>
+        <a th:href="@{/companies}" class="bottom-nav-item">
+            <i class="bi bi-building"></i>
+            <span>Companies</span>
+        </a>
+        <a th:href="@{/statistics}" class="bottom-nav-item">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Stats</span>
+        </a>
+        <a th:href="@{/upcoming}" class="bottom-nav-item">
+            <i class="bi bi-megaphone"></i>
+            <span>Drives</span>
+        </a>
+        <a th:href="@{/login}" class="bottom-nav-item">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Sign In</span>
         </a>
     </nav>
 

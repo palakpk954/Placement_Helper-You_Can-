@@ -302,7 +302,7 @@
             <input type="hidden" id="selectedYearInput" name="year" th:value="${selectedYear}">
 
             <!-- Academic Year Filter Pills -->
-            <ul class="nav nav-pills gap-2 mb-3 pb-2 border-bottom flex-nowrap overflow-x-auto" id="academicYearTabs" style="scrollbar-width: thin;">
+            <ul class="nav nav-pills gap-2 mb-3 pb-2 border-bottom mobile-scroll-x" id="academicYearTabs">
                 <li class="nav-item" th:each="yr : ${officialYears}">
                     <button class="nav-link rounded-pill px-3 py-1 small fw-semibold text-nowrap"
                             th:classappend="${yr == selectedYear ? 'active bg-primary' : 'bg-light text-secondary border'}"

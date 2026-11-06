@@ -206,21 +206,21 @@
                 </div>
 
                 <!-- Type Filter Pills -->
-                <div class="col-md-7 d-flex justify-content-md-end gap-1 flex-wrap">
+                <div class="col-md-7 d-flex justify-content-md-end gap-1 mobile-scroll-x">
                     <input type="hidden" id="filterTypeInput" name="type" th:value="${selectedType}">
                     
                     <a th:href="@{/pipeline(type='ALL', q=${searchQuery})}"
-                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap"
                        th:classappend="${selectedType == 'ALL' or selectedType == null ? 'btn-primary' : 'btn-outline-secondary'}">
                         All Applications
                     </a>
                     <a th:href="@{/pipeline(type='ON_CAMPUS', q=${searchQuery})}"
-                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap"
                        th:classappend="${selectedType == 'ON_CAMPUS' ? 'btn-primary' : 'btn-outline-secondary'}">
                         <i class="bi bi-mortarboard me-1"></i> On-Campus
                     </a>
                     <a th:href="@{/pipeline(type='OFF_CAMPUS', q=${searchQuery})}"
-                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap"
                        th:classappend="${selectedType == 'OFF_CAMPUS' ? 'btn-primary' : 'btn-outline-secondary'}">
                         <i class="bi bi-globe2 me-1"></i> Off-Campus
                     </a>
