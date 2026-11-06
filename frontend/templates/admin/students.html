@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: html}">
+<head>
+    <title>Placement Cohort &amp; Funnel Intelligence — You_can Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xl px-3 px-md-4 py-3">
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-xs mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Operation completed successfully.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-xs mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${errorMessage}">Error occurred.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a th:href="@{/admin}" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i> Admin</a>
+                    <span class="text-muted small">/</span>
+                    <span class="small text-muted">Placement Cohort</span>
+                </div>
+                <h3 class="fw-extrabold mb-1 fs-3 text-dark tracking-tight">Institutional Placement Cohort &amp; Funnel Intelligence</h3>
+                <p class="text-muted small mb-0">Official 2023–2027 recruitment funnel, at-risk early warnings, faculty mentorship tracking, and attendance compliance register.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/admin/export/excel}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-xs">
+                    <i class="bi bi-file-earmark-excel text-success me-1"></i> Export Master
+                </a>
+                <a th:href="@{/statistics}" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs">
+                    <i class="bi bi-bar-chart-fill me-1"></i> Public Analytics
+                </a>
+            </div>
+        </div>
+
+        <!-- 6 High-Impact KPI Cards -->
+        <div class="row g-2 g-md-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100">
+                    <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Total Cohort</span>
+                    <div class="fs-4 fw-extrabold text-dark my-1" th:text="${metrics['totalStudents']}">1,630</div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Students tracked</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100">
+                    <span class="text-uppercase text-success fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Placed Count</span>
+                    <div class="fs-4 fw-extrabold text-success my-1">
+                        <span th:text="${metrics['placedCount']}">167</span>
+                        <span class="fs-6 fw-normal text-muted" th:text="'(' + ${metrics['placementRate']} + '%)'">(10.2%)</span>
+                    </div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Offers confirmed</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100">
+                    <span class="text-uppercase text-primary fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">In Process</span>
+                    <div class="fs-4 fw-extrabold text-primary my-1" th:text="${metrics['enrolledCount']}">1,322</div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Active enrolled</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100">
+                    <span class="text-uppercase text-danger fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Debarred / Blocked</span>
+                    <div class="fs-4 fw-extrabold text-danger my-1" th:text="${metrics['blockedCount']}">141</div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Policy violations</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100">
+                    <span class="text-uppercase text-muted fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Average CTC</span>
+                    <div class="fs-4 fw-extrabold text-dark my-1" th:text="'₹' + ${metrics['averagePackage']} + ' LPA'">₹7.23 LPA</div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">Across placements</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="stat-widget p-3 rounded-4 bg-white border shadow-xs h-100" style="border-top: 3px solid #DE1819 !important;">
+                    <span class="text-uppercase text-danger fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">Highest CTC</span>
+                    <div class="fs-4 fw-extrabold text-danger my-1" th:text="'₹' + ${metrics['highestPackage']} + ' LPA'">₹17.50 LPA</div>
+                    <span class="small text-muted" style="font-size: 0.72rem;">HPE (R&amp;D Profile)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funnel Progression Bar -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-dark mb-0"><i class="bi bi-funnel-fill text-primary me-2"></i>Institutional Recruitment Conversion Funnel</h6>
+                <span class="badge bg-light text-muted border">2023–2027 Cohort</span>
+            </div>
+            <div class="row g-2 text-center">
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-light border">
+                        <div class="small text-muted text-uppercase" style="font-size: 0.7rem;">Applications</div>
+                        <div class="fs-5 fw-bold text-dark" th:text="${#numbers.formatInteger(metrics['totalApplications'], 0, 'COMMA')}">26,000</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-light border">
+                        <div class="small text-muted text-uppercase" style="font-size: 0.7rem;">PPT Attended</div>
+                        <div class="fs-5 fw-bold text-info" th:text="${#numbers.formatInteger(metrics['totalPpt'], 0, 'COMMA')}">3,200</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-light border">
+                        <div class="small text-muted text-uppercase" style="font-size: 0.7rem;">Screening Cleared</div>
+                        <div class="fs-5 fw-bold text-primary" th:text="${#numbers.formatInteger(metrics['totalScreening'], 0, 'COMMA')}">8,800</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-light border">
+                        <div class="small text-muted text-uppercase" style="font-size: 0.7rem;">GD Cleared</div>
+                        <div class="fs-5 fw-bold text-warning" th:text="${#numbers.formatInteger(metrics['totalGd'], 0, 'COMMA')}">900</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-light border">
+                        <div class="small text-muted text-uppercase" style="font-size: 0.7rem;">PI Cleared / Reached</div>
+                        <div class="fs-5 fw-bold text-secondary" th:text="${#numbers.formatInteger(metrics['totalPi'], 0, 'COMMA')}">2,500</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4">
+                    <div class="p-2 rounded-3 bg-success-subtle border border-success-subtle">
+                        <div class="small text-success text-uppercase fw-bold" style="font-size: 0.7rem;">Offers Released</div>
+                        <div class="fs-5 fw-extrabold text-success" th:text="${metrics['totalOffers']}">167</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills nav-fill bg-white border p-1 rounded-pill shadow-xs mb-4" id="cohortTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-semibold py-2" id="students-tab" data-bs-toggle="pill" data-bs-target="#students-pane" type="button" role="tab">
+                    <i class="bi bi-people-fill me-1"></i> Students Directory (<span th:text="${studentsPage.totalElements}">1630</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold py-2 text-warning" id="atrisk-tab" data-bs-toggle="pill" data-bs-target="#atrisk-pane" type="button" role="tab">
+                    <i class="bi bi-shield-exclamation me-1"></i> At-Risk Engine (<span th:text="${metrics['lowAppCount'] + metrics['screeningBottleneckCount'] + metrics['interviewLagCount']}">713</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold py-2" id="recruiters-tab" data-bs-toggle="pill" data-bs-target="#recruiters-pane" type="button" role="tab">
+                    <i class="bi bi-building me-1"></i> Top Recruiters (<span th:text="${topRecruiters.size()}">20</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold py-2 text-danger" id="debarred-tab" data-bs-toggle="pill" data-bs-target="#debarred-pane" type="button" role="tab">
+                    <i class="bi bi-exclamation-octagon-fill me-1"></i> Debarred (<span th:text="${debarredRecords.size()}">84</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold py-2" id="mentors-tab" data-bs-toggle="pill" data-bs-target="#mentors-pane" type="button" role="tab">
+                    <i class="bi bi-person-badge-fill me-1"></i> Mentors (<span th:text="${mentorStats.size()}">55</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-semibold py-2" id="courses-tab" data-bs-toggle="pill" data-bs-target="#courses-pane" type="button" role="tab">
+                    <i class="bi bi-mortarboard me-1"></i> Specializations (<span th:text="${courseStats.size()}">13</span>)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="cohortTabContent">
+
+            <!-- TAB 1: STUDENTS DIRECTORY -->
+            <div class="tab-pane fade show active" id="students-pane" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <!-- Filters -->
+                    <form method="get" th:action="@{/admin/students}" class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" name="search" th:value="${search}" class="form-control form-control-sm border-start-0" placeholder="Search by name, roll no, company...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="">All Statuses</option>
+                                <option value="PLACED" th:selected="${selectedStatus == 'PLACED'}">PLACED</option>
+                                <option value="ENROLLED" th:selected="${selectedStatus == 'ENROLLED'}">ENROLLED</option>
+                                <option value="BLOCKED" th:selected="${selectedStatus == 'BLOCKED'}">BLOCKED</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="course" class="form-select form-select-sm">
+                                <option value="">All Specializations</option>
+                                <option th:each="c : ${distinctCourses}" th:value="${c}" th:text="${c}" th:selected="${selectedCourse == c}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="mentor" class="form-select form-select-sm">
+                                <option value="">All Mentors</option>
+                                <option th:each="m : ${distinctMentors}" th:value="${m}" th:text="${m}" th:selected="${selectedMentor == m}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex gap-1">
+                            <button type="submit" class="btn btn-sm btn-primary w-100 rounded-pill">Filter</button>
+                        </div>
+                    </form>
+
+                    <!-- Student Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Student Name</th>
+                                    <th>Specialization</th>
+                                    <th>Sec</th>
+                                    <th>Mentor</th>
+                                    <th>Applications &amp; Funnel</th>
+                                    <th>Status</th>
+                                    <th>Placed Details</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="st : ${studentsPage.content}">
+                                    <td>
+                                        <code class="fw-bold text-dark" th:text="${st.rollNumber}">23BCON1402</code>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="${st.studentName}">ANKIT JHAJHARIA</div>
+                                        <span class="text-muted" style="font-size: 0.72rem;" th:text="${st.email}">email@jecrcu.edu.in</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border text-truncate" style="max-width: 170px;" th:text="${st.course}" th:title="${st.course}">Computer Science</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary" th:text="${st.section}">M</span>
+                                    </td>
+                                    <td th:text="${st.mentor}">Abhinav</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+                                            <span class="badge bg-light text-dark border" title="Total Apps">Apps: <strong th:text="${st.totalApplications}">0</strong></span>
+                                            <span class="badge bg-light text-primary border" title="Screening">Scr: <strong th:text="${st.screeningCount}">0</strong></span>
+                                            <span class="badge bg-light text-info border" title="Interviews">PI: <strong th:text="${st.piCount}">0</strong></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span th:if="${st.placementStatus == 'PLACED'}" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> PLACED
+                                        </span>
+                                        <span th:if="${st.placementStatus == 'ENROLLED'}" class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                            ENROLLED
+                                        </span>
+                                        <span th:if="${st.placementStatus == 'BLOCKED'}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                            <i class="bi bi-slash-circle me-1"></i> BLOCKED
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div th:if="${st.placementStatus == 'PLACED'}">
+                                            <strong class="text-dark" th:text="${st.placedCompany}">Company</strong>
+                                            <div class="text-success small fw-bold" th:text="${st.ctc}">₹7.0 LPA</div>
+                                        </div>
+                                        <span th:unless="${st.placementStatus == 'PLACED'}" class="text-muted">-</span>
+                                    </td>
+                                    <td>
+                                        <form th:if="${st.placementStatus == 'BLOCKED'}" method="post" th:action="@{/admin/students/{id}/unblock(id=${st.id})}" onsubmit="return confirm('Revoke debarment and unblock this student?');">
+                                            <button type="submit" class="btn btn-xs btn-outline-success rounded-pill px-2 py-1" style="font-size: 0.72rem;">
+                                                <i class="bi bi-unlock-fill me-1"></i> Unblock
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top" th:if="${studentsPage.totalPages > 1}">
+                        <span class="small text-muted" th:text="'Showing page ' + (${studentsPage.number} + 1) + ' of ' + ${studentsPage.totalPages}">Page 1 of 66</span>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${studentsPage.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/students(page=${studentsPage.number - 1}, search=${search}, status=${selectedStatus}, course=${selectedCourse}, mentor=${selectedMentor})}">&laquo;</a>
+                            </li>
+                            <li class="page-item active">
+                                <span class="page-link" th:text="${studentsPage.number + 1}">1</span>
+                            </li>
+                            <li class="page-item" th:classappend="${studentsPage.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/students(page=${studentsPage.number + 1}, search=${search}, status=${selectedStatus}, course=${selectedCourse}, mentor=${selectedMentor})}">&raquo;</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AT-RISK EARLY WARNING ENGINE -->
+            <div class="tab-pane fade" id="atrisk-pane" role="tabpanel">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded-4 border border-warning shadow-xs h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark">High Inaction Risk</h6>
+                            </div>
+                            <div class="display-6 fw-extrabold text-warning mb-1" th:text="${lowAppRisk.size()}">310</div>
+                            <p class="small text-muted mb-0">Students eligible for <strong>25+ drives</strong> but submitted <strong>&le; 2 applications</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded-4 border border-primary shadow-xs h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-mic-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark">Interview Conversion Lag</h6>
+                            </div>
+                            <div class="display-6 fw-extrabold text-primary mb-1" th:text="${interviewRisk.size()}">379</div>
+                            <p class="small text-muted mb-0">Reached <strong>2+ Personal Interviews (PI)</strong> but <strong>0 offers converted</strong>. Need mock interviews.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded-4 border border-danger shadow-xs h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-cpu-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark">Screening Bottleneck</h6>
+                            </div>
+                            <div class="display-6 fw-extrabold text-danger mb-1" th:text="${screeningRisk.size()}">24</div>
+                            <p class="small text-muted mb-0">Applied to <strong>10+ drives</strong> with <strong>&le; 1 test cleared</strong>. Need DSA &amp; Aptitude roadmaps.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High Inaction Students Table -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>High Inaction Cohort (Top 15 Sample of <span th:text="${lowAppRisk.size()}">310</span> Students)</h6>
+                        <span class="badge bg-warning-subtle text-warning border">Needs Mentor Follow-up</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Student Name</th>
+                                    <th>Specialization</th>
+                                    <th>Mentor</th>
+                                    <th>Eligible Profiles</th>
+                                    <th>Applications</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="st, iter : ${lowAppRisk}" th:if="${iter.index < 15}">
+                                    <td><code class="fw-bold text-dark" th:text="${st.rollNumber}">Roll</code></td>
+                                    <td class="fw-bold text-dark" th:text="${st.studentName}">Name</td>
+                                    <td class="small text-muted" th:text="${st.course}">Course</td>
+                                    <td th:text="${st.mentor}">Mentor</td>
+                                    <td><span class="badge bg-primary-subtle text-primary fw-bold" th:text="${st.eligibleProfiles} + ' Profiles'">50 Profiles</span></td>
+                                    <td><span class="badge bg-danger-subtle text-danger fw-bold" th:text="${st.totalApplications} + ' Applied'">0 Applied</span></td>
+                                    <td>
+                                        <a th:href="'mailto:' + ${st.email} + '?subject=Important: JECRC Placement Drive Registration Nudge&body=Dear ' + ${st.studentName} + ',%0D%0A%0D%0AOur records show you are currently eligible for ' + ${st.eligibleProfiles} + ' campus recruitment drives, but have submitted only ' + ${st.totalApplications} + ' applications. Please review the upcoming drives on the You_can portal and register immediately.%0D%0A%0D%0ATraining & Placement Cell,%0D%0AJECRC University'" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-1" style="font-size: 0.72rem;">
+                                            <i class="bi bi-envelope-fill me-1"></i> Send Nudge
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Interview Lag Students Table -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-video3 text-primary me-2"></i>Interview Conversion Lag (Top 15 Sample of <span th:text="${interviewRisk.size()}">379</span> Students)</h6>
+                        <span class="badge bg-primary-subtle text-primary border">Needs Mock Interview Coaching</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Student Name</th>
+                                    <th>Specialization</th>
+                                    <th>Mentor</th>
+                                    <th>Interviews Reached (PI)</th>
+                                    <th>Offers Converted</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="st, iter : ${interviewRisk}" th:if="${iter.index < 15}">
+                                    <td><code class="fw-bold text-dark" th:text="${st.rollNumber}">Roll</code></td>
+                                    <td class="fw-bold text-dark" th:text="${st.studentName}">Name</td>
+                                    <td class="small text-muted" th:text="${st.course}">Course</td>
+                                    <td th:text="${st.mentor}">Mentor</td>
+                                    <td><span class="badge bg-warning-subtle text-warning fw-bold fs-6 px-2 py-1" th:text="${st.piCount} + ' PIs'">3 PIs</span></td>
+                                    <td><span class="badge bg-secondary-subtle text-secondary" th:text="${st.offersCount} + ' Offers'">0 Offers</span></td>
+                                    <td>
+                                        <a th:href="@{/mocks}" class="btn btn-xs btn-outline-success rounded-pill px-2 py-1" style="font-size: 0.72rem;">
+                                            <i class="bi bi-calendar2-check-fill me-1"></i> Schedule Mock
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: TOP RECRUITERS -->
+            <div class="tab-pane fade" id="recruiters-pane" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-building-check text-success me-2"></i>Marquee Placement Partners (2023–2027 Cohort)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Recruiter Name</th>
+                                    <th>Offers Confirmed</th>
+                                    <th>Average Package</th>
+                                    <th>Top Package</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r : ${topRecruiters}">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-buildings"></i>
+                                            </div>
+                                            <strong class="text-dark" th:text="${r['companyName']}">Company</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success fs-6 fw-bold px-3 py-1" th:text="${r['hireCount']}">29</span>
+                                    </td>
+                                    <td class="fw-bold text-dark" th:text="${r['avgCtc']}">₹7.0 LPA</td>
+                                    <td class="fw-extrabold text-danger" th:text="${r['maxCtc']}">₹17.5 LPA</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: DEBARMENT & ABSENTEES REGISTER -->
+            <div class="tab-pane fade" id="debarred-pane" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold text-danger mb-1"><i class="bi bi-shield-slash-fill me-2"></i>Attendance Compliance &amp; Debarred Register</h5>
+                            <p class="text-muted small mb-0">Students flagged for unexcused absence in recruitment rounds, Pre-Placement Talks, or Online Tests.</p>
+                        </div>
+                        <span class="badge bg-danger rounded-pill px-3 py-2" th:text="${debarredRecords.size()} + ' Penalized Students'">84 Penalized</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Student Name</th>
+                                    <th>Specialization</th>
+                                    <th>Sec</th>
+                                    <th>Mentor</th>
+                                    <th>Absence Count</th>
+                                    <th>Drive Event &amp; Company Skipped</th>
+                                    <th>Penalty Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="d : ${debarredRecords}">
+                                    <td><code class="fw-bold text-dark" th:text="${d.rollNumber}">23BCON1894</code></td>
+                                    <td class="fw-bold text-dark" th:text="${d.studentName}">Rajat Sharma</td>
+                                    <td class="small text-muted" th:text="${d.course}">Core CSE</td>
+                                    <td><span class="badge bg-secondary-subtle text-secondary" th:text="${d.section}">M</span></td>
+                                    <td th:text="${d.mentor}">Abhinav</td>
+                                    <td>
+                                        <span class="badge bg-danger px-2 py-1" th:text="${d.absentCount} + ' Missed'">1 Missed</span>
+                                    </td>
+                                    <td style="max-width: 320px;">
+                                        <div class="small text-muted text-break" style="white-space: pre-line;" th:text="${d.companiesDetails}">UBuy Technologies</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle" th:text="${d.penaltyStatus}">ACTIVE_PENALTY</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: FACULTY MENTORS -->
+            <div class="tab-pane fade" id="mentors-pane" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Faculty Mentor Cohort Overview (55 Faculty Coordinators)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Faculty Mentor</th>
+                                    <th>Mentees Assigned</th>
+                                    <th>Placed Students</th>
+                                    <th>Blocked Students</th>
+                                    <th>Conversion Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="m : ${mentorStats}">
+                                    <td class="fw-bold text-dark" th:text="${m['mentor']}">Dr. Himanshu Sharma</td>
+                                    <td th:text="${m['total']}">30</td>
+                                    <td class="text-success fw-bold" th:text="${m['placed']}">4</td>
+                                    <td class="text-danger fw-bold" th:text="${m['blocked']}">2</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-success" role="progressbar" th:style="'width: ' + ${m['placementRate']} + '%'"></div>
+                                            </div>
+                                            <span class="small fw-bold" th:text="${m['placementRate']} + '%'">15%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: SPECIALIZATIONS -->
+            <div class="tab-pane fade" id="courses-pane" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-mortarboard text-info me-2"></i>Academic Specialization Performance</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Academic Track / Course</th>
+                                    <th>Total Enrolled</th>
+                                    <th>Placed</th>
+                                    <th>Blocked</th>
+                                    <th>Placement %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${courseStats}">
+                                    <td class="fw-bold text-dark" th:text="${c['course']}">Core CSE</td>
+                                    <td th:text="${c['total']}">1023</td>
+                                    <td class="text-success fw-bold" th:text="${c['placed']}">100</td>
+                                    <td class="text-danger fw-bold" th:text="${c['blocked']}">70</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" role="progressbar" th:style="'width: ' + ${c['placementRate']} + '%'"></div>
+                                            </div>
+                                            <span class="small fw-bold" th:text="${c['placementRate']} + '%'">10%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

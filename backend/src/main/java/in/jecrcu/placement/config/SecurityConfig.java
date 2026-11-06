@@ -97,7 +97,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**", "/api/**")
+                .ignoringRequestMatchers("/h2-console/**", "/api/**", "/offers/**", "/pipeline/*/stage")
             )
             .exceptionHandling(ex -> ex
                 .accessDeniedHandler((request, response, accessDeniedException) -> {

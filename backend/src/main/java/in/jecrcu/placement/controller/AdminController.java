@@ -18,6 +18,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import in.jecrcu.placement.repository.UpcomingDriveRepository;
+import in.jecrcu.placement.service.StudentPlacementService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Controller
 @RequestMapping("/admin")
@@ -36,6 +41,7 @@ public class AdminController {
     private final UpcomingDriveRepository upcomingDriveRepository;
     private final NotificationService notificationService;
     private final OpportunityService opportunityService;
+    private final StudentPlacementService studentPlacementService;
 
     // In-memory cache for import preview before user commits
     private ImportService.ImportPreviewResult cachedImportPreview;
@@ -494,5 +500,57 @@ public class AdminController {
         response.setHeader("Content-Disposition", "attachment; filename=\"JECRC_Placement_Report_" + (year != null ? year : "All") + ".xlsx\"");
         response.getOutputStream().write(excelBytes);
         response.getOutputStream().flush();
+    }
+
+    // ==========================================
+    // 7. Student Cohort & Funnel Intelligence
+    // ==========================================
+    @GetMapping("/students")
+    public String studentCohortAnalytics(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String course,
+            @RequestParam(required = false) String mentor,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size,
+            Model model) {
+
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size), Sort.by("id").ascending());
+        Page<StudentPlacementRecord> studentsPage = studentPlacementService.filterStudents(search, status, course, mentor, pageable);
+
+        model.addAttribute("studentsPage", studentsPage);
+        model.addAttribute("metrics", studentPlacementService.getFunnelMetrics());
+        model.addAttribute("topRecruiters", studentPlacementService.getTopRecruiters());
+        model.addAttribute("courseStats", studentPlacementService.getCourseStatistics());
+        model.addAttribute("mentorStats", studentPlacementService.getMentorStatistics());
+        model.addAttribute("debarredRecords", studentPlacementService.getDebarredRecords());
+        model.addAttribute("lowAppRisk", studentPlacementService.getLowApplicationRisk());
+        model.addAttribute("screeningRisk", studentPlacementService.getScreeningBottleneckRisk());
+        model.addAttribute("interviewRisk", studentPlacementService.getInterviewConversionRisk());
+        model.addAttribute("distinctCourses", studentPlacementService.getDistinctCourses());
+        model.addAttribute("distinctMentors", studentPlacementService.getDistinctMentors());
+        model.addAttribute("search", search);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedCourse", course);
+        model.addAttribute("selectedMentor", mentor);
+
+        return "admin/students";
+    }
+
+    @PostMapping("/students/{id}/unblock")
+    public String unblockStudent(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        boolean success = studentPlacementService.unblockStudent(id);
+        if (success) {
+            User actor = (userDetails != null) ? userService.findById(userDetails.getId()).orElse(null) : null;
+            auditService.logAction(actor, "UNBLOCK_STUDENT", "StudentPlacementRecord", id, null, "Debarment penalty cleared by Placement Cell Admin");
+            redirectAttributes.addFlashAttribute("successMessage", "Student penalty removed and placement status reset to ENROLLED.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Could not locate student record with ID: " + id);
+        }
+        return "redirect:/admin/students";
     }
 }

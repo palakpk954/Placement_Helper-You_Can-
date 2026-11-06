@@ -209,6 +209,8 @@ The table below lists every Spring Boot controller in `in.jecrcu.placement.contr
 | `AuthController` | `/login`, `/register`, `/logout` | `templates/auth/*` | `permitAll()` |
 | `DashboardController` | `/`, `/dashboard` | `templates/dashboard.html` | `ROLE_STUDENT` or Public |
 | `UpcomingController` | `/upcoming`, `/upcoming/{id}`, `/upcoming/apply` | `templates/upcoming/*` | Public / `ROLE_STUDENT` |
+| `PipelineController` | `/pipeline`, `/pipeline/board`, `/pipeline/{id}/*` | `templates/pipeline/*` | `ROLE_STUDENT` |
+| `OfferAnalyzerController` | `/offers`, `/offers/calculate`, `/offers/compare` | `templates/offers/*` | `ROLE_STUDENT` |
 | `CompanyController` | `/companies`, `/companies/{slug}` | `templates/companies/*` | Public |
 | `StatsController` | `/placements/statistics` | `templates/statistics/*` | Public |
 | `CalendarController` | `/calendar` | `templates/calendar/*` | Authenticated |

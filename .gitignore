@@ -36,6 +36,8 @@ build/
 data/
 uploads/
 scratch/
+cookies.txt
+out_*.html
 ~$*
 *.tmp
 .DS_Store

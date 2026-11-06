@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Recruitment Pipeline &amp; Kanban Tracker — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xxl px-3 px-md-4 py-3">
+
+        <!-- Top Alerts (Flash Messages) -->
+        <div th:if="${successMessage != null}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-xs d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5 me-2 text-success"></i>
+            <div th:text="${successMessage}">Operation completed successfully!</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${infoMessage != null}" class="alert alert-info alert-dismissible fade show rounded-3 shadow-xs d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle-fill fs-5 me-2 text-info"></i>
+            <div th:text="${infoMessage}">Information updated.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${errorMessage != null}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-xs d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger"></i>
+            <div th:text="${errorMessage}">An error occurred.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Page Header -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="bg-primary-subtle text-primary rounded-3 p-2 d-inline-flex">
+                        <i class="bi bi-kanban fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">Personal Application Pipeline</h3>
+                    <span class="badge badge-soft-primary rounded-pill px-3 py-1">Live Tracker</span>
+                </div>
+                <p class="text-muted small mb-0">Manage and advance your on-campus drives and off-campus applications across every interview stage.</p>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a th:href="@{/upcoming}" class="btn btn-outline-secondary rounded-pill btn-sm fw-semibold">
+                    <i class="bi bi-megaphone me-1"></i> Browse Upcoming Drives
+                </a>
+                <button type="button" class="btn btn-primary rounded-pill btn-sm fw-semibold shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addApplicationModal">
+                    <i class="bi bi-plus-lg me-1"></i> Add Application
+                </button>
+            </div>
+        </div>
+
+        <!-- Upcoming Interviews Urgent Reminder Banner -->
+        <div th:if="${upcomingInterviews != null and !upcomingInterviews.isEmpty()}" class="app-card border-primary p-3 mb-4 shadow-sm" style="border-left: 5px solid var(--primary-blue) !important;">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-2 d-flex align-items-center justify-content-center" style="width: 2.75rem; height: 2.75rem;">
+                        <i class="bi bi-alarm-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <span class="badge badge-soft-warning mb-1">
+                            <i class="bi bi-clock-history me-1"></i> Upcoming Event
+                        </span>
+                        <h6 class="fw-bold mb-0" th:text="${upcomingInterviews[0].companyName + ' — ' + (upcomingInterviews[0].nextEventTitle != null ? upcomingInterviews[0].nextEventTitle : upcomingInterviews[0].stage.displayName)}">
+                            Microsoft — Online Assessment
+                        </h6>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <span th:text="${#temporals.format(upcomingInterviews[0].nextEventDate, 'EEEE, dd MMM yyyy, HH:mm')}">Date</span>
+                            <span th:if="${upcomingInterviews[0].interviewLocation != null}">
+                                &bull; <i class="bi bi-geo-alt me-1"></i><span th:text="${upcomingInterviews[0].interviewLocation}">Location</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a th:if="${upcomingInterviews[0].company != null}" th:href="@{/companies/{id}(id=${upcomingInterviews[0].company?.id})}" class="btn btn-sm btn-outline-primary rounded-pill">
+                        <i class="bi bi-journal-text me-1"></i> Past Questions
+                    </a>
+                    <a th:href="@{/practice}" class="btn btn-sm btn-warning text-dark rounded-pill fw-semibold">
+                        <i class="bi bi-lightning-charge me-1"></i> Practice Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funnel Metrics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 shadow-xs h-100 border-0">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Total Applied</span>
+                        <div class="rounded-circle bg-light p-2 text-primary">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-primary" th:text="${stats.totalApplications}">0</h3>
+                    <span class="small text-muted">Across all recruiters</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 shadow-xs h-100 border-0">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Active in Pipeline</span>
+                        <div class="rounded-circle bg-light p-2 text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-warning" th:text="${stats.activeInPipeline}">0</h3>
+                    <span class="small text-muted">Under ongoing evaluation</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 shadow-xs h-100 border-0">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Interviews Reached</span>
+                        <div class="rounded-circle bg-light p-2 text-info">
+                            <i class="bi bi-code-slash"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-info" th:text="${stats.interviewsCount}">0</h3>
+                    <span class="small text-muted" th:text="${stats.interviewRate + '% shortlist rate'}">0% shortlist rate</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 shadow-xs h-100 border-0">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-semibold">Offers Secured</span>
+                        <div class="rounded-circle bg-light p-2 text-success">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-success" th:text="${stats.offeredCount}">0</h3>
+                    <span class="small text-muted" th:text="${stats.offerRate + '% conversion rate'}">0% conversion</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Recruitment Funnel Bar -->
+        <div class="pipeline-funnel-container mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-bold text-uppercase text-muted" style="letter-spacing: 0.05em;">
+                    <i class="bi bi-funnel-fill text-primary me-1"></i> Recruitment Conversion Funnel
+                </span>
+                <span class="badge badge-soft-info" th:text="${stats.totalApplications + ' Applications Tracked'}">0 Applications</span>
+            </div>
+            <div class="row g-2 align-items-center">
+                <div class="col-6 col-md-3">
+                    <div class="funnel-step">
+                        <div class="small text-muted mb-1">1. Applied</div>
+                        <h5 class="fw-bold mb-0 text-primary" th:text="${stats.appliedCount}">0</h5>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="funnel-step">
+                        <div class="small text-muted mb-1">2. Online Assessment</div>
+                        <h5 class="fw-bold mb-0 text-warning" th:text="${stats.oaCount}">0</h5>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                 th:style="${stats.totalApplications > 0 ? 'width: ' + ((stats.oaCount + stats.interviewsCount + stats.offeredCount) * 100 / stats.totalApplications) + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="funnel-step">
+                        <div class="small text-muted mb-1">3. Tech &amp; HR Rounds</div>
+                        <h5 class="fw-bold mb-0 text-info" th:text="${stats.interviewsCount}">0</h5>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar bg-info" role="progressbar"
+                                 th:style="${stats.totalApplications > 0 ? 'width: ' + ((stats.interviewsCount + stats.offeredCount) * 100 / stats.totalApplications) + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="funnel-step">
+                        <div class="small text-muted mb-1">4. Offer Extended</div>
+                        <h5 class="fw-bold mb-0 text-success" th:text="${stats.offeredCount}">0</h5>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 th:style="${stats.totalApplications > 0 ? 'width: ' + (stats.offeredCount * 100 / stats.totalApplications) + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="app-card p-3 mb-4 shadow-sm">
+            <div class="row g-2 align-items-center">
+                <!-- Live Search -->
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text"
+                               class="form-control border-start-0"
+                               id="pipelineSearchInput"
+                               name="q"
+                               th:value="${searchQuery}"
+                               placeholder="Search company or role (e.g. Microsoft, Analyst)..."
+                               hx-get="/pipeline/board"
+                               hx-target="#boardContainer"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-include="#filterTypeInput">
+                    </div>
+                </div>
+
+                <!-- Type Filter Pills -->
+                <div class="col-md-7 d-flex justify-content-md-end gap-1 flex-wrap">
+                    <input type="hidden" id="filterTypeInput" name="type" th:value="${selectedType}">
+                    
+                    <a th:href="@{/pipeline(type='ALL', q=${searchQuery})}"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       th:classappend="${selectedType == 'ALL' or selectedType == null ? 'btn-primary' : 'btn-outline-secondary'}">
+                        All Applications
+                    </a>
+                    <a th:href="@{/pipeline(type='ON_CAMPUS', q=${searchQuery})}"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       th:classappend="${selectedType == 'ON_CAMPUS' ? 'btn-primary' : 'btn-outline-secondary'}">
+                        <i class="bi bi-mortarboard me-1"></i> On-Campus
+                    </a>
+                    <a th:href="@{/pipeline(type='OFF_CAMPUS', q=${searchQuery})}"
+                       class="btn btn-sm rounded-pill px-3 fw-semibold"
+                       th:classappend="${selectedType == 'OFF_CAMPUS' ? 'btn-primary' : 'btn-outline-secondary'}">
+                        <i class="bi bi-globe2 me-1"></i> Off-Campus
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             KANBAN BOARD CONTAINER (HTMX Refresh Target)
+             ========================================== -->
+        <div id="boardContainer" th:fragment="boardContainer">
+            <div class="kanban-board-wrapper">
+
+                <!-- Loop over each Stage Column -->
+                <div class="kanban-column"
+                     th:each="stage : ${stages}"
+                     th:attr="data-stage=${stage.name()}"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, this)">
+
+                    <!-- Column Header -->
+                    <div class="kanban-column-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi" th:classappend="${stage.iconClass}"></i>
+                            <span class="fw-bold small" th:text="${stage.displayName}">Stage</span>
+                        </div>
+                        <span class="badge rounded-pill bg-light text-dark border px-2 py-1 small fw-semibold"
+                              th:text="${board[stage] != null ? board[stage].size() : 0}">0</span>
+                    </div>
+
+                    <!-- Cards Dropzone -->
+                    <div class="kanban-cards-wrapper">
+
+                        <!-- Application Card -->
+                        <div class="kanban-card"
+                             th:each="app : ${board[stage]}"
+                             th:id="${'app-card-' + app.id}"
+                             th:attr="data-app-id=${app.id}, data-current-stage=${app.stage.name()}"
+                             draggable="true"
+                             ondragstart="handleDragStart(event)"
+                             ondragend="handleDragEnd(event)">
+
+                            <!-- Top: Company Avatar + Name + Type Badge -->
+                            <div class="d-flex align-items-start gap-2 mb-2">
+                                <div class="company-avatar">
+                                    <img th:if="${app.company != null and app.company.logoUrl != null}"
+                                         th:src="${app.company.logoUrl}"
+                                         th:alt="${app.companyName}">
+                                    <span th:unless="${app.company != null and app.company.logoUrl != null}"
+                                          class="fw-bold text-primary small"
+                                          th:text="${#strings.substring(app.companyName, 0, 1)}">C</span>
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <h6 class="fw-bold mb-0 text-truncate" th:text="${app.companyName}">Company</h6>
+                                    <p class="small text-muted mb-0 text-truncate" th:text="${app.roleTitle}">Software Engineer</p>
+                                </div>
+                                <span class="badge" th:classappend="${app.applicationType.badgeClass}" style="font-size: 0.65rem;"
+                                      th:text="${app.applicationType.displayName}">On-Campus</span>
+                            </div>
+
+                            <!-- CTC & Compensation Tag -->
+                            <div class="mb-2" th:if="${app.ctcOrStipend != null}">
+                                <span class="badge bg-light text-dark border small fw-normal">
+                                    <i class="bi bi-cash-stack text-success me-1"></i>
+                                    <span th:text="${app.ctcOrStipend}">12.0 LPA</span>
+                                </span>
+                            </div>
+
+                            <!-- Next Round / Scheduled Date Alert -->
+                            <div class="alert alert-light border py-1 px-2 small mb-2 rounded-2"
+                                 th:if="${app.nextEventDate != null}"
+                                 th:classappend="${app.nextEventDate.isBefore(#temporals.createNow().plusHours(48)) ? 'border-warning bg-warning-subtle' : ''}">
+                                <div class="d-flex align-items-center gap-1 text-truncate">
+                                    <i class="bi bi-clock-history text-warning"></i>
+                                    <span class="fw-semibold text-truncate"
+                                          th:text="${app.nextEventTitle != null ? app.nextEventTitle : 'Next Round'}">Event</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.72rem;"
+                                     th:text="${#temporals.format(app.nextEventDate, 'dd MMM, HH:mm')}">Date</div>
+                            </div>
+
+                            <!-- Notes Preview (if any) -->
+                            <div class="small text-muted mb-2 text-truncate" th:if="${app.notes != null and !app.notes.isBlank()}"
+                                 th:title="${app.notes}">
+                                <i class="bi bi-chat-left-dots text-primary me-1"></i>
+                                <span th:text="${app.notes}">Notes...</span>
+                            </div>
+
+                            <!-- Card Footer Controls: Stage Steppers & Quick Actions -->
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
+                                <div class="d-flex gap-1">
+                                    <!-- Edit Button (Loads Modal) -->
+                                    <button type="button"
+                                            class="btn btn-xs btn-outline-secondary rounded-pill py-0 px-2"
+                                            style="font-size: 0.75rem;"
+                                            title="Edit details &amp; notes"
+                                            hx-get=""
+                                            th:attr="hx-get=@{/pipeline/{id}/modal(id=${app.id})}"
+                                            hx-target="#editModalContainer"
+                                            onclick="new bootstrap.Modal(document.getElementById('editApplicationModal')).show();">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <!-- Link to Company Archive (if linked) -->
+                                    <a th:if="${app.company != null}"
+                                       th:href="@{/companies/{id}(id=${app.company?.id})}"
+                                       class="btn btn-xs btn-outline-primary rounded-pill py-0 px-2"
+                                       style="font-size: 0.75rem;"
+                                       title="View past interview questions">
+                                        <i class="bi bi-collection"></i>
+                                    </a>
+
+                                    <!-- Analyze Offer & Bond -->
+                                    <a th:href="@{/offers(company=${app.companyName}, role=${app.roleTitle})}"
+                                       class="btn btn-xs btn-outline-success rounded-pill py-0 px-2"
+                                       style="font-size: 0.75rem;"
+                                       title="Analyze in-hand salary &amp; bond terms">
+                                        <i class="bi bi-calculator"></i>
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <form th:action="@{/pipeline/{id}/delete(id=${app.id})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Remove this application from your pipeline?');">
+                                        <button type="submit" class="btn btn-xs btn-outline-danger rounded-pill py-0 px-2"
+                                                style="font-size: 0.75rem;" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Quick Stage Stepper -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Move Left -->
+                                    <form th:if="${stage.ordinal() > 0}"
+                                          th:action="@{/pipeline/{id}/stage(id=${app.id})}"
+                                          method="post"
+                                          class="d-inline">
+                                        <input type="hidden" name="stage" th:value="${stages[stage.ordinal() - 1].name()}">
+                                        <button type="submit" class="btn btn-light border btn-sm py-0 px-2" title="Move to previous stage">
+                                            <i class="bi bi-chevron-left" style="font-size: 0.7rem;"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Move Right -->
+                                    <form th:if="${stage.ordinal() < stages.length - 1}"
+                                          th:action="@{/pipeline/{id}/stage(id=${app.id})}"
+                                          method="post"
+                                          class="d-inline">
+                                        <input type="hidden" name="stage" th:value="${stages[stage.ordinal() + 1].name()}">
+                                        <button type="submit" class="btn btn-light border btn-sm py-0 px-2" title="Move to next stage">
+                                            <i class="bi bi-chevron-right" style="font-size: 0.7rem;"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Empty State in Column -->
+                        <div class="text-center py-4 text-muted small" th:if="${board[stage] == null or board[stage].isEmpty()}">
+                            <i class="bi bi-inbox fs-3 d-block mb-1 opacity-25"></i>
+                            <span>No applications in this stage</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         MODAL 1: ADD NEW APPLICATION
+         ========================================== -->
+    <div class="modal fade" id="addApplicationModal" tabindex="-1" aria-labelledby="addAppModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <form th:action="@{/pipeline/add}" method="post">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-plus-lg fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold" id="addAppModalLabel">Add Job Application</h5>
+                                <p class="text-muted small mb-0">Record an on-campus or off-campus application</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body py-3">
+                        <!-- Application Type -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Application Type</label>
+                            <select class="form-select" name="applicationType" id="addAppTypeSelect" onchange="toggleDrivePicker(this.value)">
+                                <option value="OFF_CAMPUS" selected>Off-Campus (Referral / Direct Portal)</option>
+                                <option value="ON_CAMPUS">On-Campus Drive</option>
+                                <option value="OPPORTUNITY">Hackathon / Challenge</option>
+                            </select>
+                        </div>
+
+                        <!-- On-Campus Drive Picker (Shows if On-Campus selected) -->
+                        <div class="mb-3 d-none" id="upcomingDrivePickerDiv">
+                            <label class="form-label small fw-semibold">Select Scheduled Campus Drive</label>
+                            <select class="form-select" name="upcomingDriveId" onchange="autofillUpcomingDrive(this)">
+                                <option value="">-- Choose Upcoming Drive --</option>
+                                <option th:each="ud : ${upcomingDrives}"
+                                        th:value="${ud.id}"
+                                        th:attr="data-company=${ud.companyName}, data-role=${ud.rolesOffered}, data-ctc=${ud.ctcOrStipend}"
+                                        th:text="${ud.companyName + ' (' + ud.rolesOffered + ')'}">Drive</option>
+                            </select>
+                        </div>
+
+                        <!-- Recruiter Name -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Company / Recruiter Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="companyName" id="addCompanyNameInput" required placeholder="e.g. Amazon, Goldman Sachs, TCS...">
+                        </div>
+
+                        <!-- Role Title & CTC -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label small fw-semibold">Role / Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="roleTitle" id="addRoleTitleInput" required placeholder="e.g. SDE-1, Cloud Associate...">
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label small fw-semibold">CTC / Package</label>
+                                <input type="text" class="form-control" name="ctcOrStipend" id="addCtcInput" placeholder="e.g. 14.5 LPA">
+                            </div>
+                        </div>
+
+                        <!-- Initial Stage -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Current Pipeline Stage</label>
+                            <select class="form-select" name="stage">
+                                <option th:each="s : ${stages}" th:value="${s.name()}" th:text="${s.displayName}" th:selected="${s.name() == 'APPLIED'}">Applied</option>
+                            </select>
+                        </div>
+
+                        <!-- Next Round Details -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Next Round Date &amp; Time</label>
+                                <input type="datetime-local" class="form-control" name="nextEventDate">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Next Round Title</label>
+                                <input type="text" class="form-control" name="nextEventTitle" placeholder="e.g. OA Test, Round 1 Tech">
+                            </div>
+                        </div>
+
+                        <!-- Notes & Tips -->
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Personal Notes &amp; Preparation Focus</label>
+                            <textarea class="form-control" name="notes" rows="3" placeholder="Key topics asked, recruiter contact, things to revise before next round..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill btn-sm px-4 fw-semibold shadow-sm">Save Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: EDIT APPLICATION (Target for HTMX)
+         ========================================== -->
+    <div class="modal fade" id="editApplicationModal" tabindex="-1" aria-labelledby="editAppModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4" id="editModalContainer">
+                <!-- HTMX will inject the content here -->
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note: Edit modal content fragment is dynamically loaded from pipeline/edit_modal.html via HTMX -->
+
+</div>
+
+<!-- Drag & Drop Client-side Script -->
+<script>
+    let draggedAppId = null;
+
+    function handleDragStart(e) {
+        draggedAppId = e.target.getAttribute('data-app-id');
+        e.target.classList.add('is-dragging');
+        e.dataTransfer.setData('text/plain', draggedAppId);
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+        e.target.classList.remove('is-dragging');
+        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over'));
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const col = e.currentTarget;
+        if (!col.classList.contains('drag-over')) {
+            col.classList.add('drag-over');
+        }
+    }
+
+    function handleDragLeave(e) {
+        const col = e.currentTarget;
+        col.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, columnElement) {
+        e.preventDefault();
+        columnElement.classList.remove('drag-over');
+        const targetStage = columnElement.getAttribute('data-stage');
+        const appId = e.dataTransfer.getData('text/plain') || draggedAppId;
+
+        if (!appId || !targetStage) return;
+
+        // Perform instant HTMX / fetch POST to update stage
+        const formData = new FormData();
+        formData.append('stage', targetStage);
+
+        const currentType = document.getElementById('filterTypeInput') ? document.getElementById('filterTypeInput').value : 'ALL';
+        const currentQuery = document.getElementById('pipelineSearchInput') ? document.getElementById('pipelineSearchInput').value : '';
+        formData.append('type', currentType);
+        formData.append('q', currentQuery);
+
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+        const headers = { 'HX-Request': 'true' };
+        if (tokenMeta && headerMeta) {
+            const token = tokenMeta.getAttribute('content');
+            const header = headerMeta.getAttribute('content');
+            if (token && header) {
+                headers[header] = token;
+                formData.append('_csrf', token);
+            }
+        }
+
+        fetch(`/pipeline/${appId}/stage`, {
+            method: 'POST',
+            body: formData,
+            headers: headers
+        })
+        .then(response => response.text())
+        .then(html => {
+            const boardContainer = document.getElementById('boardContainer');
+            if (boardContainer) {
+                boardContainer.outerHTML = html;
+            }
+        })
+        .catch(err => {
+            console.error('Failed to move stage:', err);
+            window.location.reload();
+        });
+    }
+
+    function toggleDrivePicker(val) {
+        const picker = document.getElementById('upcomingDrivePickerDiv');
+        if (picker) {
+            if (val === 'ON_CAMPUS') {
+                picker.classList.remove('d-none');
+            } else {
+                picker.classList.add('d-none');
+            }
+        }
+    }
+
+    function autofillUpcomingDrive(select) {
+        const selected = select.options[select.selectedIndex];
+        if (!selected || !selected.value) return;
+
+        const company = selected.getAttribute('data-company');
+        const role = selected.getAttribute('data-role');
+        const ctc = selected.getAttribute('data-ctc');
+
+        if (company) document.getElementById('addCompanyNameInput').value = company;
+        if (role) document.getElementById('addRoleTitleInput').value = role;
+        if (ctc) document.getElementById('addCtcInput').value = ctc;
+    }
+</script>
+</body>
+</html>

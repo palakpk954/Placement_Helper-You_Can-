@@ -67,21 +67,40 @@ public class DataInitializer implements CommandLineRunner {
 
                 if (!passwordEncoder.matches(expectedPassword, user.getPassword())) {
                     user.setPassword(passwordEncoder.encode(expectedPassword));
-                    user.setEmailVerified(true);
                     userRepository.save(user);
-                    log.info("Normalized seed password for user: {}", user.getEmail());
+                    log.info("Reset password for seed user {} to standard password", user.getEmail());
                 }
             }
         } catch (Exception e) {
-            log.warn("Could not check/update seed passwords: {}", e.getMessage());
+            log.error("Error normalizing user credentials: {}", e.getMessage());
         }
 
-        // 3. Deduplicate any duplicate notifications by (userId, title, type)
+        // 3. Synchronize real student cohort profiles from student_placement_records into users
+        try {
+            String defaultStudentPassword = passwordEncoder.encode("student123");
+            int inserted = jdbcTemplate.update(
+                "INSERT INTO users (email, password, full_name, branch, graduation_year, cgpa, active_backlogs, role, email_verified, points, created_at) " +
+                "SELECT LOWER(spr.email), ?, MAX(spr.student_name), MAX(spr.course), " +
+                "MAX(CASE WHEN LOWER(spr.program) LIKE '%m.tech%' THEN 2025 ELSE 2027 END), " +
+                "8.00, 0, 'ROLE_STUDENT', TRUE, " +
+                "MAX(CASE WHEN spr.placement_status = 'PLACED' THEN 50 ELSE 10 END), CURRENT_TIMESTAMP " +
+                "FROM student_placement_records spr " +
+                "WHERE spr.email IS NOT NULL AND spr.email != '' AND LOWER(spr.email) NOT IN (SELECT LOWER(email) FROM users) " +
+                "GROUP BY LOWER(spr.email)",
+                defaultStudentPassword
+            );
+            if (inserted > 0) {
+                log.info("Synchronized {} JECRC students from placement records into users table.", inserted);
+            }
+        } catch (Exception e) {
+            log.warn("Could not sync student placement records into users: {}", e.getMessage());
+        }
+
+        // 4. Deduplicate redundant notifications on startup
         try {
             List<in.jecrcu.placement.entity.Notification> allNotifs = notificationRepository.findAll();
             java.util.Set<String> seen = new java.util.HashSet<>();
             List<in.jecrcu.placement.entity.Notification> duplicates = new java.util.ArrayList<>();
-            // Sort by ID descending so we keep the newest
             allNotifs.sort((a, b) -> b.getId().compareTo(a.getId()));
             for (in.jecrcu.placement.entity.Notification n : allNotifs) {
                 String key = (n.getUser() != null ? n.getUser().getId() : 0) + "|" + n.getTitle() + "|" + n.getNotificationType();
@@ -97,12 +116,13 @@ public class DataInitializer implements CommandLineRunner {
             log.warn("Could not deduplicate notifications: {}", e.getMessage());
         }
 
-        // 4. Synchronize all table primary key identity sequences to prevent unique constraint collisions
+        // 5. Synchronize all table primary key identity sequences to prevent unique constraint collisions
         try {
             String[] tables = {
                 "users", "companies", "drives", "rounds", "experiences", "questions",
                 "interview_questions", "alumni_profiles", "upcoming_drives", "opportunities", "mock_slots",
-                "mock_bookings", "badges", "bookmarks", "notifications", "company_ratings", "jecrc_placement_records"
+                "mock_bookings", "badges", "bookmarks", "notifications", "company_ratings", "jecrc_placement_records",
+                "student_placement_records", "placement_debarment_records"
             };
             for (String table : tables) {
                 try {

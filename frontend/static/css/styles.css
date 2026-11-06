@@ -719,3 +719,200 @@ a:hover {
     transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   Recruitment Pipeline & Kanban Tracker Styles
+   ========================================================================== */
+
+/* Soft Badge Utilities */
+.badge-soft-primary {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-blue) !important;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+.badge-soft-warning {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #d97706 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+[data-bs-theme="dark"] .badge-soft-warning {
+    color: #fbbf24 !important;
+}
+.badge-soft-info {
+    background-color: rgba(6, 182, 212, 0.15) !important;
+    color: #0891b2 !important;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+}
+[data-bs-theme="dark"] .badge-soft-info {
+    color: #38bdf8 !important;
+}
+.badge-soft-purple {
+    background-color: rgba(139, 92, 246, 0.15) !important;
+    color: #7c3aed !important;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+[data-bs-theme="dark"] .badge-soft-purple {
+    color: #a78bfa !important;
+}
+.badge-soft-success {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+[data-bs-theme="dark"] .badge-soft-success {
+    color: #34d399 !important;
+}
+.badge-soft-danger {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+[data-bs-theme="dark"] .badge-soft-danger {
+    color: #f87171 !important;
+}
+
+/* Kanban Board Container */
+.kanban-board-wrapper {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+.kanban-board-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+.kanban-board-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+}
+
+/* Kanban Columns */
+.kanban-column {
+    flex: 0 0 320px;
+    min-width: 300px;
+    max-width: 340px;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 280px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Column Header Stage Accents */
+.kanban-column[data-stage="APPLIED"] .kanban-column-header {
+    border-top: 3.5px solid var(--primary-blue);
+}
+.kanban-column[data-stage="OA_ROUND"] .kanban-column-header {
+    border-top: 3.5px solid var(--accent-amber);
+}
+.kanban-column[data-stage="TECH_INTERVIEW"] .kanban-column-header {
+    border-top: 3.5px solid var(--accent-cyan);
+}
+.kanban-column[data-stage="HR_ROUND"] .kanban-column-header {
+    border-top: 3.5px solid var(--accent-purple);
+}
+.kanban-column[data-stage="OFFERED"] .kanban-column-header {
+    border-top: 3.5px solid var(--accent-emerald);
+}
+.kanban-column[data-stage="REJECTED"] .kanban-column-header {
+    border-top: 3.5px solid var(--text-muted);
+}
+
+.kanban-column-header {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--bg-surface);
+}
+
+.kanban-cards-wrapper {
+    padding: 0.75rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 220px;
+}
+
+/* Drag over active column state */
+.kanban-column.drag-over {
+    border-color: var(--primary-blue);
+    background-color: var(--primary-light);
+    box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+/* Kanban Cards */
+.kanban-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.85rem;
+    box-shadow: var(--shadow-xs);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: grab;
+    user-select: none;
+    position: relative;
+}
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-blue);
+}
+.kanban-card:active {
+    cursor: grabbing;
+}
+.kanban-card.is-dragging {
+    opacity: 0.45;
+    transform: scale(0.97);
+    border: 2px dashed var(--primary-blue);
+}
+
+/* Funnel Visual Progress Bar */
+.pipeline-funnel-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.funnel-step {
+    flex: 1;
+    position: relative;
+    padding: 0.75rem;
+    text-align: center;
+    border-radius: var(--radius-md);
+    background: var(--bg-page);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.2s ease;
+}
+.funnel-step:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-blue);
+}
+
+/* Avatar/Logo square */
+.company-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-page);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.company-avatar img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+

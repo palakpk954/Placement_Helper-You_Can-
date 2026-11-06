@@ -390,6 +390,15 @@ During development and continuous verification, the following technical issues w
   2. Streamlined student navigation into 5 balanced groups (`Companies`, `Upcoming`, `Calendar`, `Prep Tools ▾`, `Community ▾`), eliminating ~210px of excess width.
   3. Added `flex-shrink: 0` to all right toolbar controls and unified container classes on `/upcoming` to match the dashboard.
 
+### 16. Alumni Mentor Top Navigation Bar Defaulting to Student Prep Tools
+- **Symptom**: When logged in with an alumni mentor account (`ROLE_ALUMNI`), the top navigation bar displayed student-specific recruitment tools (Application Pipeline Kanban, Resume Scanner, Practice Mode, Roadmap, Eligibility Engine) instead of mentor tools, and the brand logo directed them to the student dashboard (`/dashboard`).
+- **Root Cause**: In `frontend/templates/layout/base.html`, the navigation condition fell back to student links for any user matching `!hasRole('ADMIN')`. Since `ROLE_ALUMNI` is not `ROLE_ADMIN`, alumni users were served the student navigation bar.
+- **Resolution**:
+  1. Created a dedicated navigation bar in `base.html` for `sec:authorize="hasRole('ALUMNI')"` featuring *Mentor Cockpit*, *Mock Interviews*, *Alumni Network*, *Recruiters & Drives*, *Placement Records*, and *Share Experience*.
+  2. Guarded the student navigation links to only render when the user has `ROLE_STUDENT` or when an admin/alumni user explicitly toggles student preview mode (`isAlumniPreview` / `isAdminPreview`).
+  3. Updated the brand logo link and user profile dropdown to route mentors directly to their *Mentor Cockpit* (`/alumni/dashboard`).
+  4. Added a responsive "Student View" toggle pill in the alumni top bar.
+
 ---
 
 ## 🏛 System Architecture & Module Directory

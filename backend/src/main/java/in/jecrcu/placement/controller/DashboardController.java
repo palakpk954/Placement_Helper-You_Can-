@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,6 +25,8 @@ public class DashboardController {
     private final NotificationService notificationService;
     private final StatsService statsService;
     private final OpportunityService opportunityService;
+    private final ApplicationPipelineService applicationPipelineService;
+    private final StudentPlacementService studentPlacementService;
 
     @GetMapping({"/", "/dashboard"})
     public String dashboard(
@@ -89,6 +92,19 @@ public class DashboardController {
 
         // 6. Trending Off-Campus Opportunities & Hackathons
         model.addAttribute("trendingOpportunities", opportunityService.getTopTrending());
+
+        // 7. Personal Application Pipeline
+        model.addAttribute("pipelineStats", applicationPipelineService.getPipelineStats(userDetails.getId()));
+        model.addAttribute("pipelineUpcomingInterviews", applicationPipelineService.getUpcomingInterviews(userDetails.getId()));
+
+        // 8. Institutional Student Placement & Risk Warning Engine
+        if (user != null) {
+            Optional<StudentPlacementRecord> spr = studentPlacementService.findByEmailOrRoll(user.getEmail());
+            if (spr.isPresent()) {
+                model.addAttribute("studentPlacementRecord", spr.get());
+                model.addAttribute("studentRiskSummary", studentPlacementService.getStudentRiskSummary(spr.get()));
+            }
+        }
 
         return "dashboard";
     }

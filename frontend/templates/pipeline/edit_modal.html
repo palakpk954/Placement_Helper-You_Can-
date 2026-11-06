@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="editModalContent">
+    <form th:action="@{/pipeline/{id}/update(id=${app.id})}" method="post">
+        <div class="modal-header border-bottom-0 pb-0">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                </div>
+                <div>
+                    <h5 class="modal-title fw-bold" th:text="${'Edit: ' + app.companyName}">Edit Application</h5>
+                    <p class="text-muted small mb-0">Update interview progress and notes</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body py-3">
+            <div class="row g-2 mb-3">
+                <div class="col-7">
+                    <label class="form-label small fw-semibold">Company Name</label>
+                    <input type="text" class="form-control" name="companyName" th:value="${app.companyName}" required>
+                </div>
+                <div class="col-5">
+                    <label class="form-label small fw-semibold">CTC / Package</label>
+                    <input type="text" class="form-control" name="ctcOrStipend" th:value="${app.ctcOrStipend}">
+                </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="form-label small fw-semibold">Role Title</label>
+                    <input type="text" class="form-control" name="roleTitle" th:value="${app.roleTitle}" required>
+                </div>
+                <div class="col-6">
+                    <label class="form-label small fw-semibold">Stage</label>
+                    <select class="form-select" name="stage">
+                        <option th:each="s : ${stages}" th:value="${s.name()}" th:text="${s.displayName}"
+                                th:selected="${app.stage == s}">Stage</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="form-label small fw-semibold">Next Round Date</label>
+                    <input type="datetime-local" class="form-control" name="nextEventDate"
+                           th:value="${app.nextEventDate != null ? #temporals.format(app.nextEventDate, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label small fw-semibold">Next Round Title</label>
+                    <input type="text" class="form-control" name="nextEventTitle" th:value="${app.nextEventTitle}" placeholder="e.g. Tech Round 1">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Interview Location / Platform</label>
+                <input type="text" class="form-control" name="interviewLocation" th:value="${app.interviewLocation}" placeholder="e.g. MS Teams, HackerRank, Campus Audi">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-semibold">Personal Notes &amp; Questions Encountered</label>
+                <textarea class="form-control" name="notes" rows="4" th:text="${app.notes}" placeholder="Notes on interviewer questions, technical topics asked, feedback..."></textarea>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label small fw-semibold">Interview Experience Rating (1 to 5 Stars)</label>
+                <select class="form-select" name="rating">
+                    <option value="0" th:selected="${app.rating == 0}">Not Rated Yet</option>
+                    <option value="1" th:selected="${app.rating == 1}">⭐ 1 - Very Poor / Disorganized</option>
+                    <option value="2" th:selected="${app.rating == 2}">⭐⭐ 2 - Below Average</option>
+                    <option value="3" th:selected="${app.rating == 3}">⭐⭐⭐ 3 - Average Experience</option>
+                    <option value="4" th:selected="${app.rating == 4}">⭐⭐⭐⭐ 4 - Good / Professional</option>
+                    <option value="5" th:selected="${app.rating == 5}">⭐⭐⭐⭐⭐ 5 - Exceptional Experience</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-pill btn-sm px-4 fw-semibold shadow-sm">Save Changes</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Offer In-Hand Breakdown &amp; Bond Risk Analyzer — You_can</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="container-xxl px-3 px-md-4 py-3">
+
+        <!-- Page Header -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="bg-success-subtle text-success rounded-3 p-2 d-inline-flex">
+                        <i class="bi bi-calculator-fill fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">Offer &amp; Bond Risk Analyzer</h3>
+                    <span class="badge badge-soft-success rounded-pill px-3 py-1">Indian Tax FY 2025-26</span>
+                </div>
+                <p class="text-muted small mb-0">Deconstruct campus placement CTC packages into real monthly in-hand take-home, evaluate agreement bonds, and uncover hidden clauses.</p>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a th:href="@{/offers/compare}" class="btn btn-outline-primary rounded-pill btn-sm fw-semibold shadow-xs">
+                    <i class="bi bi-arrow-left-right me-1"></i> Compare 2 Offers Side-by-Side
+                </a>
+                <a th:href="@{/pipeline}" class="btn btn-outline-secondary rounded-pill btn-sm fw-semibold">
+                    <i class="bi bi-kanban me-1"></i> My Pipeline
+                </a>
+            </div>
+        </div>
+
+        <!-- Benchmark Offer Presets Bar -->
+        <div class="app-card p-3 mb-4 shadow-sm">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                <span class="small fw-bold text-muted text-uppercase" style="letter-spacing: 0.05em;">
+                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Benchmark Presets:
+                </span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a th:href="@{/offers(ctc=48.0, company='Microsoft', role='Software Development Engineer - 1', city='Bangalore', bondMonths=0, bondPenalty=0.0)}"
+                       class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                        <strong>Microsoft</strong> &bull; 48 LPA
+                    </a>
+                    <a th:href="@{/offers(ctc=9.5, company='Deloitte USI', role='Technology Consultant', city='Bangalore', bondMonths=0, bondPenalty=0.0)}"
+                       class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                        <strong>Deloitte</strong> &bull; 9.5 LPA
+                    </a>
+                    <a th:href="@{/offers(ctc=7.5, company='Celebal Technologies', role='Cloud Associate (Azure)', city='Jaipur', bondMonths=12, bondPenalty=1.0)}"
+                       class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                        <strong>Celebal</strong> &bull; 7.5 LPA
+                    </a>
+                    <a th:href="@{/offers(ctc=7.2, company='TCS (Tata Consultancy Services)', role='Digital Specialist', city='Jaipur', bondMonths=12, bondPenalty=0.5)}"
+                       class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                        <strong>TCS Digital</strong> &bull; 7.2 LPA
+                    </a>
+                    <a th:href="@{/offers(ctc=3.6, company='Infosys', role='System Engineer', city='Pune', bondMonths=12, bondPenalty=0.75)}"
+                       class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                        <strong>Infosys</strong> &bull; 3.6 LPA
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Calculator Layout (2 Columns) -->
+        <div class="row g-4">
+
+            <!-- Left Column: Input Form (HTMX Real-time Trigger) -->
+            <div class="col-lg-5 col-xl-4">
+                <div class="app-card p-4 shadow-sm border-0 sticky-top" style="top: 80px; z-index: 10;">
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-sliders text-primary me-2"></i>Offer Inputs</h5>
+                        <span class="badge bg-light text-muted border small">Auto-Updates</span>
+                    </div>
+
+                    <form id="offerForm"
+                          th:action="@{/offers/calculate}"
+                          hx-post="/offers/calculate"
+                          hx-target="#analysisResultsContainer"
+                          hx-trigger="input delay:250ms, change"
+                          method="post">
+
+                        <!-- Company & Role -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Company / Employer</label>
+                            <input type="text" class="form-control form-control-sm" name="companyName" th:value="${req.companyName}" placeholder="e.g. Deloitte, Microsoft, Celebal...">
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label small fw-semibold">Role Title</label>
+                                <input type="text" class="form-control form-control-sm" name="roleTitle" th:value="${req.roleTitle}" placeholder="e.g. SDE-1">
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label small fw-semibold">Location / City</label>
+                                <select class="form-select form-select-sm" name="city">
+                                    <option value="JAIPUR" th:selected="${req.city == 'Jaipur' or req.city == 'JAIPUR'}">Jaipur (Base 1.0x)</option>
+                                    <option value="BANGALORE" th:selected="${req.city == 'Bangalore' or req.city == 'BANGALORE'}">Bangalore (1.65x)</option>
+                                    <option value="GURGAON" th:selected="${req.city == 'Gurgaon' or req.city == 'GURGAON'}">Gurgaon (1.50x)</option>
+                                    <option value="PUNE" th:selected="${req.city == 'Pune' or req.city == 'PUNE'}">Pune (1.35x)</option>
+                                    <option value="HYDERABAD" th:selected="${req.city == 'Hyderabad' or req.city == 'HYDERABAD'}">Hyderabad (1.35x)</option>
+                                    <option value="NOIDA" th:selected="${req.city == 'Noida' or req.city == 'NOIDA'}">Noida (1.30x)</option>
+                                    <option value="MUMBAI" th:selected="${req.city == 'Mumbai' or req.city == 'MUMBAI'}">Mumbai (1.80x)</option>
+                                    <option value="REMOTE" th:selected="${req.city == 'Remote' or req.city == 'REMOTE'}">Remote (0.90x)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Annual CTC Input Slider -->
+                        <div class="mb-3 p-3 rounded-3 bg-light border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small fw-bold text-dark mb-0">Annual CTC Package</label>
+                                <div class="badge bg-primary fs-6 px-2 py-1">
+                                    <span id="ctcDisplay" th:text="${req.ctcAnnualLpa + ' LPA'}">10.0 LPA</span>
+                                </div>
+                            </div>
+                            <input type="range" class="form-range" name="ctcAnnualLpa" id="ctcRange" min="2.5" max="60.0" step="0.25"
+                                   th:value="${req.ctcAnnualLpa}"
+                                   oninput="document.getElementById('ctcDisplay').innerText = parseFloat(this.value).toFixed(2) + ' LPA'; autoAdjustDefaults(this.value)">
+                            <div class="d-flex justify-content-between text-muted" style="font-size: 0.7rem;">
+                                <span>2.5 LPA</span>
+                                <span>15 LPA</span>
+                                <span>30 LPA</span>
+                                <span>60 LPA</span>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Salary Breakdown Toggle -->
+                        <div class="accordion accordion-flush mb-3" id="advancedCompensationAccordion">
+                            <div class="accordion-item border rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="headingAdv">
+                                    <button class="accordion-button collapsed py-2 px-3 small fw-semibold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdv" aria-expanded="false" aria-controls="collapseAdv">
+                                        <i class="bi bi-pie-chart me-2 text-primary"></i> Detailed Salary Components
+                                    </button>
+                                </h2>
+                                <div id="collapseAdv" class="accordion-collapse collapse" aria-labelledby="headingAdv">
+                                    <div class="accordion-body p-3 bg-body-tertiary">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold" style="font-size: 0.72rem;">Basic Salary (LPA)</label>
+                                                <input type="number" step="0.1" class="form-control form-control-sm" name="basicSalaryLpa" id="basicSalaryInput" th:value="${req.basicSalaryLpa}">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold" style="font-size: 0.72rem;">Variable Bonus (LPA)</label>
+                                                <input type="number" step="0.1" class="form-control form-control-sm" name="variableBonusLpa" id="variableBonusInput" th:value="${req.variableBonusLpa}">
+                                            </div>
+                                        </div>
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold" style="font-size: 0.72rem;">Joining Bonus (LPA)</label>
+                                                <input type="number" step="0.1" class="form-control form-control-sm" name="joiningBonusLpa" th:value="${req.joiningBonusLpa}">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold" style="font-size: 0.72rem;">ESOPs / Stocks (LPA)</label>
+                                                <input type="number" step="0.1" class="form-control form-control-sm" name="esopAnnualLpa" th:value="${req.esopAnnualLpa}">
+                                            </div>
+                                        </div>
+                                        <div class="mb-1">
+                                            <label class="form-label small fw-semibold" style="font-size: 0.72rem;">Tax Regime</label>
+                                            <select class="form-select form-select-sm" name="taxRegime">
+                                                <option value="NEW" th:selected="${req.taxRegime == 'NEW'}">New Tax Regime (FY 2025-26 Default)</option>
+                                                <option value="OLD" th:selected="${req.taxRegime == 'OLD'}">Old Tax Regime (With 80C deductions)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bond & Service Agreement Section -->
+                        <div class="p-3 rounded-3 border bg-body-tertiary mb-3">
+                            <h6 class="fw-bold small mb-2 text-danger">
+                                <i class="bi bi-file-earmark-lock-fill me-1"></i> Service Agreement / Bond Terms
+                            </h6>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold" style="font-size: 0.75rem;">Bond Duration</label>
+                                    <select class="form-select form-select-sm" name="bondDurationMonths">
+                                        <option value="0" th:selected="${req.bondDurationMonths == 0}">No Bond (0 mo)</option>
+                                        <option value="12" th:selected="${req.bondDurationMonths == 12}">1 Year (12 mo)</option>
+                                        <option value="18" th:selected="${req.bondDurationMonths == 18}">1.5 Years (18 mo)</option>
+                                        <option value="24" th:selected="${req.bondDurationMonths == 24}">2 Years (24 mo)</option>
+                                        <option value="36" th:selected="${req.bondDurationMonths == 36}">3 Years (36 mo)</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold" style="font-size: 0.75rem;">Exit Penalty (₹ Lakhs)</label>
+                                    <input type="number" step="0.25" class="form-control form-control-sm" name="bondPenaltyLakhs" th:value="${req.bondPenaltyLakhs}" placeholder="0.0">
+                                </div>
+                            </div>
+
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" name="certificateRetention" id="certRetentionCheck" th:checked="${req.certificateRetention}">
+                                <label class="form-check-label small fw-semibold text-danger" for="certRetentionCheck" style="font-size: 0.75rem;">
+                                    Requires keeping original marksheets
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" name="trainingCostRecovery" id="trainingRecoveryCheck" th:checked="${req.trainingCostRecovery}">
+                                <label class="form-check-label small text-secondary" for="trainingRecoveryCheck" style="font-size: 0.75rem;">
+                                    Training cost recovery clause
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" name="nonCompeteClause" id="nonCompeteCheck" th:checked="${req.nonCompeteClause}">
+                                <label class="form-check-label small text-secondary" for="nonCompeteCheck" style="font-size: 0.75rem;">
+                                    Post-employment non-compete clause
+                                </label>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Live Analysis & Breakdown Results (HTMX Target) -->
+            <div class="col-lg-7 col-xl-8">
+                <div id="analysisResultsContainer" th:fragment="analysisResultsContainer">
+
+                    <!-- Top Spotlight: Monthly Take-Home Hero Card -->
+                    <div class="app-card p-4 mb-4 border-0 shadow-sm position-relative overflow-hidden"
+                         style="background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(16,185,129,0.08) 100%); border-left: 6px solid var(--accent-emerald) !important;">
+                        
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-7">
+                                <span class="badge badge-soft-success mb-2 px-3 py-1">
+                                    <i class="bi bi-wallet2 me-1"></i> Estimated Real In-Hand Salary
+                                </span>
+                                <div class="d-flex align-items-baseline gap-2 mb-1">
+                                    <h1 class="display-5 fw-extrabold text-success mb-0"
+                                        th:text="${'₹' + #numbers.formatDecimal(result.monthlyInHand, 0, 'COMMA', 0, 'POINT')}">₹62,450</h1>
+                                    <span class="fs-5 text-muted fw-semibold">/ month</span>
+                                </div>
+                                <p class="text-secondary small mb-0">
+                                    Credited to bank account on salary day after Income Tax (TDS), Employee PF, and Professional Tax.
+                                </p>
+                            </div>
+
+                            <div class="col-md-5 border-start-md ps-md-4">
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span class="text-muted">Take-Home Efficiency</span>
+                                        <span class="fw-bold text-success" th:text="${result.inHandPercentage + '% of CTC'}">78% of CTC</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" th:style="${'width: ' + result.inHandPercentage + '%'}"></div>
+                                        <div class="progress-bar bg-danger opacity-75" role="progressbar" th:style="${'width: ' + result.deductionsPercentage + '%'}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between small text-muted pt-1">
+                                    <span>Annual In-Hand:</span>
+                                    <strong class="text-dark" th:text="${'₹' + #numbers.formatDecimal(result.netTakeHomeAnnual, 0, 'COMMA', 0, 'POINT')}">₹7,49,400</strong>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted pt-1">
+                                    <span>Annual CTC:</span>
+                                    <span th:text="${'₹' + #numbers.formatDecimal(result.ctcAnnual, 0, 'COMMA', 0, 'POINT')}">₹10,00,000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Metric Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="app-card p-3 shadow-xs h-100 border-0">
+                                <span class="text-muted small fw-semibold d-block mb-1">Gross Monthly</span>
+                                <h5 class="fw-bold mb-0 text-dark" th:text="${'₹' + #numbers.formatDecimal(result.monthlyGross, 0, 'COMMA', 0, 'POINT')}">₹83,333</h5>
+                                <span class="small text-muted" style="font-size: 0.72rem;">Pre-tax earnings</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="app-card p-3 shadow-xs h-100 border-0">
+                                <span class="text-muted small fw-semibold d-block mb-1">Income Tax (TDS)</span>
+                                <h5 class="fw-bold mb-0 text-danger" th:text="${'₹' + #numbers.formatDecimal(result.monthlyTaxDeduction, 0, 'COMMA', 0, 'POINT')}">₹4,200</h5>
+                                <span class="small text-muted" style="font-size: 0.72rem;" th:text="${result.taxRegime + ' Regime'}">New Regime</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="app-card p-3 shadow-xs h-100 border-0">
+                                <span class="text-muted small fw-semibold d-block mb-1">Monthly PF</span>
+                                <h5 class="fw-bold mb-0 text-primary" th:text="${'₹' + #numbers.formatDecimal(result.monthlyPfDeduction, 0, 'COMMA', 0, 'POINT')}">₹1,800</h5>
+                                <span class="small text-muted" style="font-size: 0.72rem;">12% Employee EPF</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="app-card p-3 shadow-xs h-100 border-0">
+                                <span class="text-muted small fw-semibold d-block mb-1">City Purchasing Power</span>
+                                <h5 class="fw-bold mb-0 text-info" th:text="${'₹' + #numbers.formatDecimal(result.purchasingPowerAdjustedMonthly, 0, 'COMMA', 0, 'POINT')}">₹37,848</h5>
+                                <span class="small text-muted" style="font-size: 0.72rem;" th:text="${result.city + ' (' + result.cityCostIndex + 'x)'}">Bangalore</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- City Cost of Living Reality Check Alert -->
+                    <div class="alert alert-info border-info d-flex align-items-center gap-3 py-3 px-4 mb-4 rounded-3 shadow-xs"
+                         th:if="${result.cityCostIndex > 1.2}">
+                        <div class="bg-info text-white rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 2.5rem; height: 2.5rem;">
+                            <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark" th:text="${'City Reality Check: ' + result.city + ' Cost of Living'}">City Reality Check</strong>
+                            <span class="small text-muted">
+                                Due to higher rent and transport in <strong th:text="${result.city}">City</strong> (<span th:text="${result.cityCostIndex + 'x multiplier'}">1.65x</span>), your monthly in-hand of
+                                <strong th:text="${'₹' + #numbers.formatDecimal(result.monthlyInHand, 0, 'COMMA', 0, 'POINT')}">₹62,000</strong>
+                                provides the same real lifestyle and purchasing power as
+                                <strong class="text-success" th:text="${'₹' + #numbers.formatDecimal(result.purchasingPowerAdjustedMonthly, 0, 'COMMA', 0, 'POINT')} + '/mo'">₹37,800</strong>
+                                in Jaipur or Tier-2 cities.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Service Agreement & Bond Risk Card -->
+                    <div class="app-card p-4 mb-4 border-0 shadow-sm"
+                         th:classappend="${result.bondRisk.riskScore > 50 ? 'border-danger' : 'border-success'}"
+                         style="border-top: 5px solid; border-color: inherit !important;">
+
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                     th:classappend="${result.bondRisk.pillClass}" style="width: 2.5rem; height: 2.5rem;">
+                                    <i class="bi fs-5" th:classappend="${result.bondRisk.iconClass}"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">Bond &amp; Service Agreement Risk</h5>
+                                    <span class="small text-muted" th:text="${result.bondRisk.summaryHeadline}">Clean, Candidate-Friendly Offer</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge fs-6 px-3 py-2 rounded-pill fw-bold"
+                                      th:classappend="${result.bondRisk.badgeClass}"
+                                      th:text="${result.bondRisk.riskLevel + ' (' + result.bondRisk.riskScore + '/100)'}">
+                                    LOW RISK (10/100)
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="small text-secondary mb-3" th:text="${result.bondRisk.detailedAnalysis}">
+                            Detailed risk evaluation description here.
+                        </p>
+
+                        <!-- Red Flags Warning List (if any) -->
+                        <div class="alert alert-danger p-3 mb-3 rounded-3" th:if="${result.bondRisk.redFlags != null and !result.bondRisk.redFlags.isEmpty()}">
+                            <h6 class="fw-bold text-danger mb-2 small"><i class="bi bi-exclamation-triangle-fill me-1"></i> Critical Red Flags Detected:</h6>
+                            <ul class="mb-0 ps-3 small text-danger">
+                                <li th:each="flag : ${result.bondRisk.redFlags}" th:text="${flag}">Red flag item</li>
+                            </ul>
+                        </div>
+
+                        <!-- Safe Points (if any) -->
+                        <div class="mb-3" th:if="${result.bondRisk.safePoints != null and !result.bondRisk.safePoints.isEmpty()}">
+                            <h6 class="fw-bold text-success mb-2 small"><i class="bi bi-check-circle-fill me-1"></i> Positive Offer Terms:</h6>
+                            <ul class="mb-0 ps-3 small text-muted">
+                                <li th:each="sp : ${result.bondRisk.safePoints}" th:text="${sp}">Safe point</li>
+                            </ul>
+                        </div>
+
+                        <!-- Legal Protections & Tips -->
+                        <div class="bg-light p-3 rounded-3 border" th:if="${result.bondRisk.legalTips != null and !result.bondRisk.legalTips.isEmpty()}">
+                            <h6 class="fw-bold text-dark mb-1 small"><i class="bi bi-shield-check text-primary me-1"></i> Legal Know-Your-Rights Advisory:</h6>
+                            <ul class="mb-0 ps-3 small text-muted">
+                                <li th:each="tip : ${result.bondRisk.legalTips}" th:text="${tip}">Legal advice</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Annual Compensation Waterfall Breakdown Table -->
+                    <div class="app-card p-4 mb-4 border-0 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-receipt text-primary me-2"></i>Annual Compensation Waterfall</h5>
+                            <span class="badge bg-light text-muted border small">All figures in INR / Year</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 small">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Classification</th>
+                                        <th class="text-end">Annual Amount</th>
+                                        <th class="text-end">Monthly Equivalent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Base / Basic Pay</strong></td>
+                                        <td><span class="badge badge-soft-success">Guaranteed Cash</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'₹' + #numbers.formatDecimal(result.baseSalary, 0, 'COMMA', 0, 'POINT')}">₹6,00,000</td>
+                                        <td class="text-end" th:text="${'₹' + #numbers.formatDecimal(result.baseSalary / 12, 0, 'COMMA', 0, 'POINT')}">₹50,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Variable / Performance Bonus</strong></td>
+                                        <td><span class="badge badge-soft-warning">Performance Linked</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'₹' + #numbers.formatDecimal(result.variableBonus, 0, 'COMMA', 0, 'POINT')}">₹1,20,000</td>
+                                        <td class="text-end" th:text="${'₹' + #numbers.formatDecimal(result.variableBonus / 12, 0, 'COMMA', 0, 'POINT')}">₹10,000</td>
+                                    </tr>
+                                    <tr th:if="${result.joiningBonus > 0}">
+                                        <td><strong>Joining / Retention Bonus</strong></td>
+                                        <td><span class="badge badge-soft-info">First Year Only</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'₹' + #numbers.formatDecimal(result.joiningBonus, 0, 'COMMA', 0, 'POINT')}">₹1,00,000</td>
+                                        <td class="text-end" th:text="${'₹' + #numbers.formatDecimal(result.joiningBonus / 12, 0, 'COMMA', 0, 'POINT')}">₹8,333</td>
+                                    </tr>
+                                    <tr th:if="${result.esops > 0}">
+                                        <td><strong>ESOPs / Stock Units</strong></td>
+                                        <td><span class="badge badge-soft-purple">Paper Money (4yr Vesting)</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'₹' + #numbers.formatDecimal(result.esops, 0, 'COMMA', 0, 'POINT')}">₹1,50,000</td>
+                                        <td class="text-end text-muted">-</td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td colspan="2"><strong>Gross CTC Package Total</strong></td>
+                                        <td class="text-end fw-bold text-primary" th:text="${'₹' + #numbers.formatDecimal(result.ctcAnnual, 0, 'COMMA', 0, 'POINT')}">₹10,00,000</td>
+                                        <td class="text-end fw-bold text-primary" th:text="${'₹' + #numbers.formatDecimal(result.ctcAnnual / 12, 0, 'COMMA', 0, 'POINT')}">₹83,333</td>
+                                    </tr>
+                                    <!-- Deductions -->
+                                    <tr class="text-danger">
+                                        <td><strong>Less: Income Tax (TDS)</strong></td>
+                                        <td><span class="badge badge-soft-danger">Government Tax</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'- ₹' + #numbers.formatDecimal(result.totalAnnualTax, 0, 'COMMA', 0, 'POINT')}">- ₹50,400</td>
+                                        <td class="text-end" th:text="${'- ₹' + #numbers.formatDecimal(result.monthlyTaxDeduction, 0, 'COMMA', 0, 'POINT')}">- ₹4,200</td>
+                                    </tr>
+                                    <tr class="text-danger">
+                                        <td><strong>Less: Employee PF Contribution</strong></td>
+                                        <td><span class="badge badge-soft-primary">Retirement Fund</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'- ₹' + #numbers.formatDecimal(result.totalAnnualPf, 0, 'COMMA', 0, 'POINT')}">- ₹21,600</td>
+                                        <td class="text-end" th:text="${'- ₹' + #numbers.formatDecimal(result.monthlyPfDeduction, 0, 'COMMA', 0, 'POINT')}">- ₹1,800</td>
+                                    </tr>
+                                    <tr class="text-danger">
+                                        <td><strong>Less: Professional Tax (PT)</strong></td>
+                                        <td><span class="badge badge-soft-secondary">State PT</span></td>
+                                        <td class="text-end fw-semibold" th:text="${'- ₹' + #numbers.formatDecimal(result.totalAnnualProfessionalTax, 0, 'COMMA', 0, 'POINT')}">- ₹2,400</td>
+                                        <td class="text-end" th:text="${'- ₹' + #numbers.formatDecimal(result.monthlyProfessionalTax, 0, 'COMMA', 0, 'POINT')}">- ₹200</td>
+                                    </tr>
+                                    <tr class="table-success border-top border-2">
+                                        <td colspan="2"><h6 class="fw-bold mb-0 text-success">Net Monthly In-Hand Cash</h6></td>
+                                        <td class="text-end fw-extrabold text-success fs-6" th:text="${'₹' + #numbers.formatDecimal(result.netTakeHomeAnnual, 0, 'COMMA', 0, 'POINT')}">₹7,49,400</td>
+                                        <td class="text-end fw-extrabold text-success fs-6" th:text="${'₹' + #numbers.formatDecimal(result.monthlyInHand, 0, 'COMMA', 0, 'POINT')}">₹62,450</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function autoAdjustDefaults(ctcLpa) {
+        const val = parseFloat(ctcLpa);
+        if (isNaN(val)) return;
+
+        const basic = (val * 0.55).toFixed(1);
+        const variable = (val * 0.12).toFixed(1);
+
+        const basicInput = document.getElementById('basicSalaryInput');
+        const varInput = document.getElementById('variableBonusInput');
+
+        if (basicInput) basicInput.value = basic;
+        if (varInput) varInput.value = variable;
+    }
+</script>
+</body>
+</html>

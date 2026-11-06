@@ -6,6 +6,7 @@ import in.jecrcu.placement.entity.UpcomingDrive;
 import in.jecrcu.placement.entity.User;
 import in.jecrcu.placement.repository.DriveRegistrationRepository;
 import in.jecrcu.placement.repository.UpcomingDriveRepository;
+import in.jecrcu.placement.service.ApplicationPipelineService;
 import in.jecrcu.placement.service.AuditService;
 import in.jecrcu.placement.service.EligibilityService;
 import in.jecrcu.placement.service.NotificationService;
@@ -35,6 +36,7 @@ public class UpcomingController {
     private final UserService userService;
     private final NotificationService notificationService;
     private final AuditService auditService;
+    private final ApplicationPipelineService applicationPipelineService;
 
     @GetMapping("/upcoming")
     public String upcomingDrivesPage(
@@ -135,6 +137,9 @@ public class UpcomingController {
         reg.setNotes(notes);
         driveRegistrationRepository.save(reg);
 
+        // Sync with Personal Recruitment Pipeline
+        applicationPipelineService.syncFromDriveRegistration(user, drive, notes);
+
         notificationService.sendNotification(
                 user,
                 "Registered: " + drive.getCompanyName(),
@@ -171,11 +176,17 @@ public class UpcomingController {
         UpcomingDrive drive = upcomingDriveRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Drive not found: " + id));
 
+        User user = userService.findById(userDetails.getId()).orElse(null);
+
         driveRegistrationRepository.findByUserIdAndUpcomingDriveId(userDetails.getId(), drive.getId())
                 .ifPresent(reg -> {
                     reg.setStatus("WITHDRAWN");
                     driveRegistrationRepository.save(reg);
                 });
+
+        if (user != null) {
+            applicationPipelineService.syncFromDriveWithdrawal(user, drive);
+        }
 
         redirectAttributes.addFlashAttribute("infoMessage",
                 "Your registration for " + drive.getCompanyName() + " has been withdrawn.");
